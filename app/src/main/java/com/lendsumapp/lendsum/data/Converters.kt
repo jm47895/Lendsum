@@ -6,8 +6,13 @@ import com.google.gson.Gson
 class Converters {
 
     @TypeConverter
-    fun itemListToJson(value: List<String>?) = Gson().toJson(value)
+    fun toString(stringList: List<String>?): String {
+        return stringList?.joinToString(separator = ",").toString()
+    }
 
     @TypeConverter
-    fun jsonToItemList(value: String) = Gson().fromJson(value, Array<String>::class.java).toList()
+    fun fromString(stringListString: String): List<String> {
+        return stringListString.split(",").map { it }
+    }
+
 }

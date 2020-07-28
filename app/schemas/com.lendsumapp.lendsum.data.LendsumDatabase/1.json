@@ -1,0 +1,124 @@
+{
+  "formatVersion": 1,
+  "database": {
+    "version": 1,
+    "identityHash": "25784d136c57998be8d15da27cf09dd6",
+    "entities": [
+      {
+        "tableName": "bundles",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`bundleId` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `lenderName` TEXT NOT NULL, `borrowerName` TEXT NOT NULL, `bundleTitle` TEXT NOT NULL, `bundleDescription` TEXT NOT NULL, `bundleItemList` TEXT, `lendTimestamp` INTEGER NOT NULL, `returnTimestamp` INTEGER, `maturityTimestamp` INTEGER, `bundleRate` TEXT, `bundlePeriod` TEXT NOT NULL, `lateFee` INTEGER, `imagePaths` TEXT, `isLendToOwn` INTEGER, `isIndefinite` INTEGER NOT NULL, `isLending` INTEGER NOT NULL)",
+        "fields": [
+          {
+            "fieldPath": "bundleId",
+            "columnName": "bundleId",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "lenderName",
+            "columnName": "lenderName",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "borrowerName",
+            "columnName": "borrowerName",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "bundleTitle",
+            "columnName": "bundleTitle",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "bundleDescription",
+            "columnName": "bundleDescription",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "bundleItemList",
+            "columnName": "bundleItemList",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "lendDate",
+            "columnName": "lendTimestamp",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "returnDate",
+            "columnName": "returnTimestamp",
+            "affinity": "INTEGER",
+            "notNull": false
+          },
+          {
+            "fieldPath": "maturityDate",
+            "columnName": "maturityTimestamp",
+            "affinity": "INTEGER",
+            "notNull": false
+          },
+          {
+            "fieldPath": "bundleRate",
+            "columnName": "bundleRate",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "bundlePeriod",
+            "columnName": "bundlePeriod",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "lateFee",
+            "columnName": "lateFee",
+            "affinity": "INTEGER",
+            "notNull": false
+          },
+          {
+            "fieldPath": "imagePaths",
+            "columnName": "imagePaths",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "isLendToOwn",
+            "columnName": "isLendToOwn",
+            "affinity": "INTEGER",
+            "notNull": false
+          },
+          {
+            "fieldPath": "isIndefinite",
+            "columnName": "isIndefinite",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "isLending",
+            "columnName": "isLending",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "columnNames": [
+            "bundleId"
+          ],
+          "autoGenerate": true
+        },
+        "indices": [],
+        "foreignKeys": []
+      }
+    ],
+    "views": [],
+    "setupQueries": [
+      "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '25784d136c57998be8d15da27cf09dd6')"
+    ]
+  }
+}

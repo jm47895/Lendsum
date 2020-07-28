@@ -3,6 +3,7 @@ package com.lendsumapp.lendsum.data.bundle
 import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
+import com.google.gson.annotations.Expose
 
 @Entity(tableName = "bundles")
 data class Bundle (
