@@ -2,9 +2,8 @@ package com.lendsumapp.lendsum.di
 
 import android.content.Context
 import androidx.room.Room
-import com.lendsumapp.lendsum.LendsumApplication
-import com.lendsumapp.lendsum.data.LendsumDatabase
-import com.lendsumapp.lendsum.data.bundle.BundleDao
+import com.lendsumapp.lendsum.data.persistence.LendsumDatabase
+import com.lendsumapp.lendsum.data.persistence.BundleDao
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -18,7 +17,7 @@ object DatabaseModule{
 
     @Provides
     @Singleton
-    fun provideDatabase(@ApplicationContext appContext: Context): LendsumDatabase{
+    fun provideDatabase(@ApplicationContext appContext: Context): LendsumDatabase {
         return Room.databaseBuilder(
             appContext,
             LendsumDatabase::class.java,
@@ -28,6 +27,6 @@ object DatabaseModule{
 
     @Provides
     fun provideBundleDao(database: LendsumDatabase) : BundleDao{
-        return database.bundleDao()
+        return database.getBundleDao()
     }
 }

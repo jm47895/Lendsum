@@ -1,7 +1,6 @@
-package com.lendsumapp.lendsum.data
+package com.lendsumapp.lendsum.data.persistence
 
 import androidx.room.TypeConverter
-import com.google.gson.Gson
 
 class Converters {
 

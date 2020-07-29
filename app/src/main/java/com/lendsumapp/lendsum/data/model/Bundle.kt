@@ -1,4 +1,4 @@
-package com.lendsumapp.lendsum.data.bundle
+package com.lendsumapp.lendsum.data.model
 
 import androidx.room.ColumnInfo
 import androidx.room.Entity
@@ -9,7 +9,7 @@ import com.google.gson.annotations.Expose
 data class Bundle (
     @PrimaryKey(autoGenerate = true) @ColumnInfo(name = "bundleId")val bundleId: Long,
     @ColumnInfo(name = "lenderName") val lenderName: String,
-    @ColumnInfo(name = "borrowerName") val borrowerName: String,
+    @ColumnInfo(name = "borrowerName") var borrowerName: String,
     @ColumnInfo(name = "bundleTitle") val bundleTitle: String,
     @ColumnInfo(name = "bundleDescription") val bundleDescription: String,
     @ColumnInfo(name = "bundleItemList") val bundleItemList: List<String>?,
@@ -17,7 +17,7 @@ data class Bundle (
     @ColumnInfo(name = "returnTimestamp") val returnDate: Long?,
     @ColumnInfo(name = "maturityTimestamp") val maturityDate: Long?,
     @ColumnInfo(name = "bundleRate") val bundleRate: String?,
-    @ColumnInfo(name = "bundlePeriod") val bundlePeriod: String,
+    @ColumnInfo(name = "bundlePeriod") val bundlePeriod: String?,
     @ColumnInfo(name = "lateFee") val lateFee: Int?,
     @ColumnInfo(name = "imagePaths") val imagePaths: List<String>?,
     @ColumnInfo(name = "isLendToOwn") val isLendToOwn: Boolean?,
