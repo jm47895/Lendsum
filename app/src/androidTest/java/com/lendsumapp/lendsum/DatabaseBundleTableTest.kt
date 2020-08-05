@@ -4,10 +4,11 @@ import android.content.Context
 import androidx.room.Room
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import com.lendsumapp.lendsum.data.model.Bundle
 import com.lendsumapp.lendsum.data.persistence.LendsumDatabase
 import com.lendsumapp.lendsum.data.persistence.BundleDao
 import com.lendsumapp.lendsum.util.TestUtil
-import junit.framework.Assert.assertEquals
+import junit.framework.Assert.*
 import kotlinx.coroutines.*
 import org.junit.After
 import org.junit.Before
@@ -17,7 +18,7 @@ import java.io.IOException
 import java.lang.Exception
 
 @RunWith(AndroidJUnit4::class)
-class DatabaseBundleTest {
+class BundleDatabaseTest {
     
     private lateinit var bundleDao: BundleDao
     private lateinit var db: LendsumDatabase
@@ -41,14 +42,13 @@ class DatabaseBundleTest {
     @Throws(Exception::class)
     fun writeBundleAndRead() = runBlocking{
 
-        val bundleWrite = TestUtil.getFirstTestBundle()
+        val bundleWrite = TestUtil.getFirstLendTestBundle()
 
         bundleDao.insertBundle(bundleWrite)
 
         val bundleRead = bundleDao.findLender("A")
 
         assertEquals("A", bundleRead[0].lenderName)
-        bundleDao.deleteAllBundles()
     }
 
     //write, read, and delete bundle
@@ -56,7 +56,7 @@ class DatabaseBundleTest {
     @Throws(Exception::class)
     fun writeReadAndDeleteBundle() = runBlocking{
 
-        val bundleWrite = TestUtil.getFirstTestBundle()
+        val bundleWrite = TestUtil.getFirstLendTestBundle()
         bundleDao.insertBundle(bundleWrite)
         assertEquals(bundleWrite.lenderName, bundleDao.findLender("A")[0].lenderName)
 
@@ -66,27 +66,119 @@ class DatabaseBundleTest {
         assertEquals(0, bundleList.size)
     }
 
+    //write, read, update, read, delete
+    @Test
+    @Throws(Exception::class)
+    fun writeReadUpdateReadDelete() = runBlocking {
+
+        //write
+        val bundleWrite = TestUtil.getFirstLendTestBundle()
+
+        //read
+        val key: Long = db.getBundleDao().insertBundle(bundleWrite)
+        assertEquals(1, db.getBundleDao().getLendBundles().size)
+        assertNotNull(key)
+
+        //update
+        val value: Long = 9999
+        val readBundle = db.getBundleDao().getBundleById(key)
+        readBundle.returnDate = value
+        db.getBundleDao().updateBundle(readBundle)
+
+        //read
+        val dbReturnDate = db.getBundleDao().getBundleById(key)
+        val updatedReturnDate = dbReturnDate.returnDate
+
+        //Test
+        assertEquals(value, updatedReturnDate)
+
+    }
+
     //write multiple entries and delete all bundles
     @Test
     @Throws(Exception::class)
     fun writeAndDeleteAllBundles() = runBlocking{
 
-        val bundle1 = TestUtil.getFirstTestBundle()
-        val bundle2 = TestUtil.getSecondTestBundle()
+        val bundleList = listOf<Bundle>(TestUtil.getFirstLendTestBundle(),
+            TestUtil.getSecondLendTestBundle(),
+            TestUtil.getThirdBorrowTestBundle(),
+            TestUtil.getFourthBorrowTestBundle())
 
-        bundleDao.insertBundle(bundle1)
-        bundleDao.insertBundle(bundle2)
+        //write multiple entries
+        bundleList.forEach {
+            db.getBundleDao().insertBundle(it)
+        }
 
-        val bundleList = bundleDao.getAllLendBundles()
-        assertEquals(2, bundleList.size)
+        //check to see if the size of items in database are what we inserted
+        val dbBundleList = bundleDao.getAllBundles()
+        assertEquals(4, dbBundleList.size)
 
+        //delete everything and check if db is empty
         bundleDao.deleteAllBundles()
-        val emptyList = bundleDao.getAllLendBundles()
+        val emptyList = bundleDao.getAllBundles()
         assertEquals(0, emptyList.size)
 
     }
 
+    //write multiple entries, read only lending bundles
+    @Test
+    @Throws(Exception::class)
+    fun writeAndReadLendingBundlesOnly() = runBlocking {
 
+        //Create list of bundle objects
+        val bundleList : List<Bundle> = listOf(TestUtil.getFirstLendTestBundle(),
+            TestUtil.getSecondLendTestBundle(),
+            TestUtil.getThirdBorrowTestBundle(),
+            TestUtil.getFourthBorrowTestBundle())
 
+        //Insert all items of list into the database
+        bundleList.forEach {
+            db.getBundleDao().insertBundle(it)
+        }
+
+        //Make sure sizes match with local and database list
+        val dbBundleList = db.getBundleDao().getAllBundles()
+        assertEquals(bundleList.size, dbBundleList.size)
+
+        //retrieve lend bundles from database
+        val dbLendList = db.getBundleDao().getLendBundles()
+        assertEquals(2, dbLendList.size)
+
+        //check to see if the lender name data matches and is what we expect
+        dbLendList.forEach {
+            assertTrue(it.lenderName == "A" || it.lenderName == "C")
+        }
+    }
+
+    //write multiple entries, read only borrow bundles
+    @Test
+    @Throws(Exception::class)
+    fun writeAndReadBorrowBundlesOnly() = runBlocking{
+
+        //Create list of bundle objects
+        val bundleList : List<Bundle> = listOf(TestUtil.getFirstLendTestBundle(),
+            TestUtil.getSecondLendTestBundle(),
+            TestUtil.getThirdBorrowTestBundle(),
+            TestUtil.getFourthBorrowTestBundle())
+
+        //Insert all items of list into the database
+        bundleList.forEach {
+            db.getBundleDao().insertBundle(it)
+        }
+
+        //Make sure sizes match with local and database list
+        val dbBundleList = db.getBundleDao().getAllBundles()
+        assertEquals(bundleList.size, dbBundleList.size)
+
+        //retrieve borrow bundles from database
+        val dbBorrowList = db.getBundleDao().getBorrowBundles()
+        assertEquals(2, dbBorrowList.size)
+
+        //check to see if the lender name data matches and is what we expect
+        dbBorrowList.forEach {
+            assertTrue(it.lenderName == "E" || it.lenderName == "G")
+        }
+
+    }
 
 }

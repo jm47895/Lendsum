@@ -11,7 +11,7 @@ object TestUtil {
         "Description A",
         null,
         12345,
-        null,
+        2345,
         null,
         null,
         "Adays",
@@ -21,7 +21,7 @@ object TestUtil {
         false,
         true)
 
-    fun getFirstTestBundle(): Bundle{
+    fun getFirstLendTestBundle(): Bundle{
         return bundle1
     }
 
@@ -32,7 +32,7 @@ object TestUtil {
         "Description C",
         null,
         12345,
-        null,
+        3456,
         null,
         null,
         "Cdays",
@@ -42,7 +42,49 @@ object TestUtil {
         false,
         true)
 
-    fun getSecondTestBundle(): Bundle{
+    fun getSecondLendTestBundle(): Bundle{
         return bundle2
+    }
+
+    private val bundle3 = Bundle(3,
+        "E",
+        "F",
+        "Bundle title E",
+        "Description E",
+        null,
+        12345,
+        4567,
+        null,
+        null,
+        "Edays",
+        null,
+        null,
+        null,
+        false,
+        false)
+
+    fun getThirdBorrowTestBundle(): Bundle{
+        return bundle3
+    }
+
+    private val bundle4 = Bundle(4,
+        "G",
+        "H",
+        "Bundle title G",
+        "Description G",
+        null,
+        12345,
+        5678,
+        null,
+        null,
+        "Gdays",
+        null,
+        null,
+        null,
+        false,
+        false)
+
+    fun getFourthBorrowTestBundle(): Bundle{
+        return bundle4
     }
 }
