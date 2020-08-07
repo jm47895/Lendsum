@@ -7,4 +7,6 @@
     <string name="cap_services">Services</string>
     <string name="cap_lending">Lending</string>
     <string name="cap_messages">Messages</string>
+    <string name="cap_search">Search</string>
+    <string name="cap_back">Back</string>
 </resources>

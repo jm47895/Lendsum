@@ -5,6 +5,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@color/opacity80Black"
     tools:context=".ui.HomeActivity">
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -36,9 +37,9 @@
             android:id="@+id/navigation"
             android:layout_width="match_parent"
             android:layout_height="56dp"
-            app:itemBackground="@color/colorPrimary"
-            app:itemIconTint="@android:color/white"
-            app:itemRippleColor="@color/colorAccentSkyBlue"
+            app:backgroundTint="@color/colorPrimary"
+            app:itemBackground="@color/bottom_nav_background_selector"
+            app:itemIconTint="@color/bottom_nav_icon_selector"
             app:itemTextColor="@android:color/white"
             app:labelVisibilityMode="unlabeled"
             app:layout_constraintBottom_toBottomOf="parent"
@@ -46,7 +47,7 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintVertical_bias="1"
-            app:menu="@menu/bottom_nav_menu" />
+            app:menu="@menu/home_nav_menu"/>
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
