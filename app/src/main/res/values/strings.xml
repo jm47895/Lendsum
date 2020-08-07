@@ -1,3 +1,10 @@
 <resources>
     <string name="app_name">Lendsum</string>
+    <string name="cap_settings">Settings</string>
+    <string name="cap_profile">Profile</string>
+    <string name="cap_add">Add</string>
+    <string name="cap_bundles">Bundles</string>
+    <string name="cap_services">Services</string>
+    <string name="cap_lending">Lending</string>
+    <string name="cap_messages">Messages</string>
 </resources>

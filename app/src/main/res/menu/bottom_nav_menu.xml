@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:id="@+id/profile"
+        android:icon="@drawable/ic_profile_24"
+        android:title="@string/cap_profile" />
+    <item android:id="@+id/messages"
+        android:title="@string/cap_messages"
+        android:icon="@drawable/ic_message_24" />
+    <item android:id="@+id/add"
+        android:icon="@drawable/ic_add_box_24"
+        android:title="@string/cap_add" />
+    <item android:id="@+id/bundles"
+        android:title="@string/cap_bundles"
+        android:icon="@drawable/ic_bundle_24" />
+    <item android:id="@+id/services"
+        android:title="@string/cap_services"
+        android:icon="@drawable/ic_handshake" />
+</menu>
