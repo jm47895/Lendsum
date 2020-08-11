@@ -8,6 +8,9 @@ import android.view.View
 import android.widget.Toast
 import androidx.core.os.postDelayed
 import androidx.navigation.NavController
+import androidx.navigation.NavDestination
+import androidx.navigation.Navigation
+import androidx.navigation.findNavController
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.NavigationUI
 import com.google.android.material.bottomnavigation.BottomNavigationView
@@ -16,7 +19,8 @@ import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.android.synthetic.main.activity_home.*
 
 @AndroidEntryPoint
-class HomeActivity: AppCompatActivity(), BottomNavigationView.OnNavigationItemSelectedListener{
+class HomeActivity: AppCompatActivity(),
+    BottomNavigationView.OnNavigationItemSelectedListener, NavController.OnDestinationChangedListener{
 
     lateinit var navController: NavController
 
@@ -24,79 +28,65 @@ class HomeActivity: AppCompatActivity(), BottomNavigationView.OnNavigationItemSe
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_home)
 
+        bottom_navigation.selectedItemId = R.id.marketplace
+        hideBottomNavigation()
         setupBottomNavigation()
 
     }
 
     private fun setupBottomNavigation() {
 
+        navController = Navigation.findNavController(this, R.id.nav_host_fragment)
         bottom_navigation.setOnNavigationItemSelectedListener(this)
-        bottom_navigation.selectedItemId = R.id.marketplace
 
-        val navHostFragment = supportFragmentManager.findFragmentById(R.id.nav_host_fragment) as NavHostFragment
-        navController = navHostFragment.navController
-        NavigationUI.setupWithNavController(bottom_navigation, navHostFragment.navController)
+        navController.addOnDestinationChangedListener(this)
 
     }
 
-    fun showBottomNavigation()
-    {
+
+
+    override fun onNavigationItemSelected(item: MenuItem): Boolean {
+        when(item.itemId){
+            R.id.profile -> {
+                item.isChecked = true
+                navController.navigate(R.id.profileFragment)
+            }
+            R.id.messages -> {
+                navController.navigate(R.id.messagesFragment)
+                item.isChecked = true
+            }
+            R.id.marketplace -> {
+                navController.navigate(R.id.marketplaceFragment)
+                item.isChecked = true
+            }
+            R.id.bundles -> {
+                navController.navigate(R.id.bundlesFragment)
+                item.isChecked = true
+            }
+            R.id.services -> {
+                navController.navigate(R.id.servicesFragment)
+                item.isChecked = true
+            }
+        }
+        return false
+    }
+
+    private fun showBottomNavigation(){
         bottom_navigation.visibility = View.VISIBLE
     }
 
-    fun hideBottomNavigation()
-    {
+    private fun hideBottomNavigation(){
         bottom_navigation.visibility = View.GONE
     }
 
-    private var backPressedOnce = false
-
-    override fun onBackPressed() {
-        if (navController.graph.startDestination == navController.currentDestination?.id)
-        {
-            if (backPressedOnce)
-            {
-                super.onBackPressed()
-                return
-            }
-
-            backPressedOnce = true
-            Toast.makeText(this, "Press BACK again to exit", Toast.LENGTH_SHORT).show()
-
-            Handler().postDelayed(2000){
-                backPressedOnce = false
-            }
+    override fun onDestinationChanged(
+        controller: NavController,
+        destination: NavDestination,
+        arguments: Bundle?
+    ) {
+        if (destination.id == R.id.marketplaceFragment){
+            showBottomNavigation()
         }
-        else {
-            super.onBackPressed()
-        }
-    }
-
-    override fun onNavigationItemSelected(item: MenuItem): Boolean {
-        when (item.itemId) {
-            R.id.profile -> {
-                item.isChecked = true
-                print("P")
-            }
-            R.id.messages -> {
-                item.isChecked = true
-                print("Me")
-            }
-            R.id.marketplace -> {
-                item.isChecked = true
-                print("Ma")
-            }
-            R.id.bundles -> {
-                item.isChecked = true
-                print("B")
-            }
-            R.id.services -> {
-                item.isChecked = true
-                print("S")
-            }
-        }
-
-        return false
     }
 
 }
