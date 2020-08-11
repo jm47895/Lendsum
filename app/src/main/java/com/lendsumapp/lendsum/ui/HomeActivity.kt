@@ -2,40 +2,38 @@ package com.lendsumapp.lendsum.ui
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.os.Handler
+import android.util.Log
 import android.view.MenuItem
 import android.view.View
-import android.widget.Toast
-import androidx.core.os.postDelayed
+import androidx.activity.addCallback
 import androidx.navigation.NavController
 import androidx.navigation.NavDestination
 import androidx.navigation.Navigation
-import androidx.navigation.findNavController
-import androidx.navigation.fragment.NavHostFragment
-import androidx.navigation.ui.NavigationUI
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.lendsumapp.lendsum.R
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.android.synthetic.main.activity_home.*
+import java.util.*
 
 @AndroidEntryPoint
 class HomeActivity: AppCompatActivity(),
     BottomNavigationView.OnNavigationItemSelectedListener, NavController.OnDestinationChangedListener{
 
-    lateinit var navController: NavController
+    private lateinit var navController: NavController
+    private lateinit var menuItemStack: Stack<MenuItem>
 
     override fun onCreate(savedInstanceState: Bundle?){
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_home)
 
-        bottom_navigation.selectedItemId = R.id.marketplace
+        menuItemStack = Stack()
         hideBottomNavigation()
         setupBottomNavigation()
 
     }
 
     private fun setupBottomNavigation() {
-
+        bottom_navigation.selectedItemId = R.id.marketplace
         navController = Navigation.findNavController(this, R.id.nav_host_fragment)
         bottom_navigation.setOnNavigationItemSelectedListener(this)
 
@@ -46,28 +44,38 @@ class HomeActivity: AppCompatActivity(),
 
 
     override fun onNavigationItemSelected(item: MenuItem): Boolean {
+
         when(item.itemId){
             R.id.profile -> {
                 item.isChecked = true
+                menuItemStack.push(item)
                 navController.navigate(R.id.profileFragment)
             }
             R.id.messages -> {
-                navController.navigate(R.id.messagesFragment)
                 item.isChecked = true
+                menuItemStack.push(item)
+                navController.navigate(R.id.messagesFragment)
             }
             R.id.marketplace -> {
-                navController.navigate(R.id.marketplaceFragment)
                 item.isChecked = true
+                menuItemStack.push(item)
+                navController.navigate(R.id.marketplaceFragment)
+
             }
             R.id.bundles -> {
-                navController.navigate(R.id.bundlesFragment)
                 item.isChecked = true
+                menuItemStack.push(item)
+                navController.navigate(R.id.bundlesFragment)
+
             }
             R.id.services -> {
-                navController.navigate(R.id.servicesFragment)
                 item.isChecked = true
+                menuItemStack.push(item)
+                navController.navigate(R.id.servicesFragment)
+
             }
         }
+        Log.d("HomeActivity", "ItemStackSize: " + menuItemStack.size)
         return false
     }
 
@@ -84,9 +92,18 @@ class HomeActivity: AppCompatActivity(),
         destination: NavDestination,
         arguments: Bundle?
     ) {
-        if (destination.id == R.id.marketplaceFragment){
-            showBottomNavigation()
+        when(destination.id){
+            R.id.marketplaceFragment-> showBottomNavigation()
+            R.id.loginFragment-> hideBottomNavigation()
         }
     }
 
+    override fun onBackPressed() {
+        super.onBackPressed()
+
+        if(menuItemStack.size > 1){
+            menuItemStack.pop()
+            menuItemStack.lastElement().isChecked = true
+        }
+    }
 }
