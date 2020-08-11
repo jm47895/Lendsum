@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/bottom_nav_graph"
+    app:startDestination="@id/marketplaceFragment">
+
+    <fragment
+        android:id="@+id/marketplaceFragment"
+        android:name="com.lendsumapp.lendsum.ui.MarketplaceFragment"
+        android:label="MarketplaceFragment"
+        tools:layout="@layout/fragment_marketplace"/>
+    <fragment
+        android:id="@+id/profileFragment"
+        android:name="com.lendsumapp.lendsum.ui.ProfileFragment"
+        android:label="ProfileFragment"
+        tools:layout="@layout/fragment_profile"/>
+    <fragment
+        android:id="@+id/bundlesFragment"
+        android:name="com.lendsumapp.lendsum.ui.BundlesFragment"
+        android:label="BundlesFragment"
+        tools:layout="@layout/fragment_bundles"/>
+    <fragment
+        android:id="@+id/servicesFragment"
+        android:name="com.lendsumapp.lendsum.ui.ServicesFragment"
+        android:label="ServicesFragment"
+        tools:layout="@layout/fragment_services"/>
+    <fragment
+        android:id="@+id/messagesFragment"
+        android:name="com.lendsumapp.lendsum.ui.MessagesFragment"
+        android:label="MessagesFragment"
+        tools:layout="@layout/fragment_messages"/>
+</navigation>

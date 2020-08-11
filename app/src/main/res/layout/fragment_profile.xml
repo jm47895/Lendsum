@@ -1,5 +1,5 @@
-<?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/opacity80Black"
@@ -15,14 +15,21 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintVertical_bias="0">
 
-        <androidx.appcompat.widget.Toolbar
-            android:id="@+id/toolbar"
+        <androidx.appcompat.widget.SearchView
+            android:id="@+id/search_view"
+            app:queryBackground="@color/colorSecondaryLight"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
-
-        </androidx.appcompat.widget.Toolbar>
-
+            android:layout_height="?attr/actionBarSize"
+            app:queryHint="Find something to borrow"
+            android:inputType="text"
+            app:searchIcon="@drawable/ic_search_24"/>
 
     </com.google.android.material.appbar.AppBarLayout>
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/market_list"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior"/>
+
+</androidx.coordinatorlayout.widget.CoordinatorLayout>

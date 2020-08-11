@@ -7,7 +7,7 @@
         <item android:id="@+id/messages"
             android:title="@string/cap_messages"
             android:icon="@drawable/ic_message_24" />
-        <item android:id="@+id/search"
+        <item android:id="@+id/marketplace"
             android:icon="@drawable/ic_search_24"
             android:title="@string/cap_search" />
         <item android:id="@+id/bundles"
