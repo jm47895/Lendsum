@@ -14,6 +14,7 @@ import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.lendsumapp.lendsum.R
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.android.synthetic.main.activity_home.*
+import kotlinx.android.synthetic.main.fragment_marketplace.*
 import java.util.*
 
 @AndroidEntryPoint
@@ -64,7 +65,6 @@ class HomeActivity: AppCompatActivity(),
                 item.isChecked = true
                 menuItemStack.push(item)
                 navController.navigate(R.id.marketplaceFragment)
-
             }
             R.id.bundles -> {
                 item.isCheckable = true

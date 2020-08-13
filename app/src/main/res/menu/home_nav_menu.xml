@@ -2,20 +2,20 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
     <group android:id="@+id/home_group">
         <item android:id="@+id/profile"
-            android:icon="@drawable/ic_profile_24"
+            android:icon="@drawable/ic_profile_toggle"
             android:title="@string/cap_profile" />
         <item android:id="@+id/messages"
             android:title="@string/cap_messages"
-            android:icon="@drawable/ic_message_24" />
+            android:icon="@drawable/ic_message_toggle" />
         <item android:id="@+id/marketplace"
-            android:icon="@drawable/ic_search_24"
+            android:icon="@drawable/ic_market_search_toggle"
             android:title="@string/cap_search" />
         <item android:id="@+id/bundles"
             android:title="@string/cap_bundles"
-            android:icon="@drawable/ic_bundle_24" />
+            android:icon="@drawable/ic_bundle_toggle" />
         <item android:id="@+id/services"
             android:title="@string/cap_services"
-            android:icon="@drawable/ic_handshake" />
+            android:icon="@drawable/ic_handshake_toggle" />
     </group>
 
 </menu>

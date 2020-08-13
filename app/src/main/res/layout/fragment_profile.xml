@@ -22,7 +22,7 @@
             android:layout_height="?attr/actionBarSize"
             app:queryHint="Find something to borrow"
             android:inputType="text"
-            app:searchIcon="@drawable/ic_search_24"/>
+            app:searchIcon="@drawable/ic_market_search_24"/>
 
     </com.google.android.material.appbar.AppBarLayout>
 

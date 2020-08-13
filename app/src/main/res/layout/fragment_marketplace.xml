@@ -6,7 +6,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <com.google.android.material.appbar.AppBarLayout
-        android:id="@+id/app_bar"
+        android:id="@+id/marketplace_app_bar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:layout_constraintTop_toTopOf="parent"
@@ -17,12 +17,13 @@
 
         <androidx.appcompat.widget.SearchView
             android:id="@+id/search_view"
+            android:visibility="gone"
             app:queryBackground="@color/colorSecondaryLight"
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
             app:queryHint="Find something to borrow"
             android:inputType="text"
-            app:searchIcon="@drawable/ic_search_24"/>
+            app:searchIcon="@drawable/ic_market_search_24"/>
 
     </com.google.android.material.appbar.AppBarLayout>
 
