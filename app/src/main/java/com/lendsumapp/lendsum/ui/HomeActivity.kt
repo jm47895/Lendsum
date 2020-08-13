@@ -6,6 +6,7 @@ import android.util.Log
 import android.view.MenuItem
 import android.view.View
 import androidx.activity.addCallback
+import androidx.core.view.children
 import androidx.navigation.NavController
 import androidx.navigation.NavDestination
 import androidx.navigation.Navigation
@@ -26,17 +27,16 @@ class HomeActivity: AppCompatActivity(),
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_home)
 
-        menuItemStack = Stack()
-        hideBottomNavigation()
         setupBottomNavigation()
 
     }
 
     private fun setupBottomNavigation() {
-        bottom_navigation.selectedItemId = R.id.marketplace
+        menuItemStack = Stack()
+        hideBottomNavigation()
+        bottom_navigation.menu.setGroupCheckable(R.id.home_group, false, true)
         navController = Navigation.findNavController(this, R.id.nav_host_fragment)
         bottom_navigation.setOnNavigationItemSelectedListener(this)
-
         navController.addOnDestinationChangedListener(this)
 
     }
@@ -45,36 +45,44 @@ class HomeActivity: AppCompatActivity(),
 
     override fun onNavigationItemSelected(item: MenuItem): Boolean {
 
+
         when(item.itemId){
             R.id.profile -> {
+                item.isCheckable = true
                 item.isChecked = true
                 menuItemStack.push(item)
                 navController.navigate(R.id.profileFragment)
             }
             R.id.messages -> {
+                item.isCheckable = true
                 item.isChecked = true
                 menuItemStack.push(item)
                 navController.navigate(R.id.messagesFragment)
             }
             R.id.marketplace -> {
+                item.isCheckable = true
                 item.isChecked = true
                 menuItemStack.push(item)
                 navController.navigate(R.id.marketplaceFragment)
 
             }
             R.id.bundles -> {
+                item.isCheckable = true
                 item.isChecked = true
                 menuItemStack.push(item)
                 navController.navigate(R.id.bundlesFragment)
 
             }
             R.id.services -> {
+                item.isCheckable = true
                 item.isChecked = true
                 menuItemStack.push(item)
                 navController.navigate(R.id.servicesFragment)
 
             }
         }
+
+
         Log.d("HomeActivity", "ItemStackSize: " + menuItemStack.size)
         return false
     }
@@ -104,6 +112,8 @@ class HomeActivity: AppCompatActivity(),
         if(menuItemStack.size > 1){
             menuItemStack.pop()
             menuItemStack.lastElement().isChecked = true
+        }else{
+            bottom_navigation.menu.setGroupCheckable(R.id.home_group, false, true)
         }
     }
 }
