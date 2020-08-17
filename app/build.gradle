@@ -17,6 +17,10 @@ android {
         jvmTarget = JavaVersion.VERSION_1_8.toString()
     }
 
+    kapt{
+        correctErrorTypes true
+    }
+
     defaultConfig {
         applicationId "com.lendsumapp.lendsum"
         minSdkVersion 23

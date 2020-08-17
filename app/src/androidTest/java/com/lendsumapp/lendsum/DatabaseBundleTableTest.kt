@@ -8,6 +8,7 @@ import com.lendsumapp.lendsum.data.model.Bundle
 import com.lendsumapp.lendsum.data.persistence.LendsumDatabase
 import com.lendsumapp.lendsum.data.persistence.BundleDao
 import com.lendsumapp.lendsum.util.TestUtil
+import dagger.hilt.android.AndroidEntryPoint
 import junit.framework.Assert.*
 import kotlinx.coroutines.*
 import org.junit.After
@@ -16,10 +17,11 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import java.io.IOException
 import java.lang.Exception
+import javax.inject.Inject
 
 @RunWith(AndroidJUnit4::class)
 class BundleDatabaseTest {
-    
+
     private lateinit var bundleDao: BundleDao
     private lateinit var db: LendsumDatabase
 
@@ -75,18 +77,18 @@ class BundleDatabaseTest {
         val bundleWrite = TestUtil.getFirstLendTestBundle()
 
         //read
-        val key: Long = db.getBundleDao().insertBundle(bundleWrite)
-        assertEquals(1, db.getBundleDao().getLendBundles().size)
+        val key: Long = bundleDao.insertBundle(bundleWrite)
+        assertEquals(1, bundleDao.getLendBundles().size)
         assertNotNull(key)
 
         //update
         val value: Long = 9999
-        val readBundle = db.getBundleDao().getBundleById(key)
+        val readBundle = bundleDao.getBundleById(key)
         readBundle.returnDate = value
-        db.getBundleDao().updateBundle(readBundle)
+        bundleDao.updateBundle(readBundle)
 
         //read
-        val dbReturnDate = db.getBundleDao().getBundleById(key)
+        val dbReturnDate = bundleDao.getBundleById(key)
         val updatedReturnDate = dbReturnDate.returnDate
 
         //Test
@@ -106,7 +108,7 @@ class BundleDatabaseTest {
 
         //write multiple entries
         bundleList.forEach {
-            db.getBundleDao().insertBundle(it)
+            bundleDao.insertBundle(it)
         }
 
         //check to see if the size of items in database are what we inserted
@@ -133,15 +135,15 @@ class BundleDatabaseTest {
 
         //Insert all items of list into the database
         bundleList.forEach {
-            db.getBundleDao().insertBundle(it)
+            bundleDao.insertBundle(it)
         }
 
         //Make sure sizes match with local and database list
-        val dbBundleList = db.getBundleDao().getAllBundles()
+        val dbBundleList = bundleDao.getAllBundles()
         assertEquals(bundleList.size, dbBundleList.size)
 
         //retrieve lend bundles from database
-        val dbLendList = db.getBundleDao().getLendBundles()
+        val dbLendList = bundleDao.getLendBundles()
         assertEquals(2, dbLendList.size)
 
         //check to see if the lender name data matches and is what we expect
@@ -163,15 +165,15 @@ class BundleDatabaseTest {
 
         //Insert all items of list into the database
         bundleList.forEach {
-            db.getBundleDao().insertBundle(it)
+            bundleDao.insertBundle(it)
         }
 
         //Make sure sizes match with local and database list
-        val dbBundleList = db.getBundleDao().getAllBundles()
+        val dbBundleList = bundleDao.getAllBundles()
         assertEquals(bundleList.size, dbBundleList.size)
 
         //retrieve borrow bundles from database
-        val dbBorrowList = db.getBundleDao().getBorrowBundles()
+        val dbBorrowList = bundleDao.getBorrowBundles()
         assertEquals(2, dbBorrowList.size)
 
         //check to see if the lender name data matches and is what we expect
