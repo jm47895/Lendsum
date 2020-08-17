@@ -2,11 +2,11 @@
   "formatVersion": 1,
   "database": {
     "version": 1,
-    "identityHash": "4049a3b2ec4cf5c2dfddd9a2b1f5d099",
+    "identityHash": "fa4248b33f8cf52ec3e889726a225557",
     "entities": [
       {
         "tableName": "bundles",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`bundleId` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `lenderName` TEXT NOT NULL, `borrowerName` TEXT NOT NULL, `bundleTitle` TEXT NOT NULL, `bundleDescription` TEXT NOT NULL, `bundleItemList` TEXT, `lendTimestamp` INTEGER NOT NULL, `returnTimestamp` INTEGER, `maturityTimestamp` INTEGER, `bundleRate` TEXT, `bundlePeriod` TEXT, `lateFee` INTEGER, `imagePaths` TEXT, `isLendToOwn` INTEGER, `isIndefinite` INTEGER NOT NULL, `isLending` INTEGER NOT NULL)",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`bundleId` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `lenderName` TEXT NOT NULL, `borrowerName` TEXT NOT NULL, `bundleTitle` TEXT NOT NULL, `bundleDescription` TEXT NOT NULL, `bundleItemList` TEXT, `lendTimestamp` INTEGER NOT NULL, `returnTimestamp` INTEGER, `maturityTimestamp` INTEGER, `bundleRate` TEXT, `bundlePeriod` TEXT, `lateFee` INTEGER, `imagePaths` TEXT, `isLendToOwn` INTEGER, `isIndefinite` INTEGER NOT NULL, `isLending` INTEGER NOT NULL, `isPublic` INTEGER NOT NULL)",
         "fields": [
           {
             "fieldPath": "bundleId",
@@ -103,6 +103,12 @@
             "columnName": "isLending",
             "affinity": "INTEGER",
             "notNull": true
+          },
+          {
+            "fieldPath": "isPublic",
+            "columnName": "isPublic",
+            "affinity": "INTEGER",
+            "notNull": true
           }
         ],
         "primaryKey": {
@@ -118,7 +124,7 @@
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '4049a3b2ec4cf5c2dfddd9a2b1f5d099')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'fa4248b33f8cf52ec3e889726a225557')"
     ]
   }
 }

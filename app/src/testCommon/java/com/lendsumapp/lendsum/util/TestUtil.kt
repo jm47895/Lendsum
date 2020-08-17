@@ -19,7 +19,8 @@ object TestUtil {
         null,
         null,
         false,
-        true)
+        true,
+        false)
 
     fun getFirstLendTestBundle(): Bundle{
         return bundle1
@@ -40,7 +41,8 @@ object TestUtil {
         null,
         null,
         false,
-        true)
+        true,
+        false)
 
     fun getSecondLendTestBundle(): Bundle{
         return bundle2
@@ -60,6 +62,7 @@ object TestUtil {
         null,
         null,
         null,
+        false,
         false,
         false)
 
@@ -81,6 +84,7 @@ object TestUtil {
         null,
         null,
         null,
+        false,
         false,
         false)
 
