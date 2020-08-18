@@ -7,7 +7,7 @@ import com.google.gson.annotations.Expose
 
 @Entity(tableName = "bundles")
 data class Bundle (
-    @PrimaryKey(autoGenerate = true) @ColumnInfo(name = "bundleId")val bundleId: Long,
+    @PrimaryKey(autoGenerate = true) @ColumnInfo(name = "bundleId")var bundleId: Long,
     @ColumnInfo(name = "lenderName") var lenderName: String,
     @ColumnInfo(name = "borrowerName") var borrowerName: String,
     @ColumnInfo(name = "bundleTitle") var bundleTitle: String,
