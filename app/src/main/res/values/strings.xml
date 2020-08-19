@@ -12,4 +12,24 @@
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="log_in">Log In</string>
+    <string name="email">Email</string>
+    <string name="password">Password</string>
+    <string name="forgot_password">Forgot Password</string>
+    <string name="sign_in">Sign In</string>
+    <string name="create_account">Create Account</string>
+    <string name="company_logo">company logo</string>
+    <string name="send_verification_code">Send verification code</string>
+    <string name="enter_verification_code">Enter verification code</string>
+    <string name="submit">Submit</string>
+    <string name="enter_new_password">Enter new password</string>
+    <string name="re_enter_new_password">Re-enter new password</string>
+    <string name="reset_password">Reset password</string>
+    <string name="first_name">First Name</string>
+    <string name="last_name">Last Name</string>
+    <string name="next">Next</string>
+    <string name="email_or_phone_number">Email or Phone Number</string>
+    <string name="enter_code">Enter Code</string>
+    <string name="sign_up_with_email">Sign up with email</string>
+    <string name="continue_with_google">Continue with Google</string>
+    <string name="continue_with_facebook">Continue with Facebook</string>
 </resources>

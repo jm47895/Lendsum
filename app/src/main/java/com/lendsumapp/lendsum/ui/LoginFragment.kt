@@ -2,20 +2,20 @@ package com.lendsumapp.lendsum.ui
 
 import android.content.Context
 import android.os.Bundle
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.navigation.NavController
+import androidx.fragment.app.Fragment
 import androidx.navigation.findNavController
-import androidx.navigation.fragment.findNavController
-import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.lendsumapp.lendsum.R
-import kotlinx.android.synthetic.main.activity_home.*
+import com.lendsumapp.lendsum.util.GlobalConstants.backNavSignUpType
+import com.lendsumapp.lendsum.util.NavSignUp
 import kotlinx.android.synthetic.main.fragment_login.*
 
 
 class LoginFragment : Fragment() {
+
+    private val sharedPrefs by lazy { activity?.getPreferences(Context.MODE_PRIVATE) }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -33,9 +33,36 @@ class LoginFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        login_btn.setOnClickListener {
+        login_sign_in_btn.setOnClickListener {
+
             view.findNavController().navigate(R.id.action_loginFragment_to_marketplaceFragment)
         }
+
+        login_sign_up_email_btn.setOnClickListener {
+
+            sharedPrefs?.edit()?.putInt(backNavSignUpType, NavSignUp.SLOW_LOGIN.ordinal)?.apply()
+
+            view.findNavController().navigate(R.id.action_loginFragment_to_createAccountFragment)
+        }
+
+        login_forgot_password_tv.setOnClickListener {
+            view.findNavController().navigate(R.id.action_loginFragment_to_forgotPasswordFragment)
+        }
+
+        login_sign_in_with_facebook.setOnClickListener {
+
+            sharedPrefs?.edit()?.putInt(backNavSignUpType, NavSignUp.FAST_LOGIN.ordinal)?.apply()
+
+            view.findNavController().navigate(R.id.action_loginFragment_to_numberVerificationFragment)
+        }
+
+        login_sign_in_with_google.setOnClickListener {
+
+            sharedPrefs?.edit()?.putInt(backNavSignUpType, NavSignUp.FAST_LOGIN.ordinal)?.apply()
+
+            view.findNavController().navigate(R.id.action_loginFragment_to_numberVerificationFragment)
+        }
     }
+
 
 }

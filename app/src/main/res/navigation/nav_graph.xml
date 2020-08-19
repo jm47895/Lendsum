@@ -36,9 +36,80 @@
         android:label="fragment_login"
         tools:layout="@layout/fragment_login" >
         <action
+            android:id="@+id/action_loginFragment_to_forgotPasswordFragment"
+            app:destination="@id/forgotPasswordFragment" />
+        <action
+            android:id="@+id/action_loginFragment_to_createAccountFragment"
+            app:destination="@id/createAccountFragment" />
+        <action
+            android:id="@+id/action_loginFragment_to_numberVerificationFragment"
+            app:destination="@id/numberVerificationFragment" />
+        <action
             android:id="@+id/action_loginFragment_to_marketplaceFragment"
             app:destination="@id/marketplaceFragment"
-            app:popUpTo="@id/loginFragment"
-            app:popUpToInclusive="true"/>
+            app:popUpTo="@id/bottom_nav_graph"
+            app:popUpToInclusive="true" />
+    </fragment>
+    <fragment
+        android:id="@+id/forgotPasswordFragment"
+        android:name="com.lendsumapp.lendsum.ui.ForgotPasswordFragment"
+        android:label="fragment_forgot_password"
+        tools:layout="@layout/fragment_forgot_password" >
+        <action
+            android:id="@+id/action_forgotPasswordFragment_to_loginFragment"
+            app:destination="@id/loginFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/createAccountFragment"
+        android:name="com.lendsumapp.lendsum.ui.CreateAccountFragment"
+        android:label="fragment_create_account"
+        tools:layout="@layout/fragment_create_account" >
+        <action
+            android:id="@+id/action_createAccountFragment_to_loginFragment"
+            app:destination="@id/loginFragment" />
+        <action
+            android:id="@+id/action_createAccountFragment_to_numberVerificationFragment"
+            app:destination="@id/numberVerificationFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/termsConditionsFragment"
+        android:name="com.lendsumapp.lendsum.ui.TermsConditionsFragment"
+        android:label="fragment_terms_conditions"
+        tools:layout="@layout/fragment_terms_conditions" >
+        <action
+            android:id="@+id/action_termsConditionsFragment_to_financialInfoFragment"
+            app:destination="@id/financialInfoFragment" />
+        <action
+            android:id="@+id/action_termsConditionsFragment_to_numberVerificationFragment"
+            app:destination="@id/numberVerificationFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/numberVerificationFragment"
+        android:name="com.lendsumapp.lendsum.ui.NumberVerificationFragment"
+        android:label="fragment_number_verification"
+        tools:layout="@layout/fragment_number_verification" >
+        <action
+            android:id="@+id/action_numberVerificationFragment_to_termsConditionsFragment"
+            app:destination="@id/termsConditionsFragment" />
+        <action
+            android:id="@+id/action_numberVerificationFragment_to_loginFragment"
+            app:destination="@id/loginFragment" />
+        <action
+            android:id="@+id/action_numberVerificationFragment_to_createAccountFragment"
+            app:destination="@id/createAccountFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/financialInfoFragment"
+        android:name="com.lendsumapp.lendsum.ui.FinancialInfoFragment"
+        android:label="fragment_financial_info"
+        tools:layout="@layout/fragment_financial_info" >
+        <action
+            android:id="@+id/action_financialInfoFragment_to_marketplaceFragment"
+            app:destination="@id/marketplaceFragment"
+            app:popUpTo="@id/bottom_nav_graph"
+            app:popUpToInclusive="true" />
+        <action
+            android:id="@+id/action_financialInfoFragment_to_termsConditionsFragment"
+            app:destination="@id/termsConditionsFragment" />
     </fragment>
 </navigation>

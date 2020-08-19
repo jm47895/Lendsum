@@ -7,4 +7,22 @@
         <item name="colorAccent">@color/colorAccentBlack</item>
     </style>
 
+    <style name="LoginEditTextTheme">
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_margin">12dp</item>
+    </style>
+
+    <style name="LoginButtonTheme">
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_margin">12dp</item>
+        <item name="android:padding">8dp</item>
+        <item name="android:background">@color/colorPrimary</item>
+        <item name="android:textColor">@color/colorSecondaryLight</item>
+        <item name="layout_constraintHorizontal_bias">1</item>
+        <item name="android:outlineProvider">bounds</item>
+        <item name="android:elevation">2dp</item>
+    </style>
+
 </resources>

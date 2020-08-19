@@ -5,6 +5,9 @@
     <color name="colorPrimaryLight">#64aa58</color>
     <color name="colorAccentBlack">#000000</color>
     <color name="colorAccentSkyBlue">#3889C2</color>
+    <color name="googleLoginTextColor">#80000000</color>
+    <color name="googleBackgroundColor">#FFFFFF</color>
+    <color name="facebookBlue">#1877F2</color>
     <color name="linkBlue">#0000EE</color>
     <color name="headerBlack">#000000</color>
     <color name="colorSecondaryLight">#FFFFFF</color>
