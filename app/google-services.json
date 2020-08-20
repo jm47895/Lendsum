@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "550559154955",
+    "firebase_url": "https://lendsum-1597785845351.firebaseio.com",
+    "project_id": "lendsum-1597785845351",
+    "storage_bucket": "lendsum-1597785845351.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:550559154955:android:3314a66d0d0c1c96e9d80e",
+        "android_client_info": {
+          "package_name": "com.lendsumapp.lendsum"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "550559154955-culsvr3c31ivhu0i619e2uv3s1pi94du.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.lendsumapp.lendsum",
+            "certificate_hash": "dfb71662d58914ac6056d5730cde75f40cbaf83d"
+          }
+        },
+        {
+          "client_id": "550559154955-n9odltmn44a6687vlmvjjtiagj7jebam.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDsgznYdrnjyNVHUo2KT28NodZHoonJPdo"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "550559154955-n9odltmn44a6687vlmvjjtiagj7jebam.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
