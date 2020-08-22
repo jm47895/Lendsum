@@ -9,10 +9,12 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.activity.addCallback
 import com.lendsumapp.lendsum.R
+import com.lendsumapp.lendsum.util.GlobalConstants
 import kotlinx.coroutines.flow.callbackFlow
 
 class MarketplaceFragment : Fragment(){
 
+    private val sharedPrefs by lazy { activity?.getPreferences(Context.MODE_PRIVATE) }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -22,4 +24,9 @@ class MarketplaceFragment : Fragment(){
         return inflater.inflate(R.layout.fragment_marketplace, container, false)
     }
 
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+
+        sharedPrefs?.edit()?.putBoolean(GlobalConstants.returningUser, true)?.apply()
+    }
 }
