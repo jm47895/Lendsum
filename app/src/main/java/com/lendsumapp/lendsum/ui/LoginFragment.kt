@@ -6,14 +6,13 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ProgressBar
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.navigation.findNavController
 import androidx.navigation.fragment.NavHostFragment.findNavController
 import com.google.android.material.snackbar.Snackbar
 import com.lendsumapp.lendsum.R
-import com.lendsumapp.lendsum.services.firebase.auth.FirebaseAuthComponent
+import com.lendsumapp.lendsum.auth.GoogleAuthComponent
 import com.lendsumapp.lendsum.util.GlobalConstants.backNavSignUpType
 import com.lendsumapp.lendsum.util.GlobalConstants.returningUser
 import com.lendsumapp.lendsum.util.NavSignUp
@@ -27,13 +26,13 @@ import javax.inject.Inject
 class LoginFragment : Fragment(), View.OnClickListener{
 
     private val sharedPrefs by lazy { activity?.getPreferences(Context.MODE_PRIVATE) }
-    @Inject lateinit var firebaseAuthComponent: FirebaseAuthComponent
+    @Inject lateinit var googleAuthComponent: GoogleAuthComponent
     @Inject lateinit var utils: NetworkUtils
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        if(firebaseAuthComponent.getFirebaseUser() != null && sharedPrefs?.getBoolean(returningUser, false) == true){
+        if(googleAuthComponent.getFirebaseUser() != null && sharedPrefs?.getBoolean(returningUser, false) == true){
             findNavController(this).navigate(R.id.action_loginFragment_to_marketplaceFragment)
         }
     }
@@ -59,13 +58,13 @@ class LoginFragment : Fragment(), View.OnClickListener{
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
 
-        data?.let { firebaseAuthComponent.handleGoogleSignInIntent(requestCode, it) }
+        data?.let { googleAuthComponent.handleGoogleSignInIntent(requestCode, it) }
 
     }
 
     private fun sendGoogleSignInIntent(){
-        val intent = firebaseAuthComponent.getGoogleSignInIntent()
-        startActivityForResult(intent, firebaseAuthComponent.sendRequestCode())
+        val intent = googleAuthComponent.getGoogleSignInIntent()
+        startActivityForResult(intent, googleAuthComponent.sendRequestCode())
     }
 
     override fun onClick(view: View?) {
@@ -84,7 +83,7 @@ class LoginFragment : Fragment(), View.OnClickListener{
                 }
                 R.id.login_sign_in_with_google -> {
                     context?.let {
-                        firebaseAuthComponent.configureGoogleAuth(it, getString(R.string.default_web_client_id))
+                        googleAuthComponent.configureGoogleAuth(it, getString(R.string.default_web_client_id))
                         sendGoogleSignInIntent()
                     }
                     sharedPrefs?.edit()?.putInt(backNavSignUpType, NavSignUp.FAST_LOGIN.ordinal)?.apply()

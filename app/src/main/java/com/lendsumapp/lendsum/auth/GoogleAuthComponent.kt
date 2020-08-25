@@ -1,4 +1,4 @@
-package com.lendsumapp.lendsum.services.firebase.auth
+package com.lendsumapp.lendsum.auth
 
 import android.content.Context
 import android.content.Intent
@@ -14,7 +14,7 @@ import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
-class FirebaseAuthComponent @Inject constructor(){
+class GoogleAuthComponent @Inject constructor(){
 
     private val firebaseAuth : FirebaseAuth = FirebaseAuth.getInstance()
     private lateinit var googleSignInClient : GoogleSignInClient
@@ -81,7 +81,7 @@ class FirebaseAuthComponent @Inject constructor(){
 
     companion object{
         private const val RC_SIGN_IN = 9000
-        private val TAG = FirebaseAuthComponent::class.simpleName
+        private val TAG = GoogleAuthComponent::class.simpleName
     }
 
 }
