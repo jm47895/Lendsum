@@ -1,6 +1,7 @@
 package com.lendsumapp.lendsum.util
 
-enum class NavSignUp {
-    FAST_LOGIN,
-    SLOW_LOGIN,
+enum class NavSignUpType {
+    EMAIL_LOGIN,
+    GOOGLE_LOGIN,
+    FACEBOOK_LOGIN
 }

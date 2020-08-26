@@ -1,5 +1,6 @@
 package com.lendsumapp.lendsum.ui
 
+import android.content.Context
 import android.os.Bundle
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
@@ -7,7 +8,11 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.navigation.findNavController
 import com.lendsumapp.lendsum.R
+import com.lendsumapp.lendsum.auth.FacebookAuthComponent
 import com.lendsumapp.lendsum.auth.GoogleAuthComponent
+import com.lendsumapp.lendsum.util.GlobalConstants
+import com.lendsumapp.lendsum.util.GlobalConstants.navSignUpType
+import com.lendsumapp.lendsum.util.NavSignUpType
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.android.synthetic.main.fragment_profile.*
 import javax.inject.Inject
@@ -15,7 +20,9 @@ import javax.inject.Inject
 @AndroidEntryPoint
 class ProfileFragment : Fragment() {
 
+    private val sharedPrefs by lazy { activity?.getPreferences(Context.MODE_PRIVATE) }
     @Inject lateinit var googleAuthComponent: GoogleAuthComponent
+    @Inject lateinit var facebookAuthComponent: FacebookAuthComponent
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -30,11 +37,22 @@ class ProfileFragment : Fragment() {
 
         profile_logout_btn.setOnClickListener {
 
-            context?.let {
-                googleAuthComponent.configureGoogleAuth(it, getString(R.string.default_web_client_id))
-                googleAuthComponent.signOutOfGoogle()
+            when(sharedPrefs?.getInt(navSignUpType, NavSignUpType.EMAIL_LOGIN.ordinal)){
+                NavSignUpType.EMAIL_LOGIN.ordinal ->{
+
+                }
+                NavSignUpType.GOOGLE_LOGIN.ordinal ->{
+                    context?.let {
+                        googleAuthComponent.configureGoogleAuth(it, getString(R.string.default_web_client_id))
+                        googleAuthComponent.signOutOfGoogle()
+                        view.findNavController().navigate(R.id.action_profileFragment_to_loginFragment)
+                    }
+                }
+                NavSignUpType.FACEBOOK_LOGIN.ordinal ->{
+                    facebookAuthComponent.signOutOfFacebook()
+                    view.findNavController().navigate(R.id.action_profileFragment_to_loginFragment)
+                }
             }
-            view.findNavController().navigate(R.id.action_profileFragment_to_loginFragment)
         }
     }
 }

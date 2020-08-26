@@ -8,10 +8,12 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.navigation.findNavController
 import com.lendsumapp.lendsum.R
+import com.lendsumapp.lendsum.auth.FacebookAuthComponent
 import com.lendsumapp.lendsum.auth.GoogleAuthComponent
-import com.lendsumapp.lendsum.util.GlobalConstants.backNavSignUpType
+import com.lendsumapp.lendsum.util.GlobalConstants
+import com.lendsumapp.lendsum.util.GlobalConstants.navSignUpType
 import com.lendsumapp.lendsum.util.GlobalConstants.returningUser
-import com.lendsumapp.lendsum.util.NavSignUp
+import com.lendsumapp.lendsum.util.NavSignUpType
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.android.synthetic.main.fragment_number_verification.*
 import javax.inject.Inject
@@ -21,6 +23,7 @@ class NumberVerificationFragment : Fragment() {
 
     private val sharedPrefs by lazy { activity?.getPreferences(Context.MODE_PRIVATE) }
     @Inject lateinit var googleAuth : GoogleAuthComponent
+    @Inject lateinit var facebookAuthComponent: FacebookAuthComponent
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -33,15 +36,26 @@ class NumberVerificationFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        if (sharedPrefs?.getInt(backNavSignUpType, -1) == NavSignUp.FAST_LOGIN.ordinal){
-            number_verifiction_back_btn.setOnClickListener {
-                view.findNavController().navigate(R.id.action_numberVerificationFragment_to_loginFragment)
-                googleAuth.signOutOfGoogle()
-            }
-        }else{
+        if (sharedPrefs?.getInt(navSignUpType, NavSignUpType.EMAIL_LOGIN.ordinal) == NavSignUpType.EMAIL_LOGIN.ordinal){
             number_verifiction_back_btn.setOnClickListener {
                 view.findNavController().navigate(R.id.action_numberVerificationFragment_to_createAccountFragment)
 
+            }
+        }else{
+            number_verifiction_back_btn.setOnClickListener {
+                when(sharedPrefs?.getInt(navSignUpType, NavSignUpType.EMAIL_LOGIN.ordinal)){
+                    NavSignUpType.EMAIL_LOGIN.ordinal ->{
+
+                    }
+                    NavSignUpType.GOOGLE_LOGIN.ordinal ->{
+                        googleAuth.signOutOfGoogle()
+                    }
+                    NavSignUpType.FACEBOOK_LOGIN.ordinal ->{
+                        facebookAuthComponent.signOutOfFacebook()
+                    }
+                }
+
+                view.findNavController().navigate(R.id.action_numberVerificationFragment_to_loginFragment)
             }
         }
 
