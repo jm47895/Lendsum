@@ -12,10 +12,11 @@ import com.facebook.login.LoginResult
 import com.google.firebase.auth.FacebookAuthProvider
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
+import dagger.hilt.android.scopes.FragmentScoped
 import javax.inject.Inject
 import javax.inject.Singleton
 
-@Singleton
+@FragmentScoped
 class FacebookAuthComponent @Inject constructor(){
 
     private val callbackManager by lazy { CallbackManager.Factory.create() }
@@ -53,13 +54,13 @@ class FacebookAuthComponent @Inject constructor(){
         callbackManager.onActivityResult(requestCode, resultCode, data)
     }
 
-    fun sendFacebookSignInIntent(activity: Activity){
+    fun sendFacebookSignInIntent(){
         LoginManager.getInstance().registerCallback(callbackManager,
             object : FacebookCallback<LoginResult?> {
                 override fun onSuccess(loginResult: LoginResult?) {
                     Log.d(TAG, "facebook:onSuccess:$loginResult")
 
-                    sendFacebookCredentialsToFirebase(loginResult?.accessToken, activity)
+                    //sendFacebookCredentialsToFirebase(loginResult?.accessToken, activity)
                 }
 
                 override fun onCancel() {

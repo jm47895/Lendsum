@@ -46,10 +46,21 @@
         style="@style/LoginEditTextTheme"
         android:hint="@string/password"
         android:inputType="textPassword"
-        app:layout_constraintBottom_toTopOf="@+id/create_account_back_btn"
+        app:layout_constraintBottom_toTopOf="@+id/create_user_match_password_et"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/create_user_email_et"
+        tools:ignore="Autofill" />
+
+    <EditText
+        android:id="@+id/create_user_match_password_et"
+        style="@style/LoginEditTextTheme"
+        android:hint="@string/re_enter_password"
+        android:inputType="textPassword"
+        app:layout_constraintBottom_toTopOf="@+id/create_account_back_btn"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/create_user_password_et"
         tools:ignore="Autofill" />
 
     <Button
@@ -61,7 +72,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintEnd_toStartOf="@+id/create_account_next_btn"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/create_user_password_et" />
+        app:layout_constraintTop_toBottomOf="@+id/create_user_match_password_et" />
 
     <Button
         android:id="@+id/create_account_next_btn"

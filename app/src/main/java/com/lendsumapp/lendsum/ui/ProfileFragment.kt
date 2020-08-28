@@ -8,6 +8,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.navigation.findNavController
 import com.lendsumapp.lendsum.R
+import com.lendsumapp.lendsum.auth.EmailAndPassAuthComponent
 import com.lendsumapp.lendsum.auth.FacebookAuthComponent
 import com.lendsumapp.lendsum.auth.GoogleAuthComponent
 import com.lendsumapp.lendsum.util.GlobalConstants
@@ -23,6 +24,7 @@ class ProfileFragment : Fragment() {
     private val sharedPrefs by lazy { activity?.getPreferences(Context.MODE_PRIVATE) }
     @Inject lateinit var googleAuthComponent: GoogleAuthComponent
     @Inject lateinit var facebookAuthComponent: FacebookAuthComponent
+    @Inject lateinit var emailAndPassAuthComponent: EmailAndPassAuthComponent
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -39,7 +41,8 @@ class ProfileFragment : Fragment() {
 
             when(sharedPrefs?.getInt(navSignUpType, NavSignUpType.EMAIL_LOGIN.ordinal)){
                 NavSignUpType.EMAIL_LOGIN.ordinal ->{
-
+                    emailAndPassAuthComponent.signOutOfEmailAndPass()
+                    view.findNavController().navigate(R.id.action_profileFragment_to_loginFragment)
                 }
                 NavSignUpType.GOOGLE_LOGIN.ordinal ->{
                     context?.let {

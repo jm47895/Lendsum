@@ -1,17 +1,26 @@
 package com.lendsumapp.lendsum.ui
 
 import android.os.Bundle
-import androidx.fragment.app.Fragment
+import android.text.TextUtils
+import android.util.Patterns
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.fragment.app.Fragment
 import androidx.navigation.findNavController
 import com.lendsumapp.lendsum.R
+import com.lendsumapp.lendsum.auth.EmailAndPassAuthComponent
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.android.synthetic.main.fragment_create_account.*
-import kotlinx.android.synthetic.main.fragment_login.*
+import java.util.regex.Matcher
+import java.util.regex.Pattern
+import javax.inject.Inject
 
 
+@AndroidEntryPoint
 class CreateAccountFragment : Fragment() {
+
+    @Inject lateinit var emailAndPassAuthComponent: EmailAndPassAuthComponent
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -24,12 +33,71 @@ class CreateAccountFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+
+
         create_account_next_btn.setOnClickListener {
-            view.findNavController().navigate(R.id.action_createAccountFragment_to_numberVerificationFragment)
+
+            val firstName = create_user_first_name_et.text.toString().trim()
+            val lastName = create_user_last_name_et.text.toString().trim()
+            val email = create_user_email_et.text.toString().trim()
+            val password = create_user_password_et.text.toString().trim()
+            val matchPassword = create_user_match_password_et.text.toString().trim()
+
+            if(isValidAccountForm(firstName, lastName, email, password, matchPassword)){
+
+                signUpUser(firstName, lastName, email, password)
+                view.findNavController().navigate(R.id.action_createAccountFragment_to_numberVerificationFragment)
+            }
+
         }
 
         create_account_back_btn.setOnClickListener {
             view.findNavController().navigate(R.id.action_createAccountFragment_to_loginFragment)
         }
+    }
+
+    private fun signUpUser(firstName: String, lastName: String, email: String, password: String) {
+        emailAndPassAuthComponent.registerWithEmailAndPassword(email, password)
+    }
+
+    private fun isValidAccountForm(firstName: String, lastName: String, email: String, password: String, matchPassword: String): Boolean {
+
+        if (TextUtils.isEmpty(firstName) && TextUtils.isEmpty(lastName)) {
+            create_user_first_name_et.error = getString(R.string.first_name_error_msg)
+            create_user_last_name_et.error = getString(R.string.last_name_err_msg)
+            return false
+        } else if (!isValidEmail(email)) {
+            create_user_email_et.error = getString(R.string.invalid_email_err_msg)
+            return false
+        } else if (TextUtils.isEmpty(password) || !isValidPassword(password)
+        ) {
+            create_user_password_et.error = getString(R.string.password_param_err_msg)
+            return false
+        }else if(password != matchPassword){
+            create_user_match_password_et.error = getString(R.string.pass_dont_match_err_msg)
+            create_user_password_et.error = getString(R.string.pass_dont_match_err_msg)
+            return false
+        }
+        return true
+    }
+
+    //Password validation with regex for at least one letter, one number, and one number in password
+    private fun isValidPassword(password: String): Boolean {
+        val matchCase: Matcher
+        val isValid: Boolean
+        val pattern: Pattern = Pattern.compile(PASSWORD_PATTERN)
+        matchCase = pattern.matcher(password)
+        isValid = matchCase.matches()
+        return isValid
+    }
+
+    private fun isValidEmail(target: CharSequence): Boolean {
+        return !TextUtils.isEmpty(target) && Patterns.EMAIL_ADDRESS.matcher(target).matches()
+    }
+
+
+    companion object{
+        private val TAG = CreateAccountFragment::class.simpleName
+        private const val PASSWORD_PATTERN = "^((?=.*\\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[@%+/\'!#$^?:,(){}~_.]).{6,20})$"
     }
 }
