@@ -114,6 +114,7 @@ class HomeActivity: AppCompatActivity(),
             menuItemStack.lastElement().isChecked = true
         }else{
             bottom_navigation.menu.setGroupCheckable(R.id.home_group, false, true)
+            this.finishAfterTransition()
         }
     }
 }
