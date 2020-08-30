@@ -19,13 +19,7 @@ class EmailAndPassAuthComponent @Inject constructor(): OnCompleteListener<AuthRe
 
     fun signInWithEmailAndPass(email: String, password: String)
     {
-        firebaseAuth.signInWithEmailAndPassword(email, password).addOnCompleteListener(
-            OnCompleteListener { task ->
-                if (task.isSuccessful && task.isComplete){
-
-                }
-            })
-
+        firebaseAuth.signInWithEmailAndPassword(email, password)
     }
 
 
@@ -50,6 +44,10 @@ class EmailAndPassAuthComponent @Inject constructor(): OnCompleteListener<AuthRe
 
     fun signOutOfEmailAndPass(){
         firebaseAuth.signOut()
+    }
+
+    fun dismissAuthStateListener(authStateListener: FirebaseAuth.AuthStateListener){
+        firebaseAuth.removeAuthStateListener(authStateListener)
     }
 
     companion object{

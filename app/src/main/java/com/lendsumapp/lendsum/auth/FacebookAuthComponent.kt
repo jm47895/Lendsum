@@ -22,14 +22,14 @@ class FacebookAuthComponent @Inject constructor(){
     private val callbackManager by lazy { CallbackManager.Factory.create() }
     private val firebaseAuth : FirebaseAuth = FirebaseAuth.getInstance()
 
-    private fun sendFacebookCredentialsToFirebase(token: AccessToken?, activity: Activity) {
+    private fun sendFacebookCredentialsToFirebase(token: AccessToken?) {
         Log.d(TAG, "handleFacebookAccessToken:$token")
 
         val credential = FacebookAuthProvider.getCredential(token?.token!!)
 
 
             FirebaseAuth.getInstance().signInWithCredential(credential)
-                .addOnCompleteListener(activity) { task ->
+                .addOnCompleteListener() { task ->
                     if (task.isSuccessful) {
                         // Sign in success, update UI with the signed-in user's information
                         val user = FirebaseAuth.getInstance().currentUser
@@ -60,7 +60,7 @@ class FacebookAuthComponent @Inject constructor(){
                 override fun onSuccess(loginResult: LoginResult?) {
                     Log.d(TAG, "facebook:onSuccess:$loginResult")
 
-                    //sendFacebookCredentialsToFirebase(loginResult?.accessToken, activity)
+                    sendFacebookCredentialsToFirebase(loginResult?.accessToken)
                 }
 
                 override fun onCancel() {
