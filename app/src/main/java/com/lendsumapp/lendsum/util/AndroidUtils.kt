@@ -12,7 +12,7 @@ class AndroidUtils @Inject constructor(){
 
     fun showSnackBar(activity: Activity, msg: String) {
 
-        val snackBar = Snackbar.make(activity.findViewById(android.R.id.content), msg, Snackbar.LENGTH_LONG)
+        Snackbar.make(activity.findViewById(android.R.id.content), msg, Snackbar.LENGTH_LONG)
             .setAction("Dismiss") {
         }.setActionTextColor(ContextCompat.getColor(activity, R.color.colorSecondaryLight))
             .show()

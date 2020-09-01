@@ -4,6 +4,7 @@ import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.text.TextUtils
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -17,6 +18,7 @@ import com.lendsumapp.lendsum.R
 import com.lendsumapp.lendsum.auth.EmailAndPassAuthComponent
 import com.lendsumapp.lendsum.auth.FacebookAuthComponent
 import com.lendsumapp.lendsum.auth.GoogleAuthComponent
+import com.lendsumapp.lendsum.databinding.FragmentLoginBinding
 import com.lendsumapp.lendsum.util.AndroidUtils
 import com.lendsumapp.lendsum.util.GlobalConstants.navSignUpType
 import com.lendsumapp.lendsum.util.GlobalConstants.returningUser
@@ -30,6 +32,8 @@ import javax.inject.Inject
 @AndroidEntryPoint
 class LoginFragment : Fragment(), View.OnClickListener{
 
+    private var _binding: FragmentLoginBinding? = null
+    private val binding get() =  _binding
     private val sharedPrefs by lazy { activity?.getPreferences(Context.MODE_PRIVATE) }
     @Inject lateinit var googleAuthComponent: GoogleAuthComponent
     @Inject lateinit var facebookAuthComponent: FacebookAuthComponent
@@ -71,27 +75,32 @@ class LoginFragment : Fragment(), View.OnClickListener{
         }
     }
 
-    override fun onStart() {
-        super.onStart()
-        firebaseAuth.addAuthStateListener(emailSignInAuthStateListener)
-    }
-
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_login, container, false)
+        _binding = FragmentLoginBinding.inflate(inflater, container, false)
+        return binding?.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        login_sign_in_btn.setOnClickListener(this)
-        login_sign_up_email_btn.setOnClickListener(this)
-        login_forgot_password_tv.setOnClickListener(this)
-        login_sign_in_with_facebook.setOnClickListener(this)
-        login_sign_in_with_google.setOnClickListener(this)
+        binding?.loginSignInBtn?.setOnClickListener(this)
+        binding?.loginEmailEt?.setOnClickListener(this)
+        binding?.loginForgotPasswordTv?.setOnClickListener(this)
+        binding?.loginSignInWithFacebook?.setOnClickListener(this)
+        binding?.loginSignInWithGoogle?.setOnClickListener(this)
+    }
+
+    override fun onStart() {
+        super.onStart()
+        firebaseAuth.addAuthStateListener(emailSignInAuthStateListener)
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
@@ -126,8 +135,8 @@ class LoginFragment : Fragment(), View.OnClickListener{
                 }
                 R.id.login_sign_in_btn -> {
 
-                    val signInEmail = login_email_et.text.trim().toString()
-                    val signInPass = login_password_et.text.trim().toString()
+                    val signInEmail = binding?.loginEmailEt?.text?.trim().toString()
+                    val signInPass = binding?.loginPasswordEt?.text?.trim().toString()
 
                     if(!TextUtils.isEmpty(signInEmail) && !TextUtils.isEmpty(signInPass)) {
                         emailAndPassAuthComponent.signInWithEmailAndPass(signInEmail, signInPass)
