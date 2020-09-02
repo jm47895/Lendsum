@@ -9,6 +9,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
 import androidx.navigation.findNavController
 import androidx.navigation.fragment.NavHostFragment.findNavController
 import com.facebook.login.LoginManager
@@ -17,15 +18,14 @@ import com.google.firebase.auth.FirebaseAuth.AuthStateListener
 import com.lendsumapp.lendsum.R
 import com.lendsumapp.lendsum.auth.EmailAndPassAuthComponent
 import com.lendsumapp.lendsum.auth.FacebookAuthComponent
-import com.lendsumapp.lendsum.auth.GoogleAuthComponent
 import com.lendsumapp.lendsum.databinding.FragmentLoginBinding
 import com.lendsumapp.lendsum.util.AndroidUtils
 import com.lendsumapp.lendsum.util.GlobalConstants.navSignUpType
 import com.lendsumapp.lendsum.util.GlobalConstants.returningUser
 import com.lendsumapp.lendsum.util.NavSignUpType
 import com.lendsumapp.lendsum.util.NetworkUtils
+import com.lendsumapp.lendsum.viewmodel.LoginViewModel
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.android.synthetic.main.fragment_login.*
 import javax.inject.Inject
 
 
@@ -35,7 +35,7 @@ class LoginFragment : Fragment(), View.OnClickListener{
     private var _binding: FragmentLoginBinding? = null
     private val binding get() =  _binding
     private val sharedPrefs by lazy { activity?.getPreferences(Context.MODE_PRIVATE) }
-    @Inject lateinit var googleAuthComponent: GoogleAuthComponent
+    private val loginViewModel: LoginViewModel by viewModels()
     @Inject lateinit var facebookAuthComponent: FacebookAuthComponent
     @Inject lateinit var emailAndPassAuthComponent: EmailAndPassAuthComponent
     @Inject lateinit var networkUtils: NetworkUtils
@@ -61,7 +61,7 @@ class LoginFragment : Fragment(), View.OnClickListener{
                 }
             }
             NavSignUpType.GOOGLE_LOGIN.ordinal ->{
-                val googleUser = googleAuthComponent.getFirebaseUser()
+                val googleUser = loginViewModel.getFirebaseUser()
                 if(googleUser != null && sharedPrefs?.getBoolean(returningUser, false) == true){
                     findNavController(this).navigate(R.id.action_loginFragment_to_marketplaceFragment)
                 }
@@ -108,7 +108,7 @@ class LoginFragment : Fragment(), View.OnClickListener{
 
         when(sharedPrefs?.getInt(navSignUpType, NavSignUpType.EMAIL_LOGIN.ordinal)){
             NavSignUpType.GOOGLE_LOGIN.ordinal ->{
-                data?.let { googleAuthComponent.handleGoogleSignInIntent(requestCode, it) }
+                data?.let { loginViewModel.handleGoogleSignInIntent(requestCode, it) }
             }
             NavSignUpType.FACEBOOK_LOGIN.ordinal ->{
                 data?.let{ facebookAuthComponent.handleFacebookSignInIntent(requestCode, resultCode, it)}
@@ -121,11 +121,6 @@ class LoginFragment : Fragment(), View.OnClickListener{
         emailAndPassAuthComponent.dismissAuthStateListener(emailSignInAuthStateListener)
     }
 
-    private fun sendGoogleSignInIntent(){
-        val intent = googleAuthComponent.getGoogleSignInIntent()
-        startActivityForResult(intent, googleAuthComponent.sendRequestCode())
-    }
-
     override fun onClick(view: View?) {
         var action: Int = -1
         if(networkUtils.isNetworkAvailable()) {
@@ -135,6 +130,7 @@ class LoginFragment : Fragment(), View.OnClickListener{
                 }
                 R.id.login_sign_in_btn -> {
 
+                    Log.d(TAG, "Sign In clicked!!!")
                     val signInEmail = binding?.loginEmailEt?.text?.trim().toString()
                     val signInPass = binding?.loginPasswordEt?.text?.trim().toString()
 
@@ -143,13 +139,14 @@ class LoginFragment : Fragment(), View.OnClickListener{
                     }
                 }
                 R.id.login_sign_up_email_btn -> {
-                    sharedPrefs?.edit()?.putInt(navSignUpType, NavSignUpType.EMAIL_LOGIN.ordinal)?.apply()
-                    action = R.id.action_loginFragment_to_createAccountFragment
+                    Log.d(TAG, "Sign Up clicked!!!")
+                    /*sharedPrefs?.edit()?.putInt(navSignUpType, NavSignUpType.EMAIL_LOGIN.ordinal)?.apply()
+                    action = R.id.action_loginFragment_to_createAccountFragment*/
                 }
                 R.id.login_sign_in_with_google -> {
                     context?.let {
-                        googleAuthComponent.configureGoogleAuth(it, getString(R.string.default_web_client_id))
-                        sendGoogleSignInIntent()
+                        loginViewModel.configureGoogleAuth()
+                        startActivityForResult(loginViewModel.getGoogleAuthIntent(), loginViewModel.getGoogleAuthCode())
                     }
                     sharedPrefs?.edit()?.putInt(navSignUpType, NavSignUpType.GOOGLE_LOGIN.ordinal)?.apply()
                     action = R.id.action_loginFragment_to_numberVerificationFragment

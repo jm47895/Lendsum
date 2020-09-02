@@ -7,12 +7,13 @@ import com.google.android.gms.tasks.Task
 import com.google.firebase.auth.AuthResult
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
+import dagger.hilt.android.scopes.ActivityScoped
 import dagger.hilt.android.scopes.FragmentScoped
 import kotlinx.coroutines.runBlocking
 import javax.inject.Inject
 import javax.inject.Singleton
 
-@FragmentScoped
+@ActivityScoped
 class EmailAndPassAuthComponent @Inject constructor(): OnCompleteListener<AuthResult>{
 
     private val firebaseAuth : FirebaseAuth = FirebaseAuth.getInstance()

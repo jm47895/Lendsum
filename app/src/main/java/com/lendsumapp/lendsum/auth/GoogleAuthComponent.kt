@@ -10,20 +10,17 @@ import com.google.android.gms.common.api.ApiException
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.auth.GoogleAuthProvider
+import dagger.hilt.android.scopes.ActivityScoped
 import dagger.hilt.android.scopes.FragmentScoped
 import javax.inject.Inject
 import javax.inject.Singleton
 
-@FragmentScoped
+@ActivityScoped
 class GoogleAuthComponent @Inject constructor(){
 
     private val firebaseAuth : FirebaseAuth = FirebaseAuth.getInstance()
     private lateinit var googleSignInClient : GoogleSignInClient
     private lateinit var user: FirebaseUser
-
-    fun getFirebaseUser(): FirebaseUser?{
-        return firebaseAuth.currentUser
-    }
 
     fun configureGoogleAuth(context: Context, clientId: String) {
         val gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
@@ -45,7 +42,7 @@ class GoogleAuthComponent @Inject constructor(){
         googleSignInClient.signOut()
     }
 
-    fun sendRequestCode(): Int{
+    fun getGoogleAuthRequestCode(): Int{
         return RC_SIGN_IN
     }
 
@@ -59,6 +56,8 @@ class GoogleAuthComponent @Inject constructor(){
             }catch (e: ApiException){
                 Log.d(TAG, "Firebase Login failed", e)
             }
+        }else{
+            Log.d(TAG, "Request code not equal")
         }
     }
 
@@ -69,12 +68,10 @@ class GoogleAuthComponent @Inject constructor(){
         firebaseAuth.signInWithCredential(credential)
             .addOnCompleteListener() { task ->
                 if (task.isSuccessful) {
-                    // Sign in success, update UI with the signed-in user's information
-                    user = firebaseAuth.currentUser!!
-                    Log.d(TAG, "Sign in success. Hello: ${user.uid}")
+                    Log.d(TAG, "Google Firebase Sign-in Success")
                 } else {
                     // If sign in fails, display a message to the user.
-                    Log.w(TAG, "signInWithCredential:failure", task.exception)
+                    Log.d(TAG, "Google Firebase Sign-in Failed", task.exception)
                 }
             }
 

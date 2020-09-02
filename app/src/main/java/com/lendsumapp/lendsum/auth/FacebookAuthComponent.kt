@@ -12,11 +12,12 @@ import com.facebook.login.LoginResult
 import com.google.firebase.auth.FacebookAuthProvider
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
+import dagger.hilt.android.scopes.ActivityScoped
 import dagger.hilt.android.scopes.FragmentScoped
 import javax.inject.Inject
 import javax.inject.Singleton
 
-@FragmentScoped
+@ActivityScoped
 class FacebookAuthComponent @Inject constructor(){
 
     private val callbackManager by lazy { CallbackManager.Factory.create() }

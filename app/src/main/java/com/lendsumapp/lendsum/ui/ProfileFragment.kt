@@ -6,6 +6,7 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.fragment.app.viewModels
 import androidx.navigation.findNavController
 import com.lendsumapp.lendsum.R
 import com.lendsumapp.lendsum.auth.EmailAndPassAuthComponent
@@ -14,6 +15,7 @@ import com.lendsumapp.lendsum.auth.GoogleAuthComponent
 import com.lendsumapp.lendsum.util.GlobalConstants
 import com.lendsumapp.lendsum.util.GlobalConstants.navSignUpType
 import com.lendsumapp.lendsum.util.NavSignUpType
+import com.lendsumapp.lendsum.viewmodel.ProfileViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.android.synthetic.main.fragment_profile.*
 import javax.inject.Inject
@@ -22,6 +24,7 @@ import javax.inject.Inject
 class ProfileFragment : Fragment() {
 
     private val sharedPrefs by lazy { activity?.getPreferences(Context.MODE_PRIVATE) }
+    private val profileViewModel: ProfileViewModel by viewModels()
     @Inject lateinit var googleAuthComponent: GoogleAuthComponent
     @Inject lateinit var facebookAuthComponent: FacebookAuthComponent
     @Inject lateinit var emailAndPassAuthComponent: EmailAndPassAuthComponent
@@ -46,8 +49,8 @@ class ProfileFragment : Fragment() {
                 }
                 NavSignUpType.GOOGLE_LOGIN.ordinal ->{
                     context?.let {
-                        googleAuthComponent.configureGoogleAuth(it, getString(R.string.default_web_client_id))
-                        googleAuthComponent.signOutOfGoogle()
+                        profileViewModel.configureGoogleAuth()
+                        profileViewModel.logOutOfGoogle()
                         view.findNavController().navigate(R.id.action_profileFragment_to_loginFragment)
                     }
                 }
