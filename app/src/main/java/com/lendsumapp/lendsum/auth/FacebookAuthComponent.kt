@@ -21,7 +21,6 @@ import javax.inject.Singleton
 class FacebookAuthComponent @Inject constructor(){
 
     private val callbackManager by lazy { CallbackManager.Factory.create() }
-    private val firebaseAuth : FirebaseAuth = FirebaseAuth.getInstance()
 
     private fun sendFacebookCredentialsToFirebase(token: AccessToken?) {
         Log.d(TAG, "handleFacebookAccessToken:$token")
@@ -41,14 +40,8 @@ class FacebookAuthComponent @Inject constructor(){
                         Log.w(TAG, "signInWithCredential:failure", task.exception)
 
                     }
-
-                    // ...
                 }
 
-    }
-
-    fun getFirebaseUser(): FirebaseUser?{
-        return firebaseAuth.currentUser
     }
 
     fun handleFacebookSignInIntent(requestCode: Int, resultCode: Int, data: Intent){

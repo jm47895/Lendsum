@@ -57,6 +57,16 @@ class LoginViewModel @ViewModelInject constructor(
     }
     //End of Email and Pass functions
 
+    //Facebook login functions
+    fun sendFacebookIntent(){
+        loginRepository.sendFacebookIntent()
+    }
+
+    fun handleFacebookSignInIntent(requestCode: Int, resultCode: Int, data: Intent){
+        loginRepository.handleFacebookSignInIntent(requestCode, resultCode, data)
+    }
+    //End of Facebook login functions
+
     companion object{
         private val TAG = LoginViewModel::class.simpleName
     }

@@ -20,7 +20,6 @@ class GoogleAuthComponent @Inject constructor(){
 
     private val firebaseAuth : FirebaseAuth = FirebaseAuth.getInstance()
     private lateinit var googleSignInClient : GoogleSignInClient
-    private lateinit var user: FirebaseUser
 
     fun configureGoogleAuth(context: Context, clientId: String) {
         val gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)

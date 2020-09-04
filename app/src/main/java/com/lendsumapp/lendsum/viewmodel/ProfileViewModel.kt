@@ -20,4 +20,8 @@ class ProfileViewModel @ViewModelInject constructor(
         loginRepository.logOutOfEmailAndPass()
     }
 
+    fun logOutOfFacebook(){
+        loginRepository.logOutOfFacebook()
+    }
+
 }

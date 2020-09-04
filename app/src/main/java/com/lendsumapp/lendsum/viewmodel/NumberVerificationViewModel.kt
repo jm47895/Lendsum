@@ -15,4 +15,8 @@ class NumberVerificationViewModel @ViewModelInject constructor(
     fun configureGoogleAuth(){
         loginRepository.configureGoogleAuth()
     }
+
+    fun logOutOfFacebook(){
+        loginRepository.logOutOfFacebook()
+    }
 }

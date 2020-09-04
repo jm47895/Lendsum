@@ -9,9 +9,6 @@ import android.view.ViewGroup
 import androidx.fragment.app.viewModels
 import androidx.navigation.findNavController
 import com.lendsumapp.lendsum.R
-import com.lendsumapp.lendsum.auth.FacebookAuthComponent
-import com.lendsumapp.lendsum.auth.GoogleAuthComponent
-import com.lendsumapp.lendsum.util.GlobalConstants
 import com.lendsumapp.lendsum.util.GlobalConstants.navSignUpType
 import com.lendsumapp.lendsum.util.GlobalConstants.returningUser
 import com.lendsumapp.lendsum.util.NavSignUpType
@@ -25,8 +22,6 @@ class NumberVerificationFragment : Fragment() {
 
     private val sharedPrefs by lazy { activity?.getPreferences(Context.MODE_PRIVATE) }
     private val numberVerificationViewModel: NumberVerificationViewModel by viewModels()
-    @Inject lateinit var googleAuth : GoogleAuthComponent
-    @Inject lateinit var facebookAuthComponent: FacebookAuthComponent
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -55,7 +50,7 @@ class NumberVerificationFragment : Fragment() {
                         numberVerificationViewModel.logOutOfGoogle()
                     }
                     NavSignUpType.FACEBOOK_LOGIN.ordinal ->{
-                        facebookAuthComponent.signOutOfFacebook()
+                        numberVerificationViewModel.logOutOfFacebook()
                     }
                 }
 

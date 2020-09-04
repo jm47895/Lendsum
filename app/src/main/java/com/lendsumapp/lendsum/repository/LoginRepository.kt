@@ -84,6 +84,19 @@ class LoginRepository @Inject constructor(
     }
     //End of Email and Pass functions
 
+    //Facebook login functions
+    fun sendFacebookIntent(){
+        facebookAuthComponent.sendFacebookSignInIntent()
+    }
+
+    fun handleFacebookSignInIntent(requestCode: Int, resultCode: Int, data: Intent){
+        facebookAuthComponent.handleFacebookSignInIntent(requestCode, resultCode, data)
+    }
+
+    fun logOutOfFacebook(){
+        facebookAuthComponent.signOutOfFacebook()
+    }
+    //End of Facebook login functions
 
     companion object{
         private val TAG = LoginRepository::class.simpleName

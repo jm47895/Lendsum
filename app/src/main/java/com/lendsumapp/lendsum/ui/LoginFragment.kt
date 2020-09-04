@@ -8,6 +8,7 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.EditText
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
@@ -15,7 +16,6 @@ import androidx.navigation.findNavController
 import androidx.navigation.fragment.NavHostFragment.findNavController
 import com.facebook.login.LoginManager
 import com.lendsumapp.lendsum.R
-import com.lendsumapp.lendsum.auth.FacebookAuthComponent
 import com.lendsumapp.lendsum.databinding.FragmentLoginBinding
 import com.lendsumapp.lendsum.util.AndroidUtils
 import com.lendsumapp.lendsum.util.GlobalConstants.navSignUpType
@@ -34,9 +34,11 @@ class LoginFragment : Fragment(), View.OnClickListener{
     private val binding get() =  _binding
     private val sharedPrefs by lazy { activity?.getPreferences(Context.MODE_PRIVATE) }
     private val loginViewModel: LoginViewModel by viewModels()
-    @Inject lateinit var facebookAuthComponent: FacebookAuthComponent
     @Inject lateinit var networkUtils: NetworkUtils
     @Inject lateinit var androidUtils: AndroidUtils
+    lateinit var signInEmail: String
+    lateinit var signInPassword: String
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -84,6 +86,8 @@ class LoginFragment : Fragment(), View.OnClickListener{
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        signInEmail = binding?.loginEmailEt?.text?.trim().toString()
+        signInPassword = binding?.loginPasswordEt?.text?.trim().toString()
         binding?.loginSignInBtn?.setOnClickListener(this)
         binding?.loginEmailEt?.setOnClickListener(this)
         binding?.loginForgotPasswordTv?.setOnClickListener(this)
@@ -109,7 +113,7 @@ class LoginFragment : Fragment(), View.OnClickListener{
                 data?.let { loginViewModel.handleGoogleSignInIntent(requestCode, it) }
             }
             NavSignUpType.FACEBOOK_LOGIN.ordinal ->{
-                data?.let{ facebookAuthComponent.handleFacebookSignInIntent(requestCode, resultCode, it)}
+                data?.let{ loginViewModel.handleFacebookSignInIntent(requestCode, resultCode, it)}
             }
         }
     }
@@ -128,11 +132,8 @@ class LoginFragment : Fragment(), View.OnClickListener{
                 }
                 R.id.login_sign_in_btn -> {
 
-                    val signInEmail = binding?.loginEmailEt?.text?.trim().toString()
-                    val signInPass = binding?.loginPasswordEt?.text?.trim().toString()
-
-                    if(!TextUtils.isEmpty(signInEmail) && !TextUtils.isEmpty(signInPass)) {
-                        loginViewModel.signInWithEmailAndPass(signInEmail, signInPass)
+                    if(!TextUtils.isEmpty(signInEmail) && !TextUtils.isEmpty(signInPassword)) {
+                        loginViewModel.signInWithEmailAndPass(signInEmail, signInPassword)
                         sharedPrefs?.edit()?.putInt(navSignUpType, NavSignUpType.EMAIL_LOGIN.ordinal)?.apply()
                     }
                 }
@@ -151,7 +152,7 @@ class LoginFragment : Fragment(), View.OnClickListener{
                 R.id.login_sign_in_with_facebook -> {
                     sharedPrefs?.edit()?.putInt(navSignUpType, NavSignUpType.FACEBOOK_LOGIN.ordinal)?.apply()
                     LoginManager.getInstance().logInWithReadPermissions(this, listOf("user_photos", "email", "user_birthday", "public_profile"))
-                    facebookAuthComponent.sendFacebookSignInIntent()
+                    loginViewModel.sendFacebookIntent()
 
                     action = R.id.action_loginFragment_to_numberVerificationFragment
                 }

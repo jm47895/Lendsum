@@ -9,10 +9,6 @@ import android.view.ViewGroup
 import androidx.fragment.app.viewModels
 import androidx.navigation.findNavController
 import com.lendsumapp.lendsum.R
-import com.lendsumapp.lendsum.auth.EmailAndPassAuthComponent
-import com.lendsumapp.lendsum.auth.FacebookAuthComponent
-import com.lendsumapp.lendsum.auth.GoogleAuthComponent
-import com.lendsumapp.lendsum.util.GlobalConstants
 import com.lendsumapp.lendsum.util.GlobalConstants.navSignUpType
 import com.lendsumapp.lendsum.util.NavSignUpType
 import com.lendsumapp.lendsum.viewmodel.ProfileViewModel
@@ -25,9 +21,6 @@ class ProfileFragment : Fragment() {
 
     private val sharedPrefs by lazy { activity?.getPreferences(Context.MODE_PRIVATE) }
     private val profileViewModel: ProfileViewModel by viewModels()
-    @Inject lateinit var googleAuthComponent: GoogleAuthComponent
-    @Inject lateinit var facebookAuthComponent: FacebookAuthComponent
-    @Inject lateinit var emailAndPassAuthComponent: EmailAndPassAuthComponent
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -55,7 +48,7 @@ class ProfileFragment : Fragment() {
                     }
                 }
                 NavSignUpType.FACEBOOK_LOGIN.ordinal ->{
-                    facebookAuthComponent.signOutOfFacebook()
+                    profileViewModel.logOutOfFacebook()
                     view.findNavController().navigate(R.id.action_profileFragment_to_loginFragment)
                 }
             }
