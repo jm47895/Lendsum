@@ -24,7 +24,7 @@ class LoginRepository @Inject constructor(
     private val facebookAuthComponent: FacebookAuthComponent,
     private val emailAndPassAuthComponent: EmailAndPassAuthComponent,
     private var firebaseAuth: FirebaseAuth?,
-    @ActivityContext private val context: Context
+    @ActivityContext private var context: Context?
 ){
 
     //Firebase
@@ -34,7 +34,8 @@ class LoginRepository @Inject constructor(
 
     //Start of Google Auth functions
     fun configureGoogleAuth(){
-        googleAuthComponent.configureGoogleAuth(context, context.resources.getString(R.string.default_web_client_id))
+
+        context?.let { googleAuthComponent.configureGoogleAuth(it, it.resources.getString(R.string.default_web_client_id)) }
     }
 
     fun sendGoogleSignInIntent(): Intent{
@@ -69,6 +70,7 @@ class LoginRepository @Inject constructor(
 
     fun dismissAuthStateListener(){
         emailAndPassAuthComponent.dismissAuthStateListener()
+        context = null
     }
 
     fun addFirebaseAuthStateListener(){

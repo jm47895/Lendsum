@@ -1,5 +1,6 @@
 package com.lendsumapp.lendsum.viewmodel
 
+import android.app.Activity
 import android.content.Intent
 import android.util.Log
 import androidx.hilt.lifecycle.ViewModelInject

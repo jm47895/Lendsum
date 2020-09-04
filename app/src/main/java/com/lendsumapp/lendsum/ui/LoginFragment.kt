@@ -86,8 +86,7 @@ class LoginFragment : Fragment(), View.OnClickListener{
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        signInEmail = binding?.loginEmailEt?.text?.trim().toString()
-        signInPassword = binding?.loginPasswordEt?.text?.trim().toString()
+        binding?.loginSignUpEmailBtn?.setOnClickListener(this)
         binding?.loginSignInBtn?.setOnClickListener(this)
         binding?.loginEmailEt?.setOnClickListener(this)
         binding?.loginForgotPasswordTv?.setOnClickListener(this)
@@ -131,6 +130,9 @@ class LoginFragment : Fragment(), View.OnClickListener{
                     action = R.id.action_loginFragment_to_forgotPasswordFragment
                 }
                 R.id.login_sign_in_btn -> {
+
+                    signInEmail = binding?.loginEmailEt?.text?.trim().toString()
+                    signInPassword = binding?.loginPasswordEt?.text?.trim().toString()
 
                     if(!TextUtils.isEmpty(signInEmail) && !TextUtils.isEmpty(signInPassword)) {
                         loginViewModel.signInWithEmailAndPass(signInEmail, signInPassword)
