@@ -44,7 +44,7 @@ class ProfileFragment : Fragment() {
 
             when(sharedPrefs?.getInt(navSignUpType, NavSignUpType.EMAIL_LOGIN.ordinal)){
                 NavSignUpType.EMAIL_LOGIN.ordinal ->{
-                    emailAndPassAuthComponent.signOutOfEmailAndPass()
+                    profileViewModel.logOutOfEmailAndPass()
                     view.findNavController().navigate(R.id.action_profileFragment_to_loginFragment)
                 }
                 NavSignUpType.GOOGLE_LOGIN.ordinal ->{

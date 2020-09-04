@@ -17,6 +17,7 @@ class LoginViewModel @ViewModelInject constructor(
         return loginRepository.getFirebaseUser()
     }
 
+    //Start of Google Auth functions
     fun configureGoogleAuth(){
         loginRepository.configureGoogleAuth()
     }
@@ -32,6 +33,29 @@ class LoginViewModel @ViewModelInject constructor(
     fun getGoogleAuthCode(): Int{
         return loginRepository.getGoogleRequestCode()
     }
+    //End of Google Auth functions
+
+    //Start of Email and Pass functions
+    fun signInWithEmailAndPass(email: String, password: String){
+        loginRepository.signInWithEmailAndPass(email, password)
+    }
+
+    fun initializeAuthStateListener(){
+        loginRepository.initializeAuthStateListener()
+    }
+
+    fun dismissAuthStateListener(){
+        loginRepository.dismissAuthStateListener()
+    }
+
+    fun addFirebaseAuthStateListener(){
+        loginRepository.addFirebaseAuthStateListener()
+    }
+
+    fun getEmailSignInStatus(): MutableLiveData<Boolean>{
+        return loginRepository.getEmailSignInStatus()
+    }
+    //End of Email and Pass functions
 
     companion object{
         private val TAG = LoginViewModel::class.simpleName

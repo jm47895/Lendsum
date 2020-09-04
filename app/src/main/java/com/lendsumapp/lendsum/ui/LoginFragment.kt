@@ -10,13 +10,11 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.Observer
 import androidx.navigation.findNavController
 import androidx.navigation.fragment.NavHostFragment.findNavController
 import com.facebook.login.LoginManager
-import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.auth.FirebaseAuth.AuthStateListener
 import com.lendsumapp.lendsum.R
-import com.lendsumapp.lendsum.auth.EmailAndPassAuthComponent
 import com.lendsumapp.lendsum.auth.FacebookAuthComponent
 import com.lendsumapp.lendsum.databinding.FragmentLoginBinding
 import com.lendsumapp.lendsum.util.AndroidUtils
@@ -37,25 +35,25 @@ class LoginFragment : Fragment(), View.OnClickListener{
     private val sharedPrefs by lazy { activity?.getPreferences(Context.MODE_PRIVATE) }
     private val loginViewModel: LoginViewModel by viewModels()
     @Inject lateinit var facebookAuthComponent: FacebookAuthComponent
-    @Inject lateinit var emailAndPassAuthComponent: EmailAndPassAuthComponent
     @Inject lateinit var networkUtils: NetworkUtils
     @Inject lateinit var androidUtils: AndroidUtils
-    private lateinit var emailSignInAuthStateListener: AuthStateListener
-    private val firebaseAuth = FirebaseAuth.getInstance()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        emailSignInAuthStateListener = AuthStateListener {
-            val user = it.currentUser
-            if (user != null) {
+        initializeAuthStateListener()
+        val emailSignObserver = Observer<Boolean> { loginSuccessful ->
+            if (loginSuccessful){
                 findNavController(this).navigate(R.id.action_loginFragment_to_numberVerificationFragment)
+            }else{
+                Log.d(TAG, "Email login failed in login fragment")
             }
         }
+        loginViewModel.getEmailSignInStatus().observe(this, emailSignObserver)
 
         when(sharedPrefs?.getInt(navSignUpType, NavSignUpType.EMAIL_LOGIN.ordinal)){
             NavSignUpType.EMAIL_LOGIN.ordinal ->{
-                val emailUser = emailAndPassAuthComponent.getFirebaseUser()
+                val emailUser = loginViewModel.getFirebaseUser()
                 if(emailUser != null && sharedPrefs?.getBoolean(returningUser, false) == true){
                     findNavController(this).navigate(R.id.action_loginFragment_to_marketplaceFragment)
                 }
@@ -67,7 +65,7 @@ class LoginFragment : Fragment(), View.OnClickListener{
                 }
             }
             NavSignUpType.FACEBOOK_LOGIN.ordinal ->{
-                val facebookUser = facebookAuthComponent.getFirebaseUser()
+                val facebookUser = loginViewModel.getFirebaseUser()
                 if(facebookUser != null && sharedPrefs?.getBoolean(returningUser, false) == true){
                     findNavController(this).navigate(R.id.action_loginFragment_to_marketplaceFragment)
                 }
@@ -95,7 +93,7 @@ class LoginFragment : Fragment(), View.OnClickListener{
 
     override fun onStart() {
         super.onStart()
-        firebaseAuth.addAuthStateListener(emailSignInAuthStateListener)
+        addFirebaseAuthStateListener()
     }
 
     override fun onDestroyView() {
@@ -118,7 +116,7 @@ class LoginFragment : Fragment(), View.OnClickListener{
 
     override fun onStop() {
         super.onStop()
-        emailAndPassAuthComponent.dismissAuthStateListener(emailSignInAuthStateListener)
+        dismissAuthStateListener()
     }
 
     override fun onClick(view: View?) {
@@ -130,24 +128,22 @@ class LoginFragment : Fragment(), View.OnClickListener{
                 }
                 R.id.login_sign_in_btn -> {
 
-                    Log.d(TAG, "Sign In clicked!!!")
                     val signInEmail = binding?.loginEmailEt?.text?.trim().toString()
                     val signInPass = binding?.loginPasswordEt?.text?.trim().toString()
 
                     if(!TextUtils.isEmpty(signInEmail) && !TextUtils.isEmpty(signInPass)) {
-                        emailAndPassAuthComponent.signInWithEmailAndPass(signInEmail, signInPass)
+                        loginViewModel.signInWithEmailAndPass(signInEmail, signInPass)
+                        sharedPrefs?.edit()?.putInt(navSignUpType, NavSignUpType.EMAIL_LOGIN.ordinal)?.apply()
                     }
                 }
                 R.id.login_sign_up_email_btn -> {
-                    Log.d(TAG, "Sign Up clicked!!!")
-                    /*sharedPrefs?.edit()?.putInt(navSignUpType, NavSignUpType.EMAIL_LOGIN.ordinal)?.apply()
-                    action = R.id.action_loginFragment_to_createAccountFragment*/
+                    sharedPrefs?.edit()?.putInt(navSignUpType, NavSignUpType.EMAIL_LOGIN.ordinal)?.apply()
+                    action = R.id.action_loginFragment_to_createAccountFragment
                 }
                 R.id.login_sign_in_with_google -> {
-                    context?.let {
-                        loginViewModel.configureGoogleAuth()
-                        startActivityForResult(loginViewModel.getGoogleAuthIntent(), loginViewModel.getGoogleAuthCode())
-                    }
+
+                    loginViewModel.configureGoogleAuth()
+                    startActivityForResult(loginViewModel.getGoogleAuthIntent(), loginViewModel.getGoogleAuthCode())
                     sharedPrefs?.edit()?.putInt(navSignUpType, NavSignUpType.GOOGLE_LOGIN.ordinal)?.apply()
                     action = R.id.action_loginFragment_to_numberVerificationFragment
 
@@ -156,6 +152,7 @@ class LoginFragment : Fragment(), View.OnClickListener{
                     sharedPrefs?.edit()?.putInt(navSignUpType, NavSignUpType.FACEBOOK_LOGIN.ordinal)?.apply()
                     LoginManager.getInstance().logInWithReadPermissions(this, listOf("user_photos", "email", "user_birthday", "public_profile"))
                     facebookAuthComponent.sendFacebookSignInIntent()
+
                     action = R.id.action_loginFragment_to_numberVerificationFragment
                 }
             }
@@ -166,6 +163,18 @@ class LoginFragment : Fragment(), View.OnClickListener{
         }else{
             activity?.let { androidUtils.showSnackBar(it, "You are not connected to the internet") }
         }
+    }
+
+    private fun initializeAuthStateListener(){
+        loginViewModel.initializeAuthStateListener()
+    }
+
+    private fun dismissAuthStateListener(){
+        loginViewModel.dismissAuthStateListener()
+    }
+
+    private fun addFirebaseAuthStateListener(){
+        loginViewModel.addFirebaseAuthStateListener()
     }
 
     companion object{

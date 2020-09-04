@@ -7,9 +7,11 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
 import androidx.navigation.findNavController
 import com.lendsumapp.lendsum.R
 import com.lendsumapp.lendsum.auth.EmailAndPassAuthComponent
+import com.lendsumapp.lendsum.viewmodel.CreateAccountViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.android.synthetic.main.fragment_create_account.*
 import java.util.regex.Matcher
@@ -20,7 +22,7 @@ import javax.inject.Inject
 @AndroidEntryPoint
 class CreateAccountFragment : Fragment() {
 
-    @Inject lateinit var emailAndPassAuthComponent: EmailAndPassAuthComponent
+    private val createAccountViewModel: CreateAccountViewModel by viewModels()
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -57,7 +59,7 @@ class CreateAccountFragment : Fragment() {
     }
 
     private fun signUpUser(firstName: String, lastName: String, email: String, password: String) {
-        emailAndPassAuthComponent.registerWithEmailAndPassword(email, password)
+        createAccountViewModel.createUserAccount(email, password)
     }
 
     private fun isValidAccountForm(firstName: String, lastName: String, email: String, password: String, matchPassword: String): Boolean {

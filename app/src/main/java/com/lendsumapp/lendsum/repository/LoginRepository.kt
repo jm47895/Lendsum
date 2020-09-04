@@ -5,6 +5,7 @@ import android.content.Intent
 import android.provider.Settings.Global.getString
 import android.util.Log
 import androidx.core.app.ActivityCompat.startActivityForResult
+import androidx.lifecycle.MutableLiveData
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import com.lendsumapp.lendsum.R
@@ -26,10 +27,12 @@ class LoginRepository @Inject constructor(
     @ActivityContext private val context: Context
 ){
 
+    //Firebase
     fun getFirebaseUser(): FirebaseUser? {
         return firebaseAuth?.currentUser
     }
 
+    //Start of Google Auth functions
     fun configureGoogleAuth(){
         googleAuthComponent.configureGoogleAuth(context, context.resources.getString(R.string.default_web_client_id))
     }
@@ -49,6 +52,38 @@ class LoginRepository @Inject constructor(
     fun logOutOfGoogle(){
         googleAuthComponent.signOutOfGoogle()
     }
+    //End of Google Auth functions
+
+    //Start of Email and Pass functions
+    fun registerWithEmailAndPassword(email: String, password: String){
+        emailAndPassAuthComponent.registerWithEmailAndPassword(email, password)
+    }
+
+    fun signInWithEmailAndPass(email: String, password: String){
+        emailAndPassAuthComponent.signInWithEmailAndPass(email, password)
+    }
+
+    fun initializeAuthStateListener(){
+        emailAndPassAuthComponent.initializeAuthStateListener()
+    }
+
+    fun dismissAuthStateListener(){
+        emailAndPassAuthComponent.dismissAuthStateListener()
+    }
+
+    fun addFirebaseAuthStateListener(){
+        emailAndPassAuthComponent.addFirebaseAuthStateListener()
+    }
+
+    fun logOutOfEmailAndPass(){
+        emailAndPassAuthComponent.signOutOfEmailAndPass()
+    }
+
+    fun getEmailSignInStatus(): MutableLiveData<Boolean> {
+        return emailAndPassAuthComponent.getEmailSignInStatus()
+    }
+    //End of Email and Pass functions
+
 
     companion object{
         private val TAG = LoginRepository::class.simpleName

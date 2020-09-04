@@ -16,4 +16,8 @@ class ProfileViewModel @ViewModelInject constructor(
         loginRepository.configureGoogleAuth()
     }
 
+    fun logOutOfEmailAndPass(){
+        loginRepository.logOutOfEmailAndPass()
+    }
+
 }

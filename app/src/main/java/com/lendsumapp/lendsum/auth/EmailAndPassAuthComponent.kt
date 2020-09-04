@@ -1,28 +1,25 @@
 package com.lendsumapp.lendsum.auth
 
-import android.app.Activity
 import android.util.Log
+import androidx.lifecycle.MutableLiveData
 import com.google.android.gms.tasks.OnCompleteListener
 import com.google.android.gms.tasks.Task
 import com.google.firebase.auth.AuthResult
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.auth.FirebaseUser
 import dagger.hilt.android.scopes.ActivityScoped
-import dagger.hilt.android.scopes.FragmentScoped
-import kotlinx.coroutines.runBlocking
 import javax.inject.Inject
-import javax.inject.Singleton
 
 @ActivityScoped
 class EmailAndPassAuthComponent @Inject constructor(): OnCompleteListener<AuthResult>{
 
     private val firebaseAuth : FirebaseAuth = FirebaseAuth.getInstance()
+    private lateinit var emailSignInAuthStateListener: FirebaseAuth.AuthStateListener
+    private val emailSignInStatus: MutableLiveData<Boolean> = MutableLiveData()
 
     fun signInWithEmailAndPass(email: String, password: String)
     {
         firebaseAuth.signInWithEmailAndPassword(email, password)
     }
-
 
 
     fun registerWithEmailAndPassword(email: String, password: String){
@@ -39,16 +36,27 @@ class EmailAndPassAuthComponent @Inject constructor(): OnCompleteListener<AuthRe
         }
     }
 
-    fun getFirebaseUser(): FirebaseUser?{
-        return firebaseAuth.currentUser
-    }
-
     fun signOutOfEmailAndPass(){
         firebaseAuth.signOut()
     }
 
-    fun dismissAuthStateListener(authStateListener: FirebaseAuth.AuthStateListener){
-        firebaseAuth.removeAuthStateListener(authStateListener)
+    fun initializeAuthStateListener(){
+        emailSignInAuthStateListener = FirebaseAuth.AuthStateListener {
+            val user = it.currentUser
+            emailSignInStatus.value = user != null
+        }
+    }
+
+    fun dismissAuthStateListener(){
+        firebaseAuth.removeAuthStateListener(emailSignInAuthStateListener)
+    }
+
+    fun addFirebaseAuthStateListener(){
+        firebaseAuth.addAuthStateListener(emailSignInAuthStateListener)
+    }
+
+    fun getEmailSignInStatus(): MutableLiveData<Boolean> {
+        return emailSignInStatus
     }
 
     companion object{
