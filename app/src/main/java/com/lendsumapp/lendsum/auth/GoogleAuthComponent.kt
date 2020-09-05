@@ -3,6 +3,7 @@ package com.lendsumapp.lendsum.auth
 import android.content.Context
 import android.content.Intent
 import android.util.Log
+import androidx.lifecycle.MutableLiveData
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInClient
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
@@ -20,6 +21,7 @@ class GoogleAuthComponent @Inject constructor(){
 
     private val firebaseAuth : FirebaseAuth = FirebaseAuth.getInstance()
     private lateinit var googleSignInClient : GoogleSignInClient
+    private val googleAuthState: MutableLiveData<Boolean> = MutableLiveData()
 
     fun configureGoogleAuth(context: Context, clientId: String) {
         val gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
@@ -37,6 +39,7 @@ class GoogleAuthComponent @Inject constructor(){
     }
 
     fun signOutOfGoogle(){
+        googleAuthState.value = false
         firebaseAuth.signOut()
         googleSignInClient.signOut()
     }
@@ -68,12 +71,18 @@ class GoogleAuthComponent @Inject constructor(){
             .addOnCompleteListener() { task ->
                 if (task.isSuccessful) {
                     Log.d(TAG, "Google Firebase Sign-in Success")
+                    googleAuthState.value = true
                 } else {
                     // If sign in fails, display a message to the user.
                     Log.d(TAG, "Google Firebase Sign-in Failed", task.exception)
+                    googleAuthState.value = false
                 }
             }
 
+    }
+
+    fun getGoogleLoginState():MutableLiveData<Boolean>{
+        return googleAuthState
     }
 
     companion object{

@@ -2,13 +2,16 @@ package com.lendsumapp.lendsum.ui
 
 import android.os.Bundle
 import android.text.TextUtils
+import android.util.Log
 import android.util.Patterns
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.Observer
 import androidx.navigation.findNavController
+import androidx.navigation.fragment.NavHostFragment.findNavController
 import com.lendsumapp.lendsum.R
 import com.lendsumapp.lendsum.viewmodel.CreateAccountViewModel
 import dagger.hilt.android.AndroidEntryPoint
@@ -22,6 +25,22 @@ import javax.inject.Inject
 class CreateAccountFragment : Fragment() {
 
     private val createAccountViewModel: CreateAccountViewModel by viewModels()
+    private lateinit var emailSignUpObserver: Observer<Boolean>
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+
+        emailSignUpObserver = Observer { isSignUpSuccessful ->
+
+            if (isSignUpSuccessful){
+                Log.d(TAG, "Email sign up success")
+                findNavController(this).navigate(R.id.action_createAccountFragment_to_numberVerificationFragment)
+            }else{
+                Log.d(TAG, "Email sign up failure")
+            }
+
+        }
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -45,9 +64,8 @@ class CreateAccountFragment : Fragment() {
             val matchPassword = create_user_match_password_et.text.toString().trim()
 
             if(isValidAccountForm(firstName, lastName, email, password, matchPassword)){
-
+                createAccountViewModel.getEmailSignUpStatus().observe(viewLifecycleOwner, emailSignUpObserver)
                 signUpUser(firstName, lastName, email, password)
-                view.findNavController().navigate(R.id.action_createAccountFragment_to_numberVerificationFragment)
             }
 
         }

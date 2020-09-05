@@ -13,12 +13,12 @@ import javax.inject.Inject
 class EmailAndPassAuthComponent @Inject constructor(): OnCompleteListener<AuthResult>{
 
     private val firebaseAuth : FirebaseAuth = FirebaseAuth.getInstance()
-    private lateinit var emailSignInAuthStateListener: FirebaseAuth.AuthStateListener
+    //private lateinit var emailSignInAuthStateListener: FirebaseAuth.AuthStateListener
     private val emailSignInStatus: MutableLiveData<Boolean> = MutableLiveData()
 
     fun signInWithEmailAndPass(email: String, password: String)
     {
-        firebaseAuth.signInWithEmailAndPassword(email, password)
+        firebaseAuth.signInWithEmailAndPassword(email, password).addOnCompleteListener(this)
     }
 
 
@@ -29,21 +29,23 @@ class EmailAndPassAuthComponent @Inject constructor(): OnCompleteListener<AuthRe
 
     override fun onComplete(task: Task<AuthResult>) {
         if (task.isSuccessful){
-            val userEmail = firebaseAuth.currentUser?.email
-            Log.d(TAG, "register with email : Success. User email is: {$userEmail}")
+            emailSignInStatus.value = true
+            Log.d(TAG, "register with email : Success.")
         }else{
+            emailSignInStatus.value = false
             Log.d(TAG, "register with email : Failure")
         }
     }
 
     fun signOutOfEmailAndPass(){
         firebaseAuth.signOut()
+        emailSignInStatus.value = false
     }
 
-    fun initializeAuthStateListener(){
+    /*fun initializeAuthStateListener(){
         emailSignInAuthStateListener = FirebaseAuth.AuthStateListener {
-            val user = it.currentUser
-            emailSignInStatus.value = user != null
+
+
         }
     }
 
@@ -53,7 +55,7 @@ class EmailAndPassAuthComponent @Inject constructor(): OnCompleteListener<AuthRe
 
     fun addFirebaseAuthStateListener(){
         firebaseAuth.addAuthStateListener(emailSignInAuthStateListener)
-    }
+    }*/
 
     fun getEmailSignInStatus(): MutableLiveData<Boolean> {
         return emailSignInStatus

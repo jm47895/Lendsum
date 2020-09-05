@@ -24,7 +24,7 @@ class LoginRepository @Inject constructor(
     private val facebookAuthComponent: FacebookAuthComponent,
     private val emailAndPassAuthComponent: EmailAndPassAuthComponent,
     private var firebaseAuth: FirebaseAuth?,
-    @ActivityContext private var context: Context?
+    @ActivityContext private var context: Context
 ){
 
     //Firebase
@@ -34,8 +34,7 @@ class LoginRepository @Inject constructor(
 
     //Start of Google Auth functions
     fun configureGoogleAuth(){
-
-        context?.let { googleAuthComponent.configureGoogleAuth(it, it.resources.getString(R.string.default_web_client_id)) }
+        googleAuthComponent.configureGoogleAuth(context, context.resources.getString(R.string.default_web_client_id))
     }
 
     fun sendGoogleSignInIntent(): Intent{
@@ -53,6 +52,10 @@ class LoginRepository @Inject constructor(
     fun logOutOfGoogle(){
         googleAuthComponent.signOutOfGoogle()
     }
+
+    fun getGoogleLoginState():MutableLiveData<Boolean>{
+        return googleAuthComponent.getGoogleLoginState()
+    }
     //End of Google Auth functions
 
     //Start of Email and Pass functions
@@ -64,21 +67,12 @@ class LoginRepository @Inject constructor(
         emailAndPassAuthComponent.signInWithEmailAndPass(email, password)
     }
 
-    fun initializeAuthStateListener(){
-        emailAndPassAuthComponent.initializeAuthStateListener()
-    }
-
-    fun dismissAuthStateListener(){
-        emailAndPassAuthComponent.dismissAuthStateListener()
-        context = null
-    }
-
-    fun addFirebaseAuthStateListener(){
-        emailAndPassAuthComponent.addFirebaseAuthStateListener()
-    }
-
     fun logOutOfEmailAndPass(){
         emailAndPassAuthComponent.signOutOfEmailAndPass()
+    }
+
+    fun getEmailSignUpStatus(): MutableLiveData<Boolean>{
+        return emailAndPassAuthComponent.getEmailSignInStatus()
     }
 
     fun getEmailSignInStatus(): MutableLiveData<Boolean> {
@@ -97,6 +91,10 @@ class LoginRepository @Inject constructor(
 
     fun logOutOfFacebook(){
         facebookAuthComponent.signOutOfFacebook()
+    }
+
+    fun getFacebookAuthState(): MutableLiveData<Boolean>{
+        return facebookAuthComponent.getFacebookAuthState()
     }
     //End of Facebook login functions
 

@@ -3,6 +3,7 @@ package com.lendsumapp.lendsum.auth
 import android.app.Activity
 import android.content.Intent
 import android.util.Log
+import androidx.lifecycle.MutableLiveData
 import com.facebook.AccessToken
 import com.facebook.CallbackManager
 import com.facebook.FacebookCallback
@@ -21,6 +22,7 @@ import javax.inject.Singleton
 class FacebookAuthComponent @Inject constructor(){
 
     private val callbackManager by lazy { CallbackManager.Factory.create() }
+    private val facebookAuthState: MutableLiveData<Boolean> = MutableLiveData()
 
     private fun sendFacebookCredentialsToFirebase(token: AccessToken?) {
         Log.d(TAG, "handleFacebookAccessToken:$token")
@@ -32,11 +34,12 @@ class FacebookAuthComponent @Inject constructor(){
                 .addOnCompleteListener() { task ->
                     if (task.isSuccessful) {
                         // Sign in success, update UI with the signed-in user's information
-                        val user = FirebaseAuth.getInstance().currentUser
-                        Log.d(TAG, "signInWithCredential:success: " + user?.email)
+                        facebookAuthState.value = true
+                        Log.d(TAG, "signInWithCredential:success: ")
 
                     } else {
                         // If sign in fails, display a message to the user.
+                        facebookAuthState.value = false
                         Log.w(TAG, "signInWithCredential:failure", task.exception)
 
                     }
@@ -58,18 +61,25 @@ class FacebookAuthComponent @Inject constructor(){
                 }
 
                 override fun onCancel() {
+                    facebookAuthState.value = false
                     Log.d(TAG, "facebook:onCancel")
                 }
 
                 override fun onError(error: FacebookException) {
+                    facebookAuthState.value = false
                     Log.d(TAG, "facebook:onError", error)
                 }
             })
     }
 
     fun signOutOfFacebook(){
+        facebookAuthState.value = false
         LoginManager.getInstance().logOut()
         FirebaseAuth.getInstance().signOut()
+    }
+
+    fun getFacebookAuthState(): MutableLiveData<Boolean>{
+        return facebookAuthState
     }
 
     companion object{

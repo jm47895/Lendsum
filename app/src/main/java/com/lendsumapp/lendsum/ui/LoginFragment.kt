@@ -8,7 +8,6 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.EditText
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
@@ -38,20 +37,13 @@ class LoginFragment : Fragment(), View.OnClickListener{
     @Inject lateinit var androidUtils: AndroidUtils
     lateinit var signInEmail: String
     lateinit var signInPassword: String
+    lateinit var emailSignInObserver: Observer<Boolean>
+    private lateinit var googleAuthObserver: Observer<Boolean>
+    private lateinit var facebookAuthObserver: Observer<Boolean>
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
-        initializeAuthStateListener()
-        val emailSignObserver = Observer<Boolean> { loginSuccessful ->
-            if (loginSuccessful){
-                findNavController(this).navigate(R.id.action_loginFragment_to_numberVerificationFragment)
-            }else{
-                Log.d(TAG, "Email login failed in login fragment")
-            }
-        }
-        loginViewModel.getEmailSignInStatus().observe(this, emailSignObserver)
 
         when(sharedPrefs?.getInt(navSignUpType, NavSignUpType.EMAIL_LOGIN.ordinal)){
             NavSignUpType.EMAIL_LOGIN.ordinal ->{
@@ -73,6 +65,26 @@ class LoginFragment : Fragment(), View.OnClickListener{
                 }
             }
         }
+
+        googleAuthObserver = Observer{ isGoogleLoginSuccessful ->
+            if(isGoogleLoginSuccessful){
+                sharedPrefs?.edit()?.putInt(navSignUpType, NavSignUpType.GOOGLE_LOGIN.ordinal)?.apply()
+                findNavController(this).navigate(R.id.action_loginFragment_to_numberVerificationFragment)
+                Log.d(TAG, "Google Auth Observer Success")
+            }else{
+                Log.d(TAG, "Google Auth Observer Failure")
+            }
+        }
+
+        facebookAuthObserver = Observer{ isFacebookLoginSuccessful ->
+            if (isFacebookLoginSuccessful){
+                sharedPrefs?.edit()?.putInt(navSignUpType, NavSignUpType.FACEBOOK_LOGIN.ordinal)?.apply()
+                findNavController(this).navigate(R.id.action_loginFragment_to_numberVerificationFragment)
+                Log.d(TAG, "Facebook Auth Observer Success")
+            }else{
+                Log.d(TAG, "Facebook Auth Observer Failure")
+            }
+        }
     }
 
     override fun onCreateView(
@@ -88,15 +100,24 @@ class LoginFragment : Fragment(), View.OnClickListener{
 
         binding?.loginSignUpEmailBtn?.setOnClickListener(this)
         binding?.loginSignInBtn?.setOnClickListener(this)
-        binding?.loginEmailEt?.setOnClickListener(this)
         binding?.loginForgotPasswordTv?.setOnClickListener(this)
         binding?.loginSignInWithFacebook?.setOnClickListener(this)
         binding?.loginSignInWithGoogle?.setOnClickListener(this)
+
+        emailSignInObserver = Observer { isLoginSuccessful ->
+            if (isLoginSuccessful){
+                Log.d(TAG, "Email login success")
+                findNavController(this).navigate(R.id.action_loginFragment_to_numberVerificationFragment)
+            }else{
+                Log.d(TAG, "Email login failed")
+                binding?.loginEmailEt?.error = "The email or password is incorrect"
+                binding?.loginPasswordEt?.error = "The email or password is incorrect"
+            }
+        }
     }
 
     override fun onStart() {
         super.onStart()
-        addFirebaseAuthStateListener()
     }
 
     override fun onDestroyView() {
@@ -107,19 +128,15 @@ class LoginFragment : Fragment(), View.OnClickListener{
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
 
-        when(sharedPrefs?.getInt(navSignUpType, NavSignUpType.EMAIL_LOGIN.ordinal)){
-            NavSignUpType.GOOGLE_LOGIN.ordinal ->{
-                data?.let { loginViewModel.handleGoogleSignInIntent(requestCode, it) }
-            }
-            NavSignUpType.FACEBOOK_LOGIN.ordinal ->{
-                data?.let{ loginViewModel.handleFacebookSignInIntent(requestCode, resultCode, it)}
-            }
-        }
+        data?.let { loginViewModel.handleGoogleSignInIntent(requestCode, it) }
+
+        data?.let{ loginViewModel.handleFacebookSignInIntent(requestCode, resultCode, it)}
+
+
     }
 
     override fun onStop() {
         super.onStop()
-        dismissAuthStateListener()
     }
 
     override fun onClick(view: View?) {
@@ -130,13 +147,16 @@ class LoginFragment : Fragment(), View.OnClickListener{
                     action = R.id.action_loginFragment_to_forgotPasswordFragment
                 }
                 R.id.login_sign_in_btn -> {
-
+                    loginViewModel.getEmailSignInStatus().observe(this, emailSignInObserver)
                     signInEmail = binding?.loginEmailEt?.text?.trim().toString()
                     signInPassword = binding?.loginPasswordEt?.text?.trim().toString()
 
                     if(!TextUtils.isEmpty(signInEmail) && !TextUtils.isEmpty(signInPassword)) {
                         loginViewModel.signInWithEmailAndPass(signInEmail, signInPassword)
                         sharedPrefs?.edit()?.putInt(navSignUpType, NavSignUpType.EMAIL_LOGIN.ordinal)?.apply()
+                    }else{
+                        binding?.loginEmailEt?.error = "The email or password is incorrect"
+                        binding?.loginPasswordEt?.error = "The email or password is incorrect"
                     }
                 }
                 R.id.login_sign_up_email_btn -> {
@@ -144,19 +164,14 @@ class LoginFragment : Fragment(), View.OnClickListener{
                     action = R.id.action_loginFragment_to_createAccountFragment
                 }
                 R.id.login_sign_in_with_google -> {
-
+                    loginViewModel.getGoogleLoginState().observe(this, googleAuthObserver)
                     loginViewModel.configureGoogleAuth()
                     startActivityForResult(loginViewModel.getGoogleAuthIntent(), loginViewModel.getGoogleAuthCode())
-                    sharedPrefs?.edit()?.putInt(navSignUpType, NavSignUpType.GOOGLE_LOGIN.ordinal)?.apply()
-                    action = R.id.action_loginFragment_to_numberVerificationFragment
-
                 }
                 R.id.login_sign_in_with_facebook -> {
-                    sharedPrefs?.edit()?.putInt(navSignUpType, NavSignUpType.FACEBOOK_LOGIN.ordinal)?.apply()
+                    loginViewModel.getFacebookAuthState().observe(this, facebookAuthObserver)
                     LoginManager.getInstance().logInWithReadPermissions(this, listOf("user_photos", "email", "user_birthday", "public_profile"))
                     loginViewModel.sendFacebookIntent()
-
-                    action = R.id.action_loginFragment_to_numberVerificationFragment
                 }
             }
 
@@ -166,18 +181,6 @@ class LoginFragment : Fragment(), View.OnClickListener{
         }else{
             activity?.let { androidUtils.showSnackBar(it, "You are not connected to the internet") }
         }
-    }
-
-    private fun initializeAuthStateListener(){
-        loginViewModel.initializeAuthStateListener()
-    }
-
-    private fun dismissAuthStateListener(){
-        loginViewModel.dismissAuthStateListener()
-    }
-
-    private fun addFirebaseAuthStateListener(){
-        loginViewModel.addFirebaseAuthStateListener()
     }
 
     companion object{

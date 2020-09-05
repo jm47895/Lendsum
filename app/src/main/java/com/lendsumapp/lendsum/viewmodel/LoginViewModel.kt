@@ -34,23 +34,15 @@ class LoginViewModel @ViewModelInject constructor(
     fun getGoogleAuthCode(): Int{
         return loginRepository.getGoogleRequestCode()
     }
+
+    fun getGoogleLoginState():MutableLiveData<Boolean>{
+        return loginRepository.getGoogleLoginState()
+    }
     //End of Google Auth functions
 
     //Start of Email and Pass functions
     fun signInWithEmailAndPass(email: String, password: String){
         loginRepository.signInWithEmailAndPass(email, password)
-    }
-
-    fun initializeAuthStateListener(){
-        loginRepository.initializeAuthStateListener()
-    }
-
-    fun dismissAuthStateListener(){
-        loginRepository.dismissAuthStateListener()
-    }
-
-    fun addFirebaseAuthStateListener(){
-        loginRepository.addFirebaseAuthStateListener()
     }
 
     fun getEmailSignInStatus(): MutableLiveData<Boolean>{
@@ -65,6 +57,10 @@ class LoginViewModel @ViewModelInject constructor(
 
     fun handleFacebookSignInIntent(requestCode: Int, resultCode: Int, data: Intent){
         loginRepository.handleFacebookSignInIntent(requestCode, resultCode, data)
+    }
+
+    fun getFacebookAuthState(): MutableLiveData<Boolean>{
+        return loginRepository.getFacebookAuthState()
     }
     //End of Facebook login functions
 
