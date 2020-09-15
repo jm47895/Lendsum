@@ -47,25 +47,10 @@ class LoginFragment : Fragment(), View.OnClickListener{
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        when(sharedPrefs?.getInt(navSignUpType, NavSignUpType.EMAIL_LOGIN.ordinal)){
-            NavSignUpType.EMAIL_LOGIN.ordinal ->{
-                val emailUser = loginViewModel.getFirebaseUser()
-                if(emailUser != null && sharedPrefs?.getBoolean(returningUser, false) == true){
-                    findNavController(this).navigate(R.id.action_loginFragment_to_marketplaceFragment)
-                }
-            }
-            NavSignUpType.GOOGLE_LOGIN.ordinal ->{
-                val googleUser = loginViewModel.getFirebaseUser()
-                if(googleUser != null && sharedPrefs?.getBoolean(returningUser, false) == true){
-                    findNavController(this).navigate(R.id.action_loginFragment_to_marketplaceFragment)
-                }
-            }
-            NavSignUpType.FACEBOOK_LOGIN.ordinal ->{
-                val facebookUser = loginViewModel.getFirebaseUser()
-                if(facebookUser != null && sharedPrefs?.getBoolean(returningUser, false) == true){
-                    findNavController(this).navigate(R.id.action_loginFragment_to_marketplaceFragment)
-                }
-            }
+        val firebaseUser = loginViewModel.getFirebaseUser()
+
+        if(firebaseUser != null && sharedPrefs?.getBoolean(returningUser, false) == true){
+            findNavController(this).navigate(R.id.action_loginFragment_to_marketplaceFragment)
         }
 
         googleAuthObserver = Observer{ isGoogleLoginSuccessful ->
