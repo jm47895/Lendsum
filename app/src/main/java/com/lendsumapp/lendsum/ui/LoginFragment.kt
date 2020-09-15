@@ -23,6 +23,9 @@ import com.lendsumapp.lendsum.util.NavSignUpType
 import com.lendsumapp.lendsum.util.NetworkUtils
 import com.lendsumapp.lendsum.viewmodel.LoginViewModel
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 
@@ -40,7 +43,6 @@ class LoginFragment : Fragment(), View.OnClickListener{
     lateinit var emailSignInObserver: Observer<Boolean>
     private lateinit var googleAuthObserver: Observer<Boolean>
     private lateinit var facebookAuthObserver: Observer<Boolean>
-
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -137,11 +139,19 @@ class LoginFragment : Fragment(), View.OnClickListener{
 
     override fun onStop() {
         super.onStop()
+
+        loginViewModel.getEmailSignInStatus().removeObserver(emailSignInObserver)
+        loginViewModel.getFacebookAuthState().removeObserver(facebookAuthObserver)
+        loginViewModel.getGoogleLoginState().removeObserver(googleAuthObserver)
+
     }
 
     override fun onClick(view: View?) {
+
         var action: Int = -1
-        if(networkUtils.isNetworkAvailable()) {
+        val isOnline = context?.let { networkUtils.isNetworkAvailable(it) }
+
+        if(isOnline!!) {
             when (view?.id) {
                 R.id.login_forgot_password_tv -> {
                     action = R.id.action_loginFragment_to_forgotPasswordFragment
@@ -151,33 +161,42 @@ class LoginFragment : Fragment(), View.OnClickListener{
                     signInEmail = binding?.loginEmailEt?.text?.trim().toString()
                     signInPassword = binding?.loginPasswordEt?.text?.trim().toString()
 
-                    if(!TextUtils.isEmpty(signInEmail) && !TextUtils.isEmpty(signInPassword)) {
+                    if (!TextUtils.isEmpty(signInEmail) && !TextUtils.isEmpty(signInPassword)) {
                         loginViewModel.signInWithEmailAndPass(signInEmail, signInPassword)
-                        sharedPrefs?.edit()?.putInt(navSignUpType, NavSignUpType.EMAIL_LOGIN.ordinal)?.apply()
-                    }else{
+                        sharedPrefs?.edit()
+                            ?.putInt(navSignUpType, NavSignUpType.EMAIL_LOGIN.ordinal)?.apply()
+                    } else {
                         binding?.loginEmailEt?.error = "The email or password is incorrect"
                         binding?.loginPasswordEt?.error = "The email or password is incorrect"
                     }
                 }
                 R.id.login_sign_up_email_btn -> {
-                    sharedPrefs?.edit()?.putInt(navSignUpType, NavSignUpType.EMAIL_LOGIN.ordinal)?.apply()
+                    sharedPrefs?.edit()?.putInt(navSignUpType, NavSignUpType.EMAIL_LOGIN.ordinal)
+                        ?.apply()
                     action = R.id.action_loginFragment_to_createAccountFragment
                 }
                 R.id.login_sign_in_with_google -> {
                     loginViewModel.getGoogleLoginState().observe(this, googleAuthObserver)
                     loginViewModel.configureGoogleAuth()
-                    startActivityForResult(loginViewModel.getGoogleAuthIntent(), loginViewModel.getGoogleAuthCode())
+                    startActivityForResult(
+                        loginViewModel.getGoogleAuthIntent(),
+                        loginViewModel.getGoogleAuthCode()
+                    )
                 }
                 R.id.login_sign_in_with_facebook -> {
                     loginViewModel.getFacebookAuthState().observe(this, facebookAuthObserver)
-                    LoginManager.getInstance().logInWithReadPermissions(this, listOf("user_photos", "email", "user_birthday", "public_profile"))
+                    LoginManager.getInstance().logInWithReadPermissions(
+                        this,
+                        listOf("user_photos", "email", "user_birthday", "public_profile")
+                    )
                     loginViewModel.sendFacebookIntent()
                 }
             }
 
-            if(action != -1) {
+            if (action != -1) {
                 view?.findNavController()?.navigate(action)
             }
+
         }else{
             activity?.let { androidUtils.showSnackBar(it, "You are not connected to the internet") }
         }

@@ -12,6 +12,7 @@ import com.lendsumapp.lendsum.R
 import com.lendsumapp.lendsum.auth.EmailAndPassAuthComponent
 import com.lendsumapp.lendsum.auth.FacebookAuthComponent
 import com.lendsumapp.lendsum.auth.GoogleAuthComponent
+import com.lendsumapp.lendsum.util.NetworkUtils
 import dagger.hilt.android.qualifiers.ActivityContext
 import dagger.hilt.android.scopes.ActivityScoped
 import dagger.hilt.android.scopes.FragmentScoped
@@ -23,8 +24,7 @@ class LoginRepository @Inject constructor(
     private val googleAuthComponent: GoogleAuthComponent,
     private val facebookAuthComponent: FacebookAuthComponent,
     private val emailAndPassAuthComponent: EmailAndPassAuthComponent,
-    private var firebaseAuth: FirebaseAuth?,
-    @ActivityContext private var context: Context
+    private var firebaseAuth: FirebaseAuth?
 ){
 
     //Firebase
@@ -33,7 +33,7 @@ class LoginRepository @Inject constructor(
     }
 
     //Start of Google Auth functions
-    fun configureGoogleAuth(){
+    fun configureGoogleAuth(context: Context){
         googleAuthComponent.configureGoogleAuth(context, context.resources.getString(R.string.default_web_client_id))
     }
 

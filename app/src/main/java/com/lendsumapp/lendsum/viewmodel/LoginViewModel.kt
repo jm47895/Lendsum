@@ -1,17 +1,23 @@
 package com.lendsumapp.lendsum.viewmodel
 
 import android.app.Activity
+import android.content.Context
 import android.content.Intent
 import android.util.Log
 import androidx.hilt.lifecycle.ViewModelInject
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.google.firebase.auth.FirebaseUser
 import com.lendsumapp.lendsum.repository.LoginRepository
+import dagger.hilt.android.qualifiers.ActivityContext
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 class LoginViewModel @ViewModelInject constructor(
-    private val loginRepository: LoginRepository
+    private val loginRepository: LoginRepository,
+    @ActivityContext private var context: Context
 ): ViewModel(){
 
     fun getFirebaseUser(): FirebaseUser?{
@@ -20,7 +26,7 @@ class LoginViewModel @ViewModelInject constructor(
 
     //Start of Google Auth functions
     fun configureGoogleAuth(){
-        loginRepository.configureGoogleAuth()
+        loginRepository.configureGoogleAuth(context)
     }
 
     fun getGoogleAuthIntent(): Intent {
@@ -28,7 +34,9 @@ class LoginViewModel @ViewModelInject constructor(
     }
 
     fun handleGoogleSignInIntent(resultCode: Int, data: Intent){
-        loginRepository.handleGoogleSignInIntent(resultCode, data)
+        viewModelScope.launch(Dispatchers.IO) {
+            loginRepository.handleGoogleSignInIntent(resultCode, data)
+        }
     }
 
     fun getGoogleAuthCode(): Int{
@@ -42,7 +50,9 @@ class LoginViewModel @ViewModelInject constructor(
 
     //Start of Email and Pass functions
     fun signInWithEmailAndPass(email: String, password: String){
-        loginRepository.signInWithEmailAndPass(email, password)
+        viewModelScope.launch(Dispatchers.IO) {
+            loginRepository.signInWithEmailAndPass(email, password)
+        }
     }
 
     fun getEmailSignInStatus(): MutableLiveData<Boolean>{
@@ -52,11 +62,15 @@ class LoginViewModel @ViewModelInject constructor(
 
     //Facebook login functions
     fun sendFacebookIntent(){
-        loginRepository.sendFacebookIntent()
+        viewModelScope.launch(Dispatchers.IO) {
+            loginRepository.sendFacebookIntent()
+        }
     }
 
     fun handleFacebookSignInIntent(requestCode: Int, resultCode: Int, data: Intent){
-        loginRepository.handleFacebookSignInIntent(requestCode, resultCode, data)
+        viewModelScope.launch(Dispatchers.IO) {
+            loginRepository.handleFacebookSignInIntent(requestCode, resultCode, data)
+        }
     }
 
     fun getFacebookAuthState(): MutableLiveData<Boolean>{

@@ -13,7 +13,6 @@ import javax.inject.Inject
 class EmailAndPassAuthComponent @Inject constructor(): OnCompleteListener<AuthResult>{
 
     private val firebaseAuth : FirebaseAuth = FirebaseAuth.getInstance()
-    //private lateinit var emailSignInAuthStateListener: FirebaseAuth.AuthStateListener
     private val emailSignInStatus: MutableLiveData<Boolean> = MutableLiveData()
 
     fun signInWithEmailAndPass(email: String, password: String)
@@ -29,33 +28,18 @@ class EmailAndPassAuthComponent @Inject constructor(): OnCompleteListener<AuthRe
 
     override fun onComplete(task: Task<AuthResult>) {
         if (task.isSuccessful){
-            emailSignInStatus.value = true
+            emailSignInStatus.postValue(true)
             Log.d(TAG, "register with email : Success.")
         }else{
-            emailSignInStatus.value = false
+            emailSignInStatus.postValue(false)
             Log.d(TAG, "register with email : Failure")
         }
     }
 
     fun signOutOfEmailAndPass(){
         firebaseAuth.signOut()
-        emailSignInStatus.value = false
+        emailSignInStatus.postValue(false)
     }
-
-    /*fun initializeAuthStateListener(){
-        emailSignInAuthStateListener = FirebaseAuth.AuthStateListener {
-
-
-        }
-    }
-
-    fun dismissAuthStateListener(){
-        firebaseAuth.removeAuthStateListener(emailSignInAuthStateListener)
-    }
-
-    fun addFirebaseAuthStateListener(){
-        firebaseAuth.addAuthStateListener(emailSignInAuthStateListener)
-    }*/
 
     fun getEmailSignInStatus(): MutableLiveData<Boolean> {
         return emailSignInStatus

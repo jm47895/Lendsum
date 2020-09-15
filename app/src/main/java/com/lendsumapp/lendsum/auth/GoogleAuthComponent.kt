@@ -39,7 +39,7 @@ class GoogleAuthComponent @Inject constructor(){
     }
 
     fun signOutOfGoogle(){
-        googleAuthState.value = false
+        googleAuthState.postValue(false)
         firebaseAuth.signOut()
         googleSignInClient.signOut()
     }
@@ -71,11 +71,11 @@ class GoogleAuthComponent @Inject constructor(){
             .addOnCompleteListener() { task ->
                 if (task.isSuccessful) {
                     Log.d(TAG, "Google Firebase Sign-in Success")
-                    googleAuthState.value = true
+                    googleAuthState.postValue(true)
                 } else {
                     // If sign in fails, display a message to the user.
                     Log.d(TAG, "Google Firebase Sign-in Failed", task.exception)
-                    googleAuthState.value = false
+                    googleAuthState.postValue(false)
                 }
             }
 

@@ -34,12 +34,12 @@ class FacebookAuthComponent @Inject constructor(){
                 .addOnCompleteListener() { task ->
                     if (task.isSuccessful) {
                         // Sign in success, update UI with the signed-in user's information
-                        facebookAuthState.value = true
+                        facebookAuthState.postValue(true)
                         Log.d(TAG, "signInWithCredential:success: ")
 
                     } else {
                         // If sign in fails, display a message to the user.
-                        facebookAuthState.value = false
+                        facebookAuthState.postValue(false)
                         Log.w(TAG, "signInWithCredential:failure", task.exception)
 
                     }
@@ -61,19 +61,19 @@ class FacebookAuthComponent @Inject constructor(){
                 }
 
                 override fun onCancel() {
-                    facebookAuthState.value = false
+                    facebookAuthState.postValue(false)
                     Log.d(TAG, "facebook:onCancel")
                 }
 
                 override fun onError(error: FacebookException) {
-                    facebookAuthState.value = false
+                    facebookAuthState.postValue(false)
                     Log.d(TAG, "facebook:onError", error)
                 }
             })
     }
 
     fun signOutOfFacebook(){
-        facebookAuthState.value = false
+        facebookAuthState.postValue(false)
         LoginManager.getInstance().logOut()
         FirebaseAuth.getInstance().signOut()
     }
