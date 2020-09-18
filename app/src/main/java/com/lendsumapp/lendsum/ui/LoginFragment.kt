@@ -17,15 +17,12 @@ import com.facebook.login.LoginManager
 import com.lendsumapp.lendsum.R
 import com.lendsumapp.lendsum.databinding.FragmentLoginBinding
 import com.lendsumapp.lendsum.util.AndroidUtils
-import com.lendsumapp.lendsum.util.GlobalConstants.navSignUpType
-import com.lendsumapp.lendsum.util.GlobalConstants.returningUser
+import com.lendsumapp.lendsum.util.GlobalConstants.NAV_SIGN_UP_TYPE
+import com.lendsumapp.lendsum.util.GlobalConstants.RETURNING_USER
 import com.lendsumapp.lendsum.util.NavSignUpType
 import com.lendsumapp.lendsum.util.NetworkUtils
 import com.lendsumapp.lendsum.viewmodel.LoginViewModel
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 
@@ -49,13 +46,13 @@ class LoginFragment : Fragment(), View.OnClickListener{
 
         val firebaseUser = loginViewModel.getFirebaseUser()
 
-        if(firebaseUser != null && sharedPrefs?.getBoolean(returningUser, false) == true){
+        if(firebaseUser != null && sharedPrefs?.getBoolean(RETURNING_USER, false) == true){
             findNavController(this).navigate(R.id.action_loginFragment_to_marketplaceFragment)
         }
 
         googleAuthObserver = Observer{ isGoogleLoginSuccessful ->
             if(isGoogleLoginSuccessful){
-                sharedPrefs?.edit()?.putInt(navSignUpType, NavSignUpType.GOOGLE_LOGIN.ordinal)?.apply()
+                sharedPrefs?.edit()?.putInt(NAV_SIGN_UP_TYPE, NavSignUpType.GOOGLE_LOGIN.ordinal)?.apply()
                 findNavController(this).navigate(R.id.action_loginFragment_to_numberVerificationFragment)
                 Log.d(TAG, "Google Auth Observer Success")
             }else{
@@ -65,7 +62,7 @@ class LoginFragment : Fragment(), View.OnClickListener{
 
         facebookAuthObserver = Observer{ isFacebookLoginSuccessful ->
             if (isFacebookLoginSuccessful){
-                sharedPrefs?.edit()?.putInt(navSignUpType, NavSignUpType.FACEBOOK_LOGIN.ordinal)?.apply()
+                sharedPrefs?.edit()?.putInt(NAV_SIGN_UP_TYPE, NavSignUpType.FACEBOOK_LOGIN.ordinal)?.apply()
                 findNavController(this).navigate(R.id.action_loginFragment_to_numberVerificationFragment)
                 Log.d(TAG, "Facebook Auth Observer Success")
             }else{
@@ -149,14 +146,14 @@ class LoginFragment : Fragment(), View.OnClickListener{
                     if (!TextUtils.isEmpty(signInEmail) && !TextUtils.isEmpty(signInPassword)) {
                         loginViewModel.signInWithEmailAndPass(signInEmail, signInPassword)
                         sharedPrefs?.edit()
-                            ?.putInt(navSignUpType, NavSignUpType.EMAIL_LOGIN.ordinal)?.apply()
+                            ?.putInt(NAV_SIGN_UP_TYPE, NavSignUpType.EMAIL_LOGIN.ordinal)?.apply()
                     } else {
                         binding?.loginEmailEt?.error = "The email or password is incorrect"
                         binding?.loginPasswordEt?.error = "The email or password is incorrect"
                     }
                 }
                 R.id.login_sign_up_email_btn -> {
-                    sharedPrefs?.edit()?.putInt(navSignUpType, NavSignUpType.EMAIL_LOGIN.ordinal)
+                    sharedPrefs?.edit()?.putInt(NAV_SIGN_UP_TYPE, NavSignUpType.EMAIL_LOGIN.ordinal)
                         ?.apply()
                     action = R.id.action_loginFragment_to_createAccountFragment
                 }

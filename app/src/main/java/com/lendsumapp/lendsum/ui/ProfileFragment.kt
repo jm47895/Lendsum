@@ -9,12 +9,11 @@ import android.view.ViewGroup
 import androidx.fragment.app.viewModels
 import androidx.navigation.findNavController
 import com.lendsumapp.lendsum.R
-import com.lendsumapp.lendsum.util.GlobalConstants.navSignUpType
+import com.lendsumapp.lendsum.util.GlobalConstants.NAV_SIGN_UP_TYPE
 import com.lendsumapp.lendsum.util.NavSignUpType
 import com.lendsumapp.lendsum.viewmodel.ProfileViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.android.synthetic.main.fragment_profile.*
-import javax.inject.Inject
 
 @AndroidEntryPoint
 class ProfileFragment : Fragment() {
@@ -35,7 +34,7 @@ class ProfileFragment : Fragment() {
 
         profile_logout_btn.setOnClickListener {
 
-            when(sharedPrefs?.getInt(navSignUpType, NavSignUpType.EMAIL_LOGIN.ordinal)){
+            when(sharedPrefs?.getInt(NAV_SIGN_UP_TYPE, NavSignUpType.EMAIL_LOGIN.ordinal)){
                 NavSignUpType.EMAIL_LOGIN.ordinal ->{
                     profileViewModel.logOutOfEmailAndPass()
                     view.findNavController().navigate(R.id.action_profileFragment_to_loginFragment)

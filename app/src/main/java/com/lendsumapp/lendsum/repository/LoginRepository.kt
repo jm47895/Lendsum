@@ -1,29 +1,26 @@
 package com.lendsumapp.lendsum.repository
 
+import android.app.Activity
 import android.content.Context
 import android.content.Intent
-import android.provider.Settings.Global.getString
-import android.util.Log
-import androidx.core.app.ActivityCompat.startActivityForResult
 import androidx.lifecycle.MutableLiveData
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
+import com.google.firebase.auth.PhoneAuthCredential
 import com.lendsumapp.lendsum.R
 import com.lendsumapp.lendsum.auth.EmailAndPassAuthComponent
 import com.lendsumapp.lendsum.auth.FacebookAuthComponent
 import com.lendsumapp.lendsum.auth.GoogleAuthComponent
-import com.lendsumapp.lendsum.util.NetworkUtils
-import dagger.hilt.android.qualifiers.ActivityContext
+import com.lendsumapp.lendsum.auth.PhoneAuthComponent
 import dagger.hilt.android.scopes.ActivityScoped
-import dagger.hilt.android.scopes.FragmentScoped
 import javax.inject.Inject
-import javax.inject.Singleton
 
 @ActivityScoped
 class LoginRepository @Inject constructor(
     private val googleAuthComponent: GoogleAuthComponent,
     private val facebookAuthComponent: FacebookAuthComponent,
     private val emailAndPassAuthComponent: EmailAndPassAuthComponent,
+    private val phoneAuthComponent: PhoneAuthComponent,
     private var firebaseAuth: FirebaseAuth?
 ){
 
@@ -97,6 +94,20 @@ class LoginRepository @Inject constructor(
         return facebookAuthComponent.getFacebookAuthState()
     }
     //End of Facebook login functions
+
+    //Phone Auth functions
+    fun sendSMSCode(phoneNumber: String, activity: Activity){
+        phoneAuthComponent.verifyPhoneNumber(phoneNumber, activity)
+    }
+
+    fun getGeneratedPhoneAuthCode(): MutableLiveData<PhoneAuthCredential>{
+        return phoneAuthComponent.getGeneratedPhoneAuthCode()
+    }
+
+    fun linkPhoneNumWithLoginCredential(credential: PhoneAuthCredential){
+        phoneAuthComponent.linkPhoneNumWithLoginCredential(credential)
+    }
+    //End phone auth functions
 
     companion object{
         private val TAG = LoginRepository::class.simpleName

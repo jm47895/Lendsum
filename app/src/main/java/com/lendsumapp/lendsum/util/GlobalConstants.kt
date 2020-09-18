@@ -3,7 +3,8 @@ package com.lendsumapp.lendsum.util
 object GlobalConstants {
 
     /*Shared Pref keys*/
-    const val navSignUpType = "navSignUpType"
-    const val returningUser = "returningUser"
+    const val NAV_SIGN_UP_TYPE = "navSignUpType"
+    const val RETURNING_USER = "returningUser"
+
 
 }

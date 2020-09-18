@@ -34,11 +34,14 @@
 
     <!--Facebook Login protocol-->
     <string name="facebook_app_id">756998231815638</string>
+
     <string name="re_enter_password">Re-enter Password</string>
     <string name="first_name_error_msg">First name cannot be left blank</string>
     <string name="last_name_err_msg">Last name cannot be left blank</string>
     <string name="invalid_email_err_msg">Invalid Email</string>
     <string name="password_param_err_msg">Password must contain between 6 and 20 characters long and have at least one UpperCase, one number, and one symbol</string>
     <string name="pass_dont_match_err_msg">Passwords don\'t match</string>
+    <string name="enter_phone_number">Enter phone number</string>
+    <string name="country_code">Country Code</string>
 
 </resources>

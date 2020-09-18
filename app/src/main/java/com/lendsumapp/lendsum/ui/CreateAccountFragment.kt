@@ -71,6 +71,7 @@ class CreateAccountFragment : Fragment() {
         }
 
         create_account_back_btn.setOnClickListener {
+            createAccountViewModel.logOutOfEmailAndPass()
             view.findNavController().navigate(R.id.action_createAccountFragment_to_loginFragment)
         }
     }

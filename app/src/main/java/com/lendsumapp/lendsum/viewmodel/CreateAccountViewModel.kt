@@ -21,4 +21,10 @@ class CreateAccountViewModel @ViewModelInject constructor(
     fun getEmailSignUpStatus(): MutableLiveData<Boolean> {
         return loginRepository.getEmailSignUpStatus()
     }
+
+    fun logOutOfEmailAndPass(){
+        loginRepository.logOutOfEmailAndPass()
+    }
+
+
 }
