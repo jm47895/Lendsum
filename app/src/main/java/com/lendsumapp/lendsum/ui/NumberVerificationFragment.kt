@@ -97,7 +97,11 @@ class NumberVerificationFragment : Fragment(), View.OnClickListener, CountryCode
                     val code = binding?.numberVerificationCodeEt?.text?.trim().toString()
                     if (code == credential.smsCode) {
                         Log.d(TAG, "Code: $code matches $credential")
+
                         numberVerificationViewModel.linkPhoneNumWithLoginCredential(credential)
+
+                        context?.let { androidUtils.hideKeyboard(it, view) }
+
                         if (sharedPrefs?.getBoolean(RETURNING_USER, false) == false) {
                             view.findNavController()
                                 .navigate(R.id.action_numberVerificationFragment_to_termsConditionsFragment)
@@ -107,6 +111,7 @@ class NumberVerificationFragment : Fragment(), View.OnClickListener, CountryCode
                         }
                     } else {
                         Log.d(TAG, "Code: $code does not match $credential")
+
                         activity?.let { androidUtils.showSnackBar(it, "The code does not match") }
                     }
                 }

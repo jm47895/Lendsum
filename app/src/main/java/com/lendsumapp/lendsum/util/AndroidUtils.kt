@@ -1,6 +1,10 @@
 package com.lendsumapp.lendsum.util
 
 import android.app.Activity
+import android.content.Context
+import android.content.Context.INPUT_METHOD_SERVICE
+import android.view.View
+import android.view.inputmethod.InputMethodManager
 import androidx.core.content.ContextCompat
 import com.google.android.material.snackbar.Snackbar
 import com.lendsumapp.lendsum.R
@@ -16,5 +20,10 @@ class AndroidUtils @Inject constructor(){
             .setAction("Dismiss") {
         }.setActionTextColor(ContextCompat.getColor(activity, R.color.colorSecondaryLight))
             .show()
+    }
+
+    fun hideKeyboard(context: Context, view: View){
+        val inputMethodManager = context.getSystemService(INPUT_METHOD_SERVICE) as InputMethodManager
+        inputMethodManager.hideSoftInputFromWindow(view.windowToken, 0)
     }
 }
