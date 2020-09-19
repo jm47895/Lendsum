@@ -23,7 +23,9 @@ class CreateAccountViewModel @ViewModelInject constructor(
     }
 
     fun logOutOfEmailAndPass(){
-        loginRepository.logOutOfEmailAndPass()
+        viewModelScope.launch(Dispatchers.IO) {
+            loginRepository.logOutOfEmailAndPass()
+        }
     }
 
 

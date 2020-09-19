@@ -5,9 +5,12 @@ import android.content.Context
 import androidx.hilt.lifecycle.ViewModelInject
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.google.firebase.auth.PhoneAuthCredential
 import com.lendsumapp.lendsum.repository.LoginRepository
 import dagger.hilt.android.qualifiers.ActivityContext
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 class NumberVerificationViewModel @ViewModelInject constructor(
     private val loginRepository: LoginRepository,
@@ -15,7 +18,9 @@ class NumberVerificationViewModel @ViewModelInject constructor(
 ): ViewModel(){
 
     fun logOutOfGoogle(){
-        loginRepository.logOutOfGoogle()
+        viewModelScope.launch(Dispatchers.IO) {
+            loginRepository.logOutOfGoogle()
+        }
     }
 
     fun configureGoogleAuth(){
@@ -23,11 +28,15 @@ class NumberVerificationViewModel @ViewModelInject constructor(
     }
 
     fun logOutOfFacebook(){
-        loginRepository.logOutOfFacebook()
+        viewModelScope.launch(Dispatchers.IO) {
+            loginRepository.logOutOfFacebook()
+        }
     }
 
     fun sendSMSCode(phoneNumber: String, activity: Activity){
-        loginRepository.sendSMSCode(phoneNumber, activity)
+        viewModelScope.launch(Dispatchers.IO) {
+            loginRepository.sendSMSCode(phoneNumber, activity)
+        }
     }
 
     fun getGeneratedPhoneAuthCode(): MutableLiveData<PhoneAuthCredential> {
@@ -35,6 +44,8 @@ class NumberVerificationViewModel @ViewModelInject constructor(
     }
 
     fun linkPhoneNumWithLoginCredential(credential: PhoneAuthCredential){
-        loginRepository.linkPhoneNumWithLoginCredential(credential)
+        viewModelScope.launch(Dispatchers.IO) {
+            loginRepository.linkPhoneNumWithLoginCredential(credential)
+        }
     }
 }

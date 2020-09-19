@@ -3,8 +3,11 @@ package com.lendsumapp.lendsum.viewmodel
 import android.content.Context
 import androidx.hilt.lifecycle.ViewModelInject
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.lendsumapp.lendsum.repository.LoginRepository
 import dagger.hilt.android.qualifiers.ActivityContext
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 class ProfileViewModel @ViewModelInject constructor(
     private val loginRepository: LoginRepository,
@@ -12,7 +15,9 @@ class ProfileViewModel @ViewModelInject constructor(
 ): ViewModel(){
 
     fun logOutOfGoogle(){
-        loginRepository.logOutOfGoogle()
+        viewModelScope.launch(Dispatchers.IO) {
+            loginRepository.logOutOfGoogle()
+        }
     }
 
     fun configureGoogleAuth(){
@@ -20,11 +25,15 @@ class ProfileViewModel @ViewModelInject constructor(
     }
 
     fun logOutOfEmailAndPass(){
-        loginRepository.logOutOfEmailAndPass()
+        viewModelScope.launch(Dispatchers.IO) {
+            loginRepository.logOutOfEmailAndPass()
+        }
     }
 
     fun logOutOfFacebook(){
-        loginRepository.logOutOfFacebook()
+        viewModelScope.launch(Dispatchers.IO) {
+            loginRepository.logOutOfFacebook()
+        }
     }
 
 }
