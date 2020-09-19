@@ -1,5 +1,6 @@
 package com.lendsumapp.lendsum.ui
 
+import android.content.Context
 import android.os.Bundle
 import android.text.TextUtils
 import android.util.Log
@@ -13,6 +14,9 @@ import androidx.lifecycle.Observer
 import androidx.navigation.findNavController
 import androidx.navigation.fragment.NavHostFragment.findNavController
 import com.lendsumapp.lendsum.R
+import com.lendsumapp.lendsum.util.GlobalConstants
+import com.lendsumapp.lendsum.util.GlobalConstants.NAV_SIGN_UP_TYPE
+import com.lendsumapp.lendsum.util.NavSignUpType
 import com.lendsumapp.lendsum.viewmodel.CreateAccountViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.android.synthetic.main.fragment_create_account.*
@@ -24,6 +28,7 @@ import javax.inject.Inject
 @AndroidEntryPoint
 class CreateAccountFragment : Fragment() {
 
+    private val sharedPrefs by lazy { activity?.getSharedPreferences(R.string.app_name.toString(), Context.MODE_PRIVATE) }
     private val createAccountViewModel: CreateAccountViewModel by viewModels()
     private lateinit var emailSignUpObserver: Observer<Boolean>
 
@@ -33,6 +38,7 @@ class CreateAccountFragment : Fragment() {
         emailSignUpObserver = Observer { isSignUpSuccessful ->
 
             if (isSignUpSuccessful){
+                sharedPrefs?.edit()?.putInt(NAV_SIGN_UP_TYPE, NavSignUpType.EMAIL_LOGIN.ordinal)?.apply()
                 Log.d(TAG, "Email sign up success")
                 findNavController(this).navigate(R.id.action_createAccountFragment_to_numberVerificationFragment)
             }else{

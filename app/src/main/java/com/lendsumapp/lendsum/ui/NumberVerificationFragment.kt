@@ -112,7 +112,11 @@ class NumberVerificationFragment : Fragment(), View.OnClickListener, CountryCode
 
                         numberVerificationViewModel.linkPhoneNumWithLoginCredential(credential!!)
 
-                        binding?.numberVerificationNextBtn?.visibility = View.VISIBLE
+                        if(sharedPrefs?.getBoolean(RETURNING_USER, false) == false){
+                            view.findNavController().navigate(R.id.action_numberVerificationFragment_to_termsConditionsFragment)
+                        }else{
+                            view.findNavController().navigate(R.id.action_numberVerificationFragment_to_marketplaceFragment)
+                        }
 
                     } else {
                         Log.d(TAG, "Code: $code does not match $credential")
@@ -121,11 +125,7 @@ class NumberVerificationFragment : Fragment(), View.OnClickListener, CountryCode
                     }
                 }
                 R.id.number_verification_next_btn -> {
-                    if(sharedPrefs?.getBoolean(RETURNING_USER, false) == false){
-                        view.findNavController().navigate(R.id.action_numberVerificationFragment_to_termsConditionsFragment)
-                    }else{
-                        view.findNavController().navigate(R.id.action_numberVerificationFragment_to_marketplaceFragment)
-                    }
+
                 }
                 R.id.number_verification_back_btn -> {
                     if (sharedPrefs?.getInt(NAV_SIGN_UP_TYPE, NavSignUpType.EMAIL_LOGIN.ordinal) == NavSignUpType.EMAIL_LOGIN.ordinal) {
