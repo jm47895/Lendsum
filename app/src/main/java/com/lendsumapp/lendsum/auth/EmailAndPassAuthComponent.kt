@@ -32,7 +32,7 @@ class EmailAndPassAuthComponent @Inject constructor(): OnCompleteListener<AuthRe
             Log.d(TAG, "register with email : Success.")
         }else{
             emailSignInStatus.postValue(false)
-            Log.d(TAG, "register with email : Failure")
+            Log.d(TAG, "register with email : Failure" + task.exception)
         }
     }
 
