@@ -1,12 +1,14 @@
 package com.lendsumapp.lendsum.ui
 
 import android.content.Context
+import android.opengl.Visibility
 import android.os.Bundle
 import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.widget.ContentLoadingProgressBar
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import androidx.navigation.findNavController
@@ -22,6 +24,7 @@ import com.lendsumapp.lendsum.util.NavSignUpType
 import com.lendsumapp.lendsum.util.NetworkUtils
 import com.lendsumapp.lendsum.viewmodel.NumberVerificationViewModel
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.android.synthetic.main.activity_home.*
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -32,7 +35,7 @@ class NumberVerificationFragment : Fragment(), View.OnClickListener, CountryCode
     private val sharedPrefs by lazy { activity?.getPreferences(Context.MODE_PRIVATE) }
     private val numberVerificationViewModel: NumberVerificationViewModel by viewModels()
     private lateinit var phoneNumberVerificationObserver: Observer<PhoneAuthCredential>
-    private lateinit var credential: PhoneAuthCredential
+    private var credential: PhoneAuthCredential? = null
     private var isPhoneNumberValid = false
     @Inject lateinit var androidUtils: AndroidUtils
     @Inject lateinit var networkUtils: NetworkUtils
@@ -77,7 +80,13 @@ class NumberVerificationFragment : Fragment(), View.OnClickListener, CountryCode
         if(isOnline!!) {
             when (view?.id) {
                 R.id.number_verification_send_code_btn -> {
+
+                    context?.let { androidUtils.hideKeyboard(it, view) }
+
                     if(isPhoneNumberValid){
+
+                        activity?.let { androidUtils.showSnackBar(it, "Verification Code Sent") }
+
                         val phoneNumber = binding?.countryCodeSp?.fullNumberWithPlus
 
                         Log.d(TAG, "Phone number $phoneNumber sending")
@@ -94,33 +103,29 @@ class NumberVerificationFragment : Fragment(), View.OnClickListener, CountryCode
                 }
                 R.id.number_verification_verify_code_btn -> {
 
+                    context?.let { androidUtils.hideKeyboard(it, view) }
+
                     val code = binding?.numberVerificationCodeEt?.text?.trim().toString()
-                    if (code == credential.smsCode) {
+                    if (code == credential?.smsCode) {
+
                         Log.d(TAG, "Code: $code matches $credential")
 
-                        numberVerificationViewModel.linkPhoneNumWithLoginCredential(credential)
+                        numberVerificationViewModel.linkPhoneNumWithLoginCredential(credential!!)
 
-                        context?.let { androidUtils.hideKeyboard(it, view) }
+                        binding?.numberVerificationNextBtn?.visibility = View.VISIBLE
 
-                        if (sharedPrefs?.getBoolean(RETURNING_USER, false) == false) {
-                            view.findNavController()
-                                .navigate(R.id.action_numberVerificationFragment_to_termsConditionsFragment)
-                        } else {
-                            view.findNavController()
-                                .navigate(R.id.action_numberVerificationFragment_to_marketplaceFragment)
-                        }
                     } else {
                         Log.d(TAG, "Code: $code does not match $credential")
 
-                        activity?.let { androidUtils.showSnackBar(it, "The code does not match") }
+                        activity?.let { androidUtils.showSnackBar(it, "The code does not match or is empty.") }
                     }
                 }
                 R.id.number_verification_next_btn -> {
-                    /*if(sharedPrefs?.getBoolean(RETURNING_USER, false) == false){
-                    view.findNavController().navigate(R.id.action_numberVerificationFragment_to_termsConditionsFragment)
-                }else{
-                    view.findNavController().navigate(R.id.action_numberVerificationFragment_to_marketplaceFragment)
-                }*/
+                    if(sharedPrefs?.getBoolean(RETURNING_USER, false) == false){
+                        view.findNavController().navigate(R.id.action_numberVerificationFragment_to_termsConditionsFragment)
+                    }else{
+                        view.findNavController().navigate(R.id.action_numberVerificationFragment_to_marketplaceFragment)
+                    }
                 }
                 R.id.number_verification_back_btn -> {
                     if (sharedPrefs?.getInt(
