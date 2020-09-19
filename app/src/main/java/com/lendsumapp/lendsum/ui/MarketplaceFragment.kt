@@ -11,7 +11,7 @@ import com.lendsumapp.lendsum.util.GlobalConstants
 
 class MarketplaceFragment : Fragment(){
 
-    private val sharedPrefs by lazy { activity?.getPreferences(Context.MODE_PRIVATE) }
+    private val sharedPrefs by lazy { activity?.getSharedPreferences(R.string.app_name.toString(), Context.MODE_PRIVATE) }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,

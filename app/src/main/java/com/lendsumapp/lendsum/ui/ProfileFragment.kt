@@ -18,7 +18,7 @@ import kotlinx.android.synthetic.main.fragment_profile.*
 @AndroidEntryPoint
 class ProfileFragment : Fragment() {
 
-    private val sharedPrefs by lazy { activity?.getPreferences(Context.MODE_PRIVATE) }
+    private val sharedPrefs by lazy { activity?.getSharedPreferences(R.string.app_name.toString(), Context.MODE_PRIVATE) }
     private val profileViewModel: ProfileViewModel by viewModels()
 
     override fun onCreateView(

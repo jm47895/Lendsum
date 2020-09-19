@@ -31,7 +31,7 @@ class LoginFragment : Fragment(), View.OnClickListener{
 
     private var _binding: FragmentLoginBinding? = null
     private val binding get() =  _binding
-    private val sharedPrefs by lazy { activity?.getPreferences(Context.MODE_PRIVATE) }
+    private val sharedPrefs by lazy { activity?.getSharedPreferences(R.string.app_name.toString(), Context.MODE_PRIVATE) }
     private val loginViewModel: LoginViewModel by viewModels()
     @Inject lateinit var networkUtils: NetworkUtils
     @Inject lateinit var androidUtils: AndroidUtils
@@ -94,8 +94,8 @@ class LoginFragment : Fragment(), View.OnClickListener{
                 findNavController(this).navigate(R.id.action_loginFragment_to_numberVerificationFragment)
             }else{
                 Log.d(TAG, "Email login failed")
-                binding?.loginEmailEt?.error = "The email or password is incorrect"
-                binding?.loginPasswordEt?.error = "The email or password is incorrect"
+                binding?.loginEmailEt?.error = getString(R.string.email_or_pass_wrong)
+                binding?.loginPasswordEt?.error = getString(R.string.email_or_pass_wrong)
             }
         }
     }
@@ -148,8 +148,8 @@ class LoginFragment : Fragment(), View.OnClickListener{
                         sharedPrefs?.edit()
                             ?.putInt(NAV_SIGN_UP_TYPE, NavSignUpType.EMAIL_LOGIN.ordinal)?.apply()
                     } else {
-                        binding?.loginEmailEt?.error = "The email or password is incorrect"
-                        binding?.loginPasswordEt?.error = "The email or password is incorrect"
+                        binding?.loginEmailEt?.error = getString(R.string.email_or_pass_wrong)
+                        binding?.loginPasswordEt?.error = getString(R.string.email_or_pass_wrong)
                     }
                 }
                 R.id.login_sign_up_email_btn -> {
@@ -180,7 +180,7 @@ class LoginFragment : Fragment(), View.OnClickListener{
             }
 
         }else{
-            activity?.let { androidUtils.showSnackBar(it, "You are not connected to the internet") }
+            activity?.let { androidUtils.showSnackBar(it, getString(R.string.not_connected_internet)) }
         }
     }
 

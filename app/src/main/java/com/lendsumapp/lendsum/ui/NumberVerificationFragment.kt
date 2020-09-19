@@ -32,7 +32,7 @@ class NumberVerificationFragment : Fragment(), View.OnClickListener, CountryCode
 
     private var _binding: FragmentNumberVerificationBinding? = null
     private val binding get() = _binding
-    private val sharedPrefs by lazy { activity?.getPreferences(Context.MODE_PRIVATE) }
+    private val sharedPrefs by lazy { activity?.getSharedPreferences(R.string.app_name.toString(), Context.MODE_PRIVATE) }
     private val numberVerificationViewModel: NumberVerificationViewModel by viewModels()
     private lateinit var phoneNumberVerificationObserver: Observer<PhoneAuthCredential>
     private var credential: PhoneAuthCredential? = null
@@ -85,7 +85,7 @@ class NumberVerificationFragment : Fragment(), View.OnClickListener, CountryCode
 
                     if(isPhoneNumberValid){
 
-                        activity?.let { androidUtils.showSnackBar(it, "Verification Code Sent") }
+                        activity?.let { androidUtils.showSnackBar(it, getString(R.string.verification_code_sent)) }
 
                         val phoneNumber = binding?.countryCodeSp?.fullNumberWithPlus
 
@@ -98,7 +98,7 @@ class NumberVerificationFragment : Fragment(), View.OnClickListener, CountryCode
 
                     }else{
                         Log.d(TAG, "Phone number not sending")
-                        binding?.numberVerificationPhoneEt?.error = "Phone number is invalid for the country code"
+                        binding?.numberVerificationPhoneEt?.error = getString(R.string.phone_number_invalid)
                     }
                 }
                 R.id.number_verification_verify_code_btn -> {
@@ -117,7 +117,7 @@ class NumberVerificationFragment : Fragment(), View.OnClickListener, CountryCode
                     } else {
                         Log.d(TAG, "Code: $code does not match $credential")
 
-                        activity?.let { androidUtils.showSnackBar(it, "The code does not match or is empty.") }
+                        activity?.let { androidUtils.showSnackBar(it, getString(R.string.code_not_match)) }
                     }
                 }
                 R.id.number_verification_next_btn -> {
@@ -128,18 +128,11 @@ class NumberVerificationFragment : Fragment(), View.OnClickListener, CountryCode
                     }
                 }
                 R.id.number_verification_back_btn -> {
-                    if (sharedPrefs?.getInt(
-                            NAV_SIGN_UP_TYPE,
-                            NavSignUpType.EMAIL_LOGIN.ordinal
-                        ) == NavSignUpType.EMAIL_LOGIN.ordinal
-                    ) {
+                    if (sharedPrefs?.getInt(NAV_SIGN_UP_TYPE, NavSignUpType.EMAIL_LOGIN.ordinal) == NavSignUpType.EMAIL_LOGIN.ordinal) {
                         view.findNavController()
                             .navigate(R.id.action_numberVerificationFragment_to_createAccountFragment)
                     } else {
-                        when (sharedPrefs?.getInt(
-                            NAV_SIGN_UP_TYPE,
-                            NavSignUpType.EMAIL_LOGIN.ordinal
-                        )) {
+                        when (sharedPrefs?.getInt(NAV_SIGN_UP_TYPE, NavSignUpType.EMAIL_LOGIN.ordinal)) {
                             NavSignUpType.GOOGLE_LOGIN.ordinal -> {
                                 numberVerificationViewModel.configureGoogleAuth()
                                 numberVerificationViewModel.logOutOfGoogle()
@@ -155,7 +148,7 @@ class NumberVerificationFragment : Fragment(), View.OnClickListener, CountryCode
                 }
             }
         }else{
-            activity?.let { androidUtils.showSnackBar(it, "You are not connected to the internet") }
+            activity?.let { androidUtils.showSnackBar(it, getString(R.string.not_connected_internet)) }
         }
     }
 
