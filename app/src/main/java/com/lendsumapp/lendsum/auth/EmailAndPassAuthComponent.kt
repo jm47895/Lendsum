@@ -14,6 +14,7 @@ class EmailAndPassAuthComponent @Inject constructor(): OnCompleteListener<AuthRe
 
     private val firebaseAuth : FirebaseAuth = FirebaseAuth.getInstance()
     private val emailSignInStatus: MutableLiveData<Boolean> = MutableLiveData()
+    private val resetEmailStatus: MutableLiveData<Boolean> = MutableLiveData()
 
     fun signInWithEmailAndPass(email: String, password: String)
     {
@@ -43,6 +44,22 @@ class EmailAndPassAuthComponent @Inject constructor(): OnCompleteListener<AuthRe
 
     fun getEmailSignInStatus(): MutableLiveData<Boolean> {
         return emailSignInStatus
+    }
+
+    fun sendPasswordResetEmail(email: String){
+        firebaseAuth.sendPasswordResetEmail(email).addOnCompleteListener{ task ->
+            if(task.isSuccessful){
+                Log.d(TAG, "Reset Password email sent.")
+                resetEmailStatus.postValue(true)
+            }else{
+                Log.d(TAG, "Reset Password email failed to send.")
+                resetEmailStatus.postValue(false)
+            }
+        }
+    }
+
+    fun getResetEmailStatus(): MutableLiveData<Boolean> {
+        return resetEmailStatus
     }
 
     companion object{

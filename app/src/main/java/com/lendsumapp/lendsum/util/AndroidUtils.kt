@@ -3,6 +3,8 @@ package com.lendsumapp.lendsum.util
 import android.app.Activity
 import android.content.Context
 import android.content.Context.INPUT_METHOD_SERVICE
+import android.text.TextUtils
+import android.util.Patterns
 import android.view.View
 import android.view.inputmethod.InputMethodManager
 import androidx.core.content.ContextCompat
@@ -25,5 +27,9 @@ class AndroidUtils @Inject constructor(){
     fun hideKeyboard(context: Context, view: View){
         val inputMethodManager = context.getSystemService(INPUT_METHOD_SERVICE) as InputMethodManager
         inputMethodManager.hideSoftInputFromWindow(view.windowToken, 0)
+    }
+
+    fun isValidEmail(target: CharSequence): Boolean {
+        return !TextUtils.isEmpty(target) && Patterns.EMAIL_ADDRESS.matcher(target).matches()
     }
 }

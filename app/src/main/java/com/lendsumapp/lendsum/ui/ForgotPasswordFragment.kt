@@ -5,48 +5,99 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.navigation.findNavController
+import androidx.fragment.app.viewModels
+import androidx.lifecycle.Observer
+import androidx.navigation.fragment.NavHostFragment
+import androidx.navigation.fragment.findNavController
 import com.lendsumapp.lendsum.R
+import com.lendsumapp.lendsum.databinding.FragmentForgotPasswordBinding
+import com.lendsumapp.lendsum.databinding.FragmentLoginBinding
+import com.lendsumapp.lendsum.util.AndroidUtils
+import com.lendsumapp.lendsum.util.NetworkUtils
+import com.lendsumapp.lendsum.viewmodel.ForgotPasswordViewModel
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.android.synthetic.main.fragment_forgot_password.*
+import javax.inject.Inject
 
-class ForgotPasswordFragment : Fragment() {
+@AndroidEntryPoint
+class ForgotPasswordFragment : Fragment(), View.OnClickListener {
+
+    private var _binding: FragmentForgotPasswordBinding? = null
+    private val binding get() =  _binding
+    private val forgotPasswordViewModel: ForgotPasswordViewModel by viewModels()
+    private lateinit var resetEmailStatusObserver: Observer<Boolean>
+    @Inject lateinit var androidUtils: AndroidUtils
+    @Inject lateinit var networkUtils: NetworkUtils
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+
+        resetEmailStatusObserver = Observer { isEmailSent ->
+            if(isEmailSent){
+                activity?.let { androidUtils.showSnackBar(it, getString(R.string.reset_email_sent)) }
+                findNavController().navigate(R.id.action_forgotPasswordFragment_to_loginFragment)
+            }else{
+                activity?.let { androidUtils.showSnackBar(it, getString(R.string.reset_email_not_sent)) }
+            }
+        }
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_forgot_password, container, false)
+        _binding = FragmentForgotPasswordBinding.inflate(inflater, container, false)
+        return binding?.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        forgot_send_code_btn.setOnClickListener {
+        binding?.forgotSendResetPassBtn?.setOnClickListener(this)
 
-        }
-
-        forgot_enter_code_btn.setOnClickListener {
-            hideCodeVerificationUI()
-            showResetPasswordUI()
-        }
-
-        forgot_reset_pass_btn.setOnClickListener {
-            view.findNavController().navigate(R.id.action_forgotPasswordFragment_to_loginFragment)
-        }
     }
 
-    private fun hideCodeVerificationUI(){
-        forgot_send_code_btn.visibility = View.INVISIBLE
-        forgot_email_et.visibility = View.INVISIBLE
-        forgot_enter_code_btn.visibility = View.INVISIBLE
-        forgot_code_et.visibility = View.INVISIBLE
+    override fun onStop() {
+        super.onStop()
+
+        forgotPasswordViewModel.getResetEmailStatus().removeObserver(resetEmailStatusObserver)
+
     }
 
-    private fun showResetPasswordUI(){
-        forgot_new_pass_et.visibility = View.VISIBLE
-        forgot_match_new_pass_et.visibility = View.VISIBLE
-        forgot_reset_pass_btn.visibility = View.VISIBLE
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
+    }
+
+    override fun onClick(view: View?) {
+
+        val isOnline = context?.let { networkUtils.isNetworkAvailable(it) }
+
+        if(isOnline!!) {
+            when (view?.id) {
+                R.id.forgot_send_reset_pass_btn -> {
+
+                    forgotPasswordViewModel.getResetEmailStatus().observe(this, resetEmailStatusObserver)
+
+                    context?.let { androidUtils.hideKeyboard(it, view) }
+
+                    val email = binding?.forgotEmailEt?.text?.trim().toString()
+
+                    if (androidUtils.isValidEmail(email)) {
+                        forgotPasswordViewModel.sendPasswordResetEmail(email)
+                    } else {
+                        activity?.let {
+                            androidUtils.showSnackBar(
+                                it,
+                                getString(R.string.invalid_email_err_msg)
+                            )
+                        }
+                    }
+                }
+            }
+        }else{
+            activity?.let { androidUtils.showSnackBar(it, getString(R.string.not_connected_internet)) }
+        }
     }
 
 

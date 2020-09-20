@@ -35,9 +35,9 @@ class LoginFragment : Fragment(), View.OnClickListener{
     private val loginViewModel: LoginViewModel by viewModels()
     @Inject lateinit var networkUtils: NetworkUtils
     @Inject lateinit var androidUtils: AndroidUtils
-    lateinit var signInEmail: String
-    lateinit var signInPassword: String
-    lateinit var emailSignInObserver: Observer<Boolean>
+    private lateinit var signInEmail: String
+    private lateinit var signInPassword: String
+    private lateinit var emailSignInObserver: Observer<Boolean>
     private lateinit var googleAuthObserver: Observer<Boolean>
     private lateinit var facebookAuthObserver: Observer<Boolean>
 

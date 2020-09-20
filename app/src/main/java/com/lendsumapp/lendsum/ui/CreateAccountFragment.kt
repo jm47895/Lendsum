@@ -14,6 +14,7 @@ import androidx.lifecycle.Observer
 import androidx.navigation.findNavController
 import androidx.navigation.fragment.NavHostFragment.findNavController
 import com.lendsumapp.lendsum.R
+import com.lendsumapp.lendsum.util.AndroidUtils
 import com.lendsumapp.lendsum.util.GlobalConstants
 import com.lendsumapp.lendsum.util.GlobalConstants.NAV_SIGN_UP_TYPE
 import com.lendsumapp.lendsum.util.NavSignUpType
@@ -31,6 +32,7 @@ class CreateAccountFragment : Fragment() {
     private val sharedPrefs by lazy { activity?.getSharedPreferences(R.string.app_name.toString(), Context.MODE_PRIVATE) }
     private val createAccountViewModel: CreateAccountViewModel by viewModels()
     private lateinit var emailSignUpObserver: Observer<Boolean>
+    @Inject lateinit var androidUtils: AndroidUtils
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -92,7 +94,7 @@ class CreateAccountFragment : Fragment() {
             create_user_first_name_et.error = getString(R.string.first_name_error_msg)
             create_user_last_name_et.error = getString(R.string.last_name_err_msg)
             return false
-        } else if (!isValidEmail(email)) {
+        } else if (!androidUtils.isValidEmail(email)) {
             create_user_email_et.error = getString(R.string.invalid_email_err_msg)
             return false
         } else if (TextUtils.isEmpty(password) || !isValidPassword(password)
@@ -116,11 +118,6 @@ class CreateAccountFragment : Fragment() {
         isValid = matchCase.matches()
         return isValid
     }
-
-    private fun isValidEmail(target: CharSequence): Boolean {
-        return !TextUtils.isEmpty(target) && Patterns.EMAIL_ADDRESS.matcher(target).matches()
-    }
-
 
     companion object{
         private val TAG = CreateAccountFragment::class.simpleName

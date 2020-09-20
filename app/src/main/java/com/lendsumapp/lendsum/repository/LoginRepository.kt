@@ -75,6 +75,14 @@ class LoginRepository @Inject constructor(
     fun getEmailSignInStatus(): MutableLiveData<Boolean> {
         return emailAndPassAuthComponent.getEmailSignInStatus()
     }
+
+    fun sendPasswordResetEmail(email: String){
+        emailAndPassAuthComponent.sendPasswordResetEmail(email)
+    }
+
+    fun getResetEmailStatus(): MutableLiveData<Boolean> {
+        return emailAndPassAuthComponent.getResetEmailStatus()
+    }
     //End of Email and Pass functions
 
     //Facebook login functions
