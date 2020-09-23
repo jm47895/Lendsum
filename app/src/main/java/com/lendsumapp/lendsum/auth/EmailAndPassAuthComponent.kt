@@ -5,6 +5,8 @@ import androidx.lifecycle.MutableLiveData
 import com.google.android.gms.tasks.OnCompleteListener
 import com.google.android.gms.tasks.Task
 import com.google.firebase.auth.AuthResult
+import com.google.firebase.auth.EmailAuthCredential
+import com.google.firebase.auth.EmailAuthProvider
 import com.google.firebase.auth.FirebaseAuth
 import dagger.hilt.android.scopes.ActivityScoped
 import javax.inject.Inject
@@ -15,6 +17,7 @@ class EmailAndPassAuthComponent @Inject constructor(): OnCompleteListener<AuthRe
     private val firebaseAuth : FirebaseAuth = FirebaseAuth.getInstance()
     private val emailSignInStatus: MutableLiveData<Boolean> = MutableLiveData()
     private val resetEmailStatus: MutableLiveData<Boolean> = MutableLiveData()
+    private val linkWithEmailStatus: MutableLiveData<Boolean> = MutableLiveData()
 
     fun signInWithEmailAndPass(email: String, password: String)
     {
@@ -23,9 +26,22 @@ class EmailAndPassAuthComponent @Inject constructor(): OnCompleteListener<AuthRe
 
 
     fun registerWithEmailAndPassword(email: String, password: String){
-        firebaseAuth.createUserWithEmailAndPassword(email, password)
-            .addOnCompleteListener(this)
+
+        if(firebaseAuth.currentUser == null) {
+            firebaseAuth.createUserWithEmailAndPassword(email, password).addOnCompleteListener(this)
+        }else{
+            val emailAndPassCredential = EmailAuthProvider.getCredential(email, password)
+            firebaseAuth.currentUser?.linkWithCredential(emailAndPassCredential)?.addOnCompleteListener { task ->
+                if (task.isSuccessful){
+                    linkWithEmailStatus.postValue(true)
+                    Log.d(TAG, "Email and Google or Facebook credential link was successful")
+                }else{
+                    linkWithEmailStatus.postValue(false)
+                    Log.d(TAG, task.exception.toString())
+                }
+            }
         }
+    }
 
     override fun onComplete(task: Task<AuthResult>) {
         if (task.isSuccessful){
@@ -60,6 +76,10 @@ class EmailAndPassAuthComponent @Inject constructor(): OnCompleteListener<AuthRe
 
     fun getResetEmailStatus(): MutableLiveData<Boolean> {
         return resetEmailStatus
+    }
+
+    fun getLinkWithCredentialStatus(): MutableLiveData<Boolean> {
+        return linkWithEmailStatus
     }
 
     companion object{

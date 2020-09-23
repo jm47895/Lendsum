@@ -6,6 +6,7 @@ import androidx.hilt.lifecycle.ViewModelInject
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.auth.PhoneAuthCredential
 import com.lendsumapp.lendsum.repository.LoginRepository
 import dagger.hilt.android.qualifiers.ActivityContext
@@ -13,25 +14,8 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
 class NumberVerificationViewModel @ViewModelInject constructor(
-    private val loginRepository: LoginRepository,
-    @ActivityContext private var context: Context
+    private val loginRepository: LoginRepository
 ): ViewModel(){
-
-    fun logOutOfGoogle(){
-        viewModelScope.launch(Dispatchers.IO) {
-            loginRepository.logOutOfGoogle()
-        }
-    }
-
-    fun configureGoogleAuth(){
-        loginRepository.configureGoogleAuth(context)
-    }
-
-    fun logOutOfFacebook(){
-        viewModelScope.launch(Dispatchers.IO) {
-            loginRepository.logOutOfFacebook()
-        }
-    }
 
     fun sendSMSCode(phoneNumber: String, activity: Activity){
         viewModelScope.launch(Dispatchers.IO) {

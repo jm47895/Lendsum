@@ -14,6 +14,8 @@ import androidx.lifecycle.Observer
 import androidx.navigation.findNavController
 import androidx.navigation.fragment.NavHostFragment.findNavController
 import com.lendsumapp.lendsum.R
+import com.lendsumapp.lendsum.databinding.FragmentCreateAccountBinding
+import com.lendsumapp.lendsum.databinding.FragmentLoginBinding
 import com.lendsumapp.lendsum.util.AndroidUtils
 import com.lendsumapp.lendsum.util.GlobalConstants
 import com.lendsumapp.lendsum.util.GlobalConstants.NAV_SIGN_UP_TYPE
@@ -27,11 +29,14 @@ import javax.inject.Inject
 
 
 @AndroidEntryPoint
-class CreateAccountFragment : Fragment() {
+class CreateAccountFragment : Fragment(), View.OnClickListener {
 
+    private var _binding: FragmentCreateAccountBinding? = null
+    private val binding get() =  _binding
     private val sharedPrefs by lazy { activity?.getSharedPreferences(R.string.app_name.toString(), Context.MODE_PRIVATE) }
     private val createAccountViewModel: CreateAccountViewModel by viewModels()
     private lateinit var emailSignUpObserver: Observer<Boolean>
+    private lateinit var linkWithEmailObserver: Observer<Boolean>
     @Inject lateinit var androidUtils: AndroidUtils
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -48,40 +53,50 @@ class CreateAccountFragment : Fragment() {
             }
 
         }
+
+        linkWithEmailObserver = Observer { isLinkWithEmailSuccessful->
+            if(isLinkWithEmailSuccessful){
+                Log.d(TAG, "Link email with other credential provider success")
+                findNavController(this).navigate(R.id.action_createAccountFragment_to_numberVerificationFragment)
+            }else{
+                Log.d(TAG, "Link email with other credential provider failed")
+            }
+        }
     }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_create_account, container, false)
+        _binding = FragmentCreateAccountBinding.inflate(inflater, container, false)
+        return binding?.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        val user = createAccountViewModel.getFirebaseUser()
 
-
-        create_account_next_btn.setOnClickListener {
-
-            val firstName = create_user_first_name_et.text.toString().trim()
-            val lastName = create_user_last_name_et.text.toString().trim()
-            val email = create_user_email_et.text.toString().trim()
-            val password = create_user_password_et.text.toString().trim()
-            val matchPassword = create_user_match_password_et.text.toString().trim()
-
-            if(isValidAccountForm(firstName, lastName, email, password, matchPassword)){
-                createAccountViewModel.getEmailSignUpStatus().observe(viewLifecycleOwner, emailSignUpObserver)
-                signUpUser(firstName, lastName, email, password)
-            }
-
+        if(user != null){
+            binding?.createUserFirstNameEt?.setText(user.displayName?.let { getFirstName(it) })
+            binding?.createUserLastNameEt?.setText(user.displayName?.let { getLastName(it) })
+            binding?.createUserEmailEt?.setText(user.email)
         }
 
-        create_account_back_btn.setOnClickListener {
-            createAccountViewModel.logOutOfEmailAndPass()
-            view.findNavController().navigate(R.id.action_createAccountFragment_to_loginFragment)
-        }
+        binding?.createAccountBackBtn?.setOnClickListener(this)
+        binding?.createAccountNextBtn?.setOnClickListener(this)
+
+    }
+
+    override fun onStop() {
+        super.onStop()
+        createAccountViewModel.getEmailSignUpStatus().removeObserver(emailSignUpObserver)
+        createAccountViewModel.getLinkWithCredentialStatus().removeObserver(linkWithEmailObserver)
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
     }
 
     private fun signUpUser(firstName: String, lastName: String, email: String, password: String) {
@@ -91,19 +106,19 @@ class CreateAccountFragment : Fragment() {
     private fun isValidAccountForm(firstName: String, lastName: String, email: String, password: String, matchPassword: String): Boolean {
 
         if (TextUtils.isEmpty(firstName) && TextUtils.isEmpty(lastName)) {
-            create_user_first_name_et.error = getString(R.string.first_name_error_msg)
-            create_user_last_name_et.error = getString(R.string.last_name_err_msg)
+            binding?.createUserFirstNameEt?.error = getString(R.string.first_name_error_msg)
+            binding?.createUserLastNameEt?.error = getString(R.string.last_name_err_msg)
             return false
         } else if (!androidUtils.isValidEmail(email)) {
-            create_user_email_et.error = getString(R.string.invalid_email_err_msg)
+            binding?.createUserEmailEt?.error = getString(R.string.invalid_email_err_msg)
             return false
         } else if (TextUtils.isEmpty(password) || !isValidPassword(password)
         ) {
-            create_user_password_et.error = getString(R.string.password_param_err_msg)
+            binding?.createUserPasswordEt?.error = getString(R.string.password_param_err_msg)
             return false
         }else if(password != matchPassword){
-            create_user_match_password_et.error = getString(R.string.pass_dont_match_err_msg)
-            create_user_password_et.error = getString(R.string.pass_dont_match_err_msg)
+            binding?.createUserMatchPasswordEt?.error = getString(R.string.pass_dont_match_err_msg)
+            binding?.createUserPasswordEt?.error = getString(R.string.pass_dont_match_err_msg)
             return false
         }
         return true
@@ -117,6 +132,49 @@ class CreateAccountFragment : Fragment() {
         matchCase = pattern.matcher(password)
         isValid = matchCase.matches()
         return isValid
+    }
+
+    override fun onClick(view: View?) {
+        when(view?.id){
+            R.id.create_account_back_btn->{
+
+                when (sharedPrefs?.getInt(NAV_SIGN_UP_TYPE, NavSignUpType.EMAIL_LOGIN.ordinal)) {
+                    NavSignUpType.EMAIL_LOGIN.ordinal ->{
+                        createAccountViewModel.logOutOfEmailAndPass()
+                    }
+                    NavSignUpType.GOOGLE_LOGIN.ordinal -> {
+                        createAccountViewModel.configureGoogleAuth()
+                        createAccountViewModel.logOutOfGoogle()
+                    }
+                    NavSignUpType.FACEBOOK_LOGIN.ordinal -> {
+                        createAccountViewModel.logOutOfFacebook()
+                    }
+                }
+
+                view.findNavController().navigate(R.id.action_createAccountFragment_to_loginFragment)
+            }
+            R.id.create_account_next_btn->{
+                val firstName = binding?.createUserFirstNameEt?.text.toString().trim()
+                val lastName = binding?.createUserLastNameEt?.text.toString().trim()
+                val email = binding?.createUserEmailEt?.text.toString().trim()
+                val password = binding?.createUserPasswordEt?.text.toString().trim()
+                val matchPassword = binding?.createUserMatchPasswordEt?.text.toString().trim()
+
+                if(isValidAccountForm(firstName, lastName, email, password, matchPassword)){
+                    createAccountViewModel.getEmailSignUpStatus().observe(viewLifecycleOwner, emailSignUpObserver)
+                    createAccountViewModel.getLinkWithCredentialStatus().observe(viewLifecycleOwner, linkWithEmailObserver)
+                    signUpUser(firstName, lastName, email, password)
+                }
+            }
+        }
+    }
+
+    private fun getFirstName(name: String): String{
+        return name.substring(0, name.indexOf(" "))
+    }
+
+    private fun getLastName(name: String): String{
+        return name.substring(name.indexOf(" ") + 1)
     }
 
     companion object{

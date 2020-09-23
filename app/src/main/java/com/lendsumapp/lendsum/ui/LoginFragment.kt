@@ -53,7 +53,7 @@ class LoginFragment : Fragment(), View.OnClickListener{
         googleAuthObserver = Observer{ isGoogleLoginSuccessful ->
             if(isGoogleLoginSuccessful){
                 sharedPrefs?.edit()?.putInt(NAV_SIGN_UP_TYPE, NavSignUpType.GOOGLE_LOGIN.ordinal)?.apply()
-                findNavController(this).navigate(R.id.action_loginFragment_to_numberVerificationFragment)
+                findNavController(this).navigate(R.id.action_loginFragment_to_createAccountFragment)
                 Log.d(TAG, "Google Auth Observer Success")
             }else{
                 Log.d(TAG, "Google Auth Observer Failure")
@@ -63,7 +63,7 @@ class LoginFragment : Fragment(), View.OnClickListener{
         facebookAuthObserver = Observer{ isFacebookLoginSuccessful ->
             if (isFacebookLoginSuccessful){
                 sharedPrefs?.edit()?.putInt(NAV_SIGN_UP_TYPE, NavSignUpType.FACEBOOK_LOGIN.ordinal)?.apply()
-                findNavController(this).navigate(R.id.action_loginFragment_to_numberVerificationFragment)
+                findNavController(this).navigate(R.id.action_loginFragment_to_createAccountFragment)
                 Log.d(TAG, "Facebook Auth Observer Success")
             }else{
                 Log.d(TAG, "Facebook Auth Observer Failure")

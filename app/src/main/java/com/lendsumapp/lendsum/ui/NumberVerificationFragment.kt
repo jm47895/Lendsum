@@ -124,26 +124,11 @@ class NumberVerificationFragment : Fragment(), View.OnClickListener, CountryCode
                         activity?.let { androidUtils.showSnackBar(it, getString(R.string.code_not_match)) }
                     }
                 }
-                R.id.number_verification_next_btn -> {
-
-                }
                 R.id.number_verification_back_btn -> {
-                    if (sharedPrefs?.getInt(NAV_SIGN_UP_TYPE, NavSignUpType.EMAIL_LOGIN.ordinal) == NavSignUpType.EMAIL_LOGIN.ordinal) {
-                        view.findNavController()
-                            .navigate(R.id.action_numberVerificationFragment_to_createAccountFragment)
+                    if (sharedPrefs?.getBoolean(RETURNING_USER, false) == false) {
+                        view.findNavController().navigate(R.id.action_numberVerificationFragment_to_createAccountFragment)
                     } else {
-                        when (sharedPrefs?.getInt(NAV_SIGN_UP_TYPE, NavSignUpType.EMAIL_LOGIN.ordinal)) {
-                            NavSignUpType.GOOGLE_LOGIN.ordinal -> {
-                                numberVerificationViewModel.configureGoogleAuth()
-                                numberVerificationViewModel.logOutOfGoogle()
-                            }
-                            NavSignUpType.FACEBOOK_LOGIN.ordinal -> {
-                                numberVerificationViewModel.logOutOfFacebook()
-                            }
-                        }
-
-                        view.findNavController()
-                            .navigate(R.id.action_numberVerificationFragment_to_loginFragment)
+                        view.findNavController().navigate(R.id.action_numberVerificationFragment_to_loginFragment)
                     }
                 }
             }
