@@ -55,7 +55,6 @@ class EmailAndPassAuthComponent @Inject constructor(): OnCompleteListener<AuthRe
 
     fun signOutOfEmailAndPass(){
         firebaseAuth.signOut()
-        emailSignInStatus.postValue(false)
     }
 
     fun getEmailSignInStatus(): MutableLiveData<Boolean> {
