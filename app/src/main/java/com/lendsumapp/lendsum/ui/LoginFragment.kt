@@ -18,6 +18,7 @@ import com.lendsumapp.lendsum.R
 import com.lendsumapp.lendsum.databinding.FragmentLoginBinding
 import com.lendsumapp.lendsum.util.AndroidUtils
 import com.lendsumapp.lendsum.util.GlobalConstants.NAV_SIGN_UP_TYPE
+import com.lendsumapp.lendsum.util.GlobalConstants.NUMBER_VERIFIED
 import com.lendsumapp.lendsum.util.GlobalConstants.RETURNING_USER
 import com.lendsumapp.lendsum.util.NavSignUpType
 import com.lendsumapp.lendsum.util.NetworkUtils
@@ -46,7 +47,9 @@ class LoginFragment : Fragment(), View.OnClickListener{
 
         val firebaseUser = loginViewModel.getFirebaseUser()
 
-        if(firebaseUser != null && sharedPrefs?.getBoolean(RETURNING_USER, false) == true){
+        if(firebaseUser != null
+            && sharedPrefs?.getBoolean(RETURNING_USER, false) == true
+            && sharedPrefs?.getBoolean(NUMBER_VERIFIED, false) == true){
             findNavController(this).navigate(R.id.action_loginFragment_to_marketplaceFragment)
         }
 

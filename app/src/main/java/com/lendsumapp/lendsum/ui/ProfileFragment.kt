@@ -9,7 +9,9 @@ import android.view.ViewGroup
 import androidx.fragment.app.viewModels
 import androidx.navigation.findNavController
 import com.lendsumapp.lendsum.R
+import com.lendsumapp.lendsum.util.GlobalConstants
 import com.lendsumapp.lendsum.util.GlobalConstants.NAV_SIGN_UP_TYPE
+import com.lendsumapp.lendsum.util.GlobalConstants.NUMBER_VERIFIED
 import com.lendsumapp.lendsum.util.NavSignUpType
 import com.lendsumapp.lendsum.viewmodel.ProfileViewModel
 import dagger.hilt.android.AndroidEntryPoint
@@ -33,6 +35,8 @@ class ProfileFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         profile_logout_btn.setOnClickListener {
+
+            sharedPrefs?.edit()?.putBoolean(NUMBER_VERIFIED, false)?.apply()
 
             when(sharedPrefs?.getInt(NAV_SIGN_UP_TYPE, NavSignUpType.EMAIL_LOGIN.ordinal)){
                 NavSignUpType.EMAIL_LOGIN.ordinal ->{

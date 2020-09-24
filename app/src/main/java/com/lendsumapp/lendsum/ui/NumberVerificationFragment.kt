@@ -19,6 +19,7 @@ import com.lendsumapp.lendsum.R
 import com.lendsumapp.lendsum.databinding.FragmentNumberVerificationBinding
 import com.lendsumapp.lendsum.util.AndroidUtils
 import com.lendsumapp.lendsum.util.GlobalConstants.NAV_SIGN_UP_TYPE
+import com.lendsumapp.lendsum.util.GlobalConstants.NUMBER_VERIFIED
 import com.lendsumapp.lendsum.util.GlobalConstants.RETURNING_USER
 import com.lendsumapp.lendsum.util.NavSignUpType
 import com.lendsumapp.lendsum.util.NetworkUtils
@@ -107,7 +108,7 @@ class NumberVerificationFragment : Fragment(), View.OnClickListener, CountryCode
 
                     val code = binding?.numberVerificationCodeEt?.text?.trim().toString()
                     if (code == credential?.smsCode) {
-
+                        sharedPrefs?.edit()?.putBoolean(NUMBER_VERIFIED, true)?.apply()
                         Log.d(TAG, "Code: $code matches $credential")
 
                         numberVerificationViewModel.linkPhoneNumWithLoginCredential(credential!!)
