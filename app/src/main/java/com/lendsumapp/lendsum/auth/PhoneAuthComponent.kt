@@ -18,6 +18,7 @@ class PhoneAuthComponent @Inject constructor() {
 
     private val firebaseAuth : FirebaseAuth = FirebaseAuth.getInstance()
     private val generatedPhoneAuthCode: MutableLiveData<PhoneAuthCredential> = MutableLiveData()
+    private val linkPhoneNumWithCredentialStatus: MutableLiveData<Boolean> = MutableLiveData()
 
     fun verifyPhoneNumber(phoneNumber: String, activity: Activity){
         PhoneAuthProvider.getInstance().verifyPhoneNumber(phoneNumber, 60, TimeUnit.SECONDS, activity, callbacks)
@@ -63,7 +64,19 @@ class PhoneAuthComponent @Inject constructor() {
     }
 
     fun linkPhoneNumWithLoginCredential(credential: PhoneAuthCredential){
-        firebaseAuth.currentUser?.linkWithCredential(credential)
+        firebaseAuth.currentUser?.linkWithCredential(credential)?.addOnCompleteListener { task->
+            if (task.isSuccessful){
+                Log.d(TAG, "Phone number is linked with current credentials")
+                linkPhoneNumWithCredentialStatus.postValue(true)
+            }else{
+                Log.d(TAG, task.exception.toString())
+                linkPhoneNumWithCredentialStatus.postValue(false)
+            }
+        }
+    }
+
+    fun getPhoneNumberLinkStatus(): MutableLiveData<Boolean>{
+        return linkPhoneNumWithCredentialStatus
     }
 
 

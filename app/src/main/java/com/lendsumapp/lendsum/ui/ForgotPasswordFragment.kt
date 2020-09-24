@@ -37,7 +37,7 @@ class ForgotPasswordFragment : Fragment(), View.OnClickListener {
                 activity?.let { androidUtils.showSnackBar(it, getString(R.string.reset_email_sent)) }
                 findNavController().navigate(R.id.action_forgotPasswordFragment_to_loginFragment)
             }else{
-                activity?.let { androidUtils.showSnackBar(it, getString(R.string.reset_email_not_sent)) }
+                activity?.let { androidUtils.showSnackBar(it, getString(R.string.no_account_with_email)) }
             }
         }
     }

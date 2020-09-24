@@ -52,5 +52,7 @@
     <string name="enter_email">Enter email</string>
     <string name="reset_email_sent">Reset password email was sent</string>
     <string name="reset_email_not_sent">Reset password email failed to send</string>
+    <string name="account_already_exists">An account with this email already exists. Please sign in.</string>
+    <string name="no_account_with_email">There is no account associated with this email</string>
 
 </resources>

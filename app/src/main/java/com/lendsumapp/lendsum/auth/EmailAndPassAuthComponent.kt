@@ -67,7 +67,7 @@ class EmailAndPassAuthComponent @Inject constructor(): OnCompleteListener<AuthRe
                 Log.d(TAG, "Reset Password email sent.")
                 resetEmailStatus.postValue(true)
             }else{
-                Log.d(TAG, "Reset Password email failed to send.")
+                Log.d(TAG, "Reset Password email failed to send." + task.exception)
                 resetEmailStatus.postValue(false)
             }
         }

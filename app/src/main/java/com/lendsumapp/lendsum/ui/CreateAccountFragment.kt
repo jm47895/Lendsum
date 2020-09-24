@@ -63,6 +63,8 @@ class CreateAccountFragment : Fragment(), View.OnClickListener {
                 findNavController(this).navigate(R.id.action_createAccountFragment_to_numberVerificationFragment)
             }else{
                 Log.d(TAG, "Link email with other credential provider failed")
+                sharedPrefs?.edit()?.putBoolean(RETURNING_USER, true)?.apply()
+                activity?.let { androidUtils.showSnackBar(it, getString(R.string.account_already_exists)) }
             }
         }
 
@@ -152,6 +154,9 @@ class CreateAccountFragment : Fragment(), View.OnClickListener {
                 view.findNavController().navigate(R.id.action_createAccountFragment_to_loginFragment)
             }
             R.id.create_account_next_btn->{
+
+                context?.let { androidUtils.hideKeyboard(it, view) }
+
                 val firstName = binding?.createUserFirstNameEt?.text.toString().trim()
                 val lastName = binding?.createUserLastNameEt?.text.toString().trim()
                 val email = binding?.createUserEmailEt?.text.toString().trim()

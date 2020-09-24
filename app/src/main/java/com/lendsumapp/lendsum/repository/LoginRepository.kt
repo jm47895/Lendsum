@@ -123,6 +123,10 @@ class LoginRepository @Inject constructor(
     fun linkPhoneNumWithLoginCredential(credential: PhoneAuthCredential){
         phoneAuthComponent.linkPhoneNumWithLoginCredential(credential)
     }
+
+    fun getPhoneNumberLinkStatus(): MutableLiveData<Boolean>{
+        return phoneAuthComponent.getPhoneNumberLinkStatus()
+    }
     //End phone auth functions
 
     companion object{
