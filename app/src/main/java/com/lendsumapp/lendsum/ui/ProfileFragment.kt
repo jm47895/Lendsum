@@ -9,6 +9,8 @@ import android.view.ViewGroup
 import androidx.fragment.app.viewModels
 import androidx.navigation.findNavController
 import com.lendsumapp.lendsum.R
+import com.lendsumapp.lendsum.databinding.FragmentNumberVerificationBinding
+import com.lendsumapp.lendsum.databinding.FragmentProfileBinding
 import com.lendsumapp.lendsum.util.GlobalConstants
 import com.lendsumapp.lendsum.util.GlobalConstants.NAV_SIGN_UP_TYPE
 import com.lendsumapp.lendsum.util.GlobalConstants.NUMBER_VERIFIED
@@ -18,8 +20,10 @@ import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.android.synthetic.main.fragment_profile.*
 
 @AndroidEntryPoint
-class ProfileFragment : Fragment() {
+class ProfileFragment : Fragment(), View.OnClickListener {
 
+    private var _binding: FragmentProfileBinding? = null
+    private val binding get() = _binding
     private val sharedPrefs by lazy { activity?.getSharedPreferences(R.string.app_name.toString(), Context.MODE_PRIVATE) }
     private val profileViewModel: ProfileViewModel by viewModels()
 
@@ -27,32 +31,42 @@ class ProfileFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_profile, container, false)
+        _binding = FragmentProfileBinding.inflate(inflater, container, false)
+        return binding?.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        profile_logout_btn.setOnClickListener {
+        binding?.profileLogoutBtn?.setOnClickListener(this)
+    }
 
-            sharedPrefs?.edit()?.putBoolean(NUMBER_VERIFIED, false)?.apply()
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
+    }
 
-            when(sharedPrefs?.getInt(NAV_SIGN_UP_TYPE, NavSignUpType.EMAIL_LOGIN.ordinal)){
-                NavSignUpType.EMAIL_LOGIN.ordinal ->{
-                    profileViewModel.logOutOfEmailAndPass()
-                    view.findNavController().navigate(R.id.action_profileFragment_to_loginFragment)
-                }
-                NavSignUpType.GOOGLE_LOGIN.ordinal ->{
-                    context?.let {
-                        profileViewModel.configureGoogleAuth()
-                        profileViewModel.logOutOfGoogle()
+    override fun onClick(view: View?) {
+        when(view?.id){
+            R.id.profile_logout_btn -> {
+                sharedPrefs?.edit()?.putBoolean(NUMBER_VERIFIED, false)?.apply()
+
+                when(sharedPrefs?.getInt(NAV_SIGN_UP_TYPE, NavSignUpType.EMAIL_LOGIN.ordinal)){
+                    NavSignUpType.EMAIL_LOGIN.ordinal ->{
+                        profileViewModel.logOutOfEmailAndPass()
                         view.findNavController().navigate(R.id.action_profileFragment_to_loginFragment)
                     }
-                }
-                NavSignUpType.FACEBOOK_LOGIN.ordinal ->{
-                    profileViewModel.logOutOfFacebook()
-                    view.findNavController().navigate(R.id.action_profileFragment_to_loginFragment)
+                    NavSignUpType.GOOGLE_LOGIN.ordinal ->{
+                        context?.let {
+                            profileViewModel.configureGoogleAuth()
+                            profileViewModel.logOutOfGoogle()
+                            view.findNavController().navigate(R.id.action_profileFragment_to_loginFragment)
+                        }
+                    }
+                    NavSignUpType.FACEBOOK_LOGIN.ordinal ->{
+                        profileViewModel.logOutOfFacebook()
+                        view.findNavController().navigate(R.id.action_profileFragment_to_loginFragment)
+                    }
                 }
             }
         }
