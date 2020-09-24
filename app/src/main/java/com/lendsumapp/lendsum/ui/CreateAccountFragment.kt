@@ -8,17 +8,20 @@ import android.util.Patterns
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.activity.addCallback
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import androidx.navigation.findNavController
 import androidx.navigation.fragment.NavHostFragment.findNavController
+import androidx.navigation.fragment.findNavController
 import com.lendsumapp.lendsum.R
 import com.lendsumapp.lendsum.databinding.FragmentCreateAccountBinding
 import com.lendsumapp.lendsum.databinding.FragmentLoginBinding
 import com.lendsumapp.lendsum.util.AndroidUtils
 import com.lendsumapp.lendsum.util.GlobalConstants
 import com.lendsumapp.lendsum.util.GlobalConstants.NAV_SIGN_UP_TYPE
+import com.lendsumapp.lendsum.util.GlobalConstants.RETURNING_USER
 import com.lendsumapp.lendsum.util.NavSignUpType
 import com.lendsumapp.lendsum.viewmodel.CreateAccountViewModel
 import dagger.hilt.android.AndroidEntryPoint
@@ -62,6 +65,12 @@ class CreateAccountFragment : Fragment(), View.OnClickListener {
                 Log.d(TAG, "Link email with other credential provider failed")
             }
         }
+
+        requireActivity().onBackPressedDispatcher.addCallback(this){
+            sharedPrefs?.getBoolean(RETURNING_USER, false)?.let { logoutOrDeleteUserHandler(it) }
+            findNavController(this@CreateAccountFragment).navigate(R.id.action_createAccountFragment_to_loginFragment)
+        }
+
     }
 
     override fun onCreateView(
@@ -138,18 +147,7 @@ class CreateAccountFragment : Fragment(), View.OnClickListener {
         when(view?.id){
             R.id.create_account_back_btn->{
 
-                when (sharedPrefs?.getInt(NAV_SIGN_UP_TYPE, NavSignUpType.EMAIL_LOGIN.ordinal)) {
-                    NavSignUpType.EMAIL_LOGIN.ordinal ->{
-                        createAccountViewModel.logOutOfEmailAndPass()
-                    }
-                    NavSignUpType.GOOGLE_LOGIN.ordinal -> {
-                        createAccountViewModel.configureGoogleAuth()
-                        createAccountViewModel.logOutOfGoogle()
-                    }
-                    NavSignUpType.FACEBOOK_LOGIN.ordinal -> {
-                        createAccountViewModel.logOutOfFacebook()
-                    }
-                }
+                sharedPrefs?.getBoolean(RETURNING_USER, false)?.let { logoutOrDeleteUserHandler(it) }
 
                 view.findNavController().navigate(R.id.action_createAccountFragment_to_loginFragment)
             }
@@ -175,6 +173,25 @@ class CreateAccountFragment : Fragment(), View.OnClickListener {
 
     private fun getLastName(name: String): String{
         return name.substring(name.indexOf(" ") + 1)
+    }
+
+    private fun logoutOrDeleteUserHandler(isReturningUser : Boolean){
+        if(isReturningUser){
+            when (sharedPrefs?.getInt(NAV_SIGN_UP_TYPE, NavSignUpType.EMAIL_LOGIN.ordinal)) {
+                NavSignUpType.EMAIL_LOGIN.ordinal -> {
+                    createAccountViewModel.logOutOfEmailAndPass()
+                }
+                NavSignUpType.GOOGLE_LOGIN.ordinal -> {
+                    createAccountViewModel.configureGoogleAuth()
+                    createAccountViewModel.logOutOfGoogle()
+                }
+                NavSignUpType.FACEBOOK_LOGIN.ordinal -> {
+                    createAccountViewModel.logOutOfFacebook()
+                }
+            }
+        }else {
+            createAccountViewModel.deleteFirebaseUser()
+        }
     }
 
     companion object{

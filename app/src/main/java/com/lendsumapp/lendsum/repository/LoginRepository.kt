@@ -29,6 +29,10 @@ class LoginRepository @Inject constructor(
         return firebaseAuth?.currentUser
     }
 
+    fun deleteFirebaseUser(){
+        getFirebaseUser()?.delete()
+    }
+
     //Start of Google Auth functions
     fun configureGoogleAuth(context: Context){
         googleAuthComponent.configureGoogleAuth(context, context.resources.getString(R.string.default_web_client_id))

@@ -56,5 +56,7 @@ class CreateAccountViewModel @ViewModelInject constructor(
         }
     }
 
-
+    fun deleteFirebaseUser(){
+        loginRepository.deleteFirebaseUser()
+    }
 }
