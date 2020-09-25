@@ -47,7 +47,7 @@ class NumberVerificationViewModel @ViewModelInject constructor(
             val user = User(firebaseUser.uid,
                 firebaseUser.displayName.toString(),
                 "@" + firebaseUser.displayName,
-                firebaseUser.email.toString(), firebaseUser.phoneNumber.toString(),null)
+                firebaseUser.email.toString(), firebaseUser.phoneNumber.toString(),firebaseUser.photoUrl.toString(), null)
 
             Log.d(TAG, user.toString())
 

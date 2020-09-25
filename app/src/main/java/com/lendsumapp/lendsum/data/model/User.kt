@@ -11,6 +11,7 @@ data class User(
     @ColumnInfo(name = "username") var username: String,
     @ColumnInfo(name = "email") var email: String,
     @ColumnInfo(name = "phoneNumber") var phoneNumber: String,
+    @ColumnInfo(name = "profilePicUrl") var profilePicUrl: String?,
     //TODO Change to type Friend object when feature is implemented
     @ColumnInfo(name = "friendsList") var friendList: List<String>?
 )
