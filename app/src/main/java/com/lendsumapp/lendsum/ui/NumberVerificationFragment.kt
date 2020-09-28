@@ -135,7 +135,11 @@ class NumberVerificationFragment : Fragment(), View.OnClickListener, CountryCode
 
                         numberVerificationViewModel.getPhoneNumberLinkStatus().observe(viewLifecycleOwner, linkPhoneNumberStatusObserver)
 
-                        numberVerificationViewModel.linkPhoneNumWithLoginCredential(credential!!)
+                        if(sharedPrefs?.getBoolean(RETURNING_USER, false) == false){
+                            numberVerificationViewModel.linkPhoneNumWithLoginCredential(credential!!)
+                        }else{
+                            findNavController().navigate(R.id.action_numberVerificationFragment_to_marketplaceFragment)
+                        }
 
                     } else {
 

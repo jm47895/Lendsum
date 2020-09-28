@@ -1,41 +1,168 @@
-<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/opacity80Black"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
+    android:background="@color/opacity80Black">
 
-    <com.google.android.material.appbar.AppBarLayout
-        android:id="@+id/app_bar"
-        android:layout_width="match_parent"
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/vertical_50_guide"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintGuide_percent=".50" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/horizontal_33_guide"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintGuide_percent=".3333" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/horizontal_66_guide"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintGuide_percent=".6666" />
+
+    <ImageButton
+        android:id="@+id/profile_profile_edit_btn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="12dp"
+        android:background="@null"
+        android:src="@drawable/ic_edit_32"
+        app:layout_constraintBottom_toTopOf="@id/horizontal_33_guide"
+        app:layout_constraintEnd_toStartOf="@+id/profile_settings_btn"
+        app:layout_constraintHorizontal_chainStyle="packed"
+        app:layout_constraintStart_toEndOf="@+id/vertical_50_guide"
         app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0"
+        app:layout_constraintHorizontal_bias="1"/>
+
+    <ImageButton
+        android:id="@+id/profile_settings_btn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="12dp"
+        android:background="@null"
+        android:src="@drawable/ic_settings_32"
+        app:layout_constraintBottom_toBottomOf="@+id/profile_profile_edit_btn"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintVertical_bias="0">
+        app:layout_constraintStart_toEndOf="@+id/profile_profile_edit_btn"
+        app:layout_constraintTop_toTopOf="@+id/profile_profile_edit_btn" />
 
-        <androidx.appcompat.widget.SearchView
-            android:id="@+id/search_view"
-            app:queryBackground="@color/colorSecondaryLight"
-            android:layout_width="match_parent"
-            android:layout_height="?attr/actionBarSize"
-            app:queryHint="Find something to borrow"
-            android:inputType="text"
-            app:searchIcon="@drawable/ic_market_search_24"/>
-
-    </com.google.android.material.appbar.AppBarLayout>
 
     <Button
         android:id="@+id/profile_logout_btn"
         style="@style/LoginButtonTheme"
-        android:text="Log out"
-        android:layout_gravity="center"/>
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="0dp"
+        android:layout_weight="1"
+        android:padding="0dp"
+        android:text="Sign Out"
+        tools:layout_editor_absoluteX="256dp"
+        tools:layout_editor_absoluteY="196dp"
+        android:visibility="gone"/>
+
+    <ImageView
+        android:id="@+id/profile_pic_image"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_margin="32dp"
+        app:layout_constraintBottom_toTopOf="@+id/horizontal_33_guide"
+        app:layout_constraintEnd_toStartOf="@+id/vertical_50_guide"
+        app:layout_constraintHorizontal_bias="1.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.0" />
+
+    <TextView
+        android:id="@+id/profile_name"
+        style="@style/PrimaryText"
+        app:layout_constraintBottom_toTopOf="@+id/profile_username"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0"
+        app:layout_constraintStart_toStartOf="@+id/vertical_50_guide"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_chainStyle="packed"
+        tools:text="Name Place Holder" />
+
+    <TextView
+        android:id="@+id/profile_username"
+        style="@style/SecondaryText"
+        app:layout_constraintBottom_toTopOf="@+id/profile_email"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0"
+        app:layout_constraintStart_toStartOf="@+id/vertical_50_guide"
+        app:layout_constraintTop_toBottomOf="@+id/profile_name"
+        tools:text="Username Placeholder" />
+
+    <TextView
+        android:id="@+id/profile_email"
+        style="@style/SecondaryText"
+        app:layout_constraintBottom_toTopOf="@+id/horizontal_33_guide"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0"
+        app:layout_constraintStart_toStartOf="@+id/vertical_50_guide"
+        app:layout_constraintTop_toBottomOf="@+id/profile_username"
+        tools:text="Email Placeholder" />
+
+    <TextView
+        android:id="@+id/profile_bundle_title"
+        style="@style/PrimaryText"
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"
+        android:layout_margin="0dp"
+        android:background="@color/colorPrimary"
+        android:gravity="center_vertical"
+        android:paddingStart="12dp"
+        android:text="@string/cap_bundles"
+        app:layout_constraintBottom_toTopOf="@+id/horizontal_66_guide"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/horizontal_33_guide"
+        app:layout_constraintVertical_bias="0" />
 
     <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/market_list"
+        android:id="@+id/list_of_bundles"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        app:layout_behavior="@string/appbar_scrolling_view_behavior"/>
+        android:layout_height="0dp"
+        android:orientation="horizontal"
+        app:layout_constraintBottom_toTopOf="@id/horizontal_66_guide"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/profile_bundle_title"
+        app:layout_constraintVertical_bias="1" />
 
-</androidx.coordinatorlayout.widget.CoordinatorLayout>
+    <TextView
+        android:id="@+id/profile_service_title"
+        style="@style/PrimaryText"
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"
+        android:layout_margin="0dp"
+        android:background="@color/colorPrimary"
+        android:gravity="center_vertical"
+        android:paddingStart="12dp"
+        android:text="@string/cap_services"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/horizontal_66_guide"
+        app:layout_constraintVertical_bias="0" />
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/list_of_services"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:orientation="horizontal"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/profile_service_title" />
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>

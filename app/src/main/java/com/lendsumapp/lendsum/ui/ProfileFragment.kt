@@ -2,26 +2,28 @@ package com.lendsumapp.lendsum.ui
 
 import android.content.Context
 import android.os.Bundle
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.findNavController
+import com.bumptech.glide.Glide
+import com.bumptech.glide.request.RequestOptions
+import com.google.firebase.auth.FirebaseAuth
 import com.lendsumapp.lendsum.R
-import com.lendsumapp.lendsum.databinding.FragmentNumberVerificationBinding
 import com.lendsumapp.lendsum.databinding.FragmentProfileBinding
-import com.lendsumapp.lendsum.util.GlobalConstants
 import com.lendsumapp.lendsum.util.GlobalConstants.NAV_SIGN_UP_TYPE
 import com.lendsumapp.lendsum.util.GlobalConstants.NUMBER_VERIFIED
 import com.lendsumapp.lendsum.util.NavSignUpType
 import com.lendsumapp.lendsum.viewmodel.ProfileViewModel
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.android.synthetic.main.fragment_profile.*
+
 
 @AndroidEntryPoint
 class ProfileFragment : Fragment(), View.OnClickListener {
 
+    private val firebaseUser = FirebaseAuth.getInstance().currentUser
     private var _binding: FragmentProfileBinding? = null
     private val binding get() = _binding
     private val sharedPrefs by lazy { activity?.getSharedPreferences(R.string.app_name.toString(), Context.MODE_PRIVATE) }
@@ -39,6 +41,17 @@ class ProfileFragment : Fragment(), View.OnClickListener {
         super.onViewCreated(view, savedInstanceState)
 
         binding?.profileLogoutBtn?.setOnClickListener(this)
+        binding?.profileName?.text = firebaseUser?.displayName
+        binding?.profileUsername?.text = "@" + firebaseUser?.displayName
+        binding?.profileEmail?.text = firebaseUser?.email
+
+        Glide.with(this)
+            .applyDefaultRequestOptions(RequestOptions()
+                .placeholder(R.drawable.com_facebook_profile_picture_blank_portrait)
+                .error(R.drawable.com_facebook_profile_picture_blank_portrait).circleCrop())
+            .load(firebaseUser?.photoUrl)
+            .circleCrop()
+            .into(binding?.profilePicImage!!)
     }
 
     override fun onDestroyView() {

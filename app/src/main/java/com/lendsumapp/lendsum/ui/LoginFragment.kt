@@ -48,8 +48,7 @@ class LoginFragment : Fragment(), View.OnClickListener{
         val firebaseUser = loginViewModel.getFirebaseUser()
 
         if(firebaseUser != null
-            && sharedPrefs?.getBoolean(RETURNING_USER, false) == true
-            && sharedPrefs?.getBoolean(NUMBER_VERIFIED, false) == true){
+            && sharedPrefs?.getBoolean(RETURNING_USER, false) == true){
             findNavController(this).navigate(R.id.action_loginFragment_to_marketplaceFragment)
         }
 
