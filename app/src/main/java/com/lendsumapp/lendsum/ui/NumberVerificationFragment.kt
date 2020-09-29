@@ -57,7 +57,7 @@ class NumberVerificationFragment : Fragment(), View.OnClickListener, CountryCode
                 }
 
             }else{
-                //This should never be hit but putting here just in case
+                //This hits when a user already has an account linked
                 activity?.let { androidUtils.showSnackBar(it, "There seems to be a problem linking your phone number to your account") }
             }
         }
@@ -133,9 +133,8 @@ class NumberVerificationFragment : Fragment(), View.OnClickListener, CountryCode
 
                         Log.d(TAG, "Code: $code matches $credential")
 
-                        numberVerificationViewModel.getPhoneNumberLinkStatus().observe(viewLifecycleOwner, linkPhoneNumberStatusObserver)
-
                         if(sharedPrefs?.getBoolean(RETURNING_USER, false) == false){
+                            numberVerificationViewModel.getPhoneNumberLinkStatus().observe(viewLifecycleOwner, linkPhoneNumberStatusObserver)
                             numberVerificationViewModel.linkPhoneNumWithLoginCredential(credential!!)
                         }else{
                             findNavController().navigate(R.id.action_numberVerificationFragment_to_marketplaceFragment)

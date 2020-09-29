@@ -93,6 +93,7 @@ class LoginFragment : Fragment(), View.OnClickListener{
         emailSignInObserver = Observer { isLoginSuccessful ->
             if (isLoginSuccessful){
                 Log.d(TAG, "Email login success")
+                sharedPrefs?.edit()?.putBoolean(RETURNING_USER, true)?.apply()
                 findNavController(this).navigate(R.id.action_loginFragment_to_numberVerificationFragment)
             }else{
                 Log.d(TAG, "Email login failed")

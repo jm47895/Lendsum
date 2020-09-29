@@ -1,9 +1,6 @@
 package com.lendsumapp.lendsum.data.persistence
 
-import androidx.room.Dao
-import androidx.room.Delete
-import androidx.room.Insert
-import androidx.room.Update
+import androidx.room.*
 import com.lendsumapp.lendsum.data.model.Bundle
 import com.lendsumapp.lendsum.data.model.User
 
@@ -15,6 +12,9 @@ interface UserDao {
 
     @Update
     suspend fun updateUser(user: User): Int
+
+    @Query("SELECT * FROM user WHERE userId = :userId")
+    suspend fun getUser(userId: String): User
 
     @Delete
     suspend fun deleteUser(user: User)

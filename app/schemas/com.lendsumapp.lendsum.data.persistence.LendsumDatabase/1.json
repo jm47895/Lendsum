@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 1,
-    "identityHash": "defa61d373890d3abcf79b826a1f09b9",
+    "identityHash": "f41dd09565c5c3ba8eab56c34adec63e",
     "entities": [
       {
         "tableName": "bundles",
@@ -122,7 +122,7 @@
       },
       {
         "tableName": "user",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`userId` TEXT NOT NULL, `name` TEXT NOT NULL, `username` TEXT NOT NULL, `email` TEXT NOT NULL, `phoneNumber` TEXT NOT NULL, `profilePicUrl` TEXT, `friendsList` TEXT, PRIMARY KEY(`userId`))",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`userId` TEXT NOT NULL, `name` TEXT NOT NULL, `username` TEXT NOT NULL, `email` TEXT NOT NULL, `phoneNumber` TEXT NOT NULL, `profilePicUrl` TEXT, `karmaScore` INTEGER NOT NULL, `friendsList` TEXT, PRIMARY KEY(`userId`))",
         "fields": [
           {
             "fieldPath": "userId",
@@ -161,6 +161,12 @@
             "notNull": false
           },
           {
+            "fieldPath": "karmaScore",
+            "columnName": "karmaScore",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
             "fieldPath": "friendList",
             "columnName": "friendsList",
             "affinity": "TEXT",
@@ -180,7 +186,7 @@
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'defa61d373890d3abcf79b826a1f09b9')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'f41dd09565c5c3ba8eab56c34adec63e')"
     ]
   }
 }
