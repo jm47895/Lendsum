@@ -40,10 +40,10 @@ class ProfileFragment : Fragment(), View.OnClickListener {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        binding?.profileLogoutBtn?.setOnClickListener(this)
+        binding?.profileSettingsBtn?.setOnClickListener(this)
         binding?.profileName?.text = firebaseUser?.displayName
         binding?.profileUsername?.text = "@" + firebaseUser?.displayName
-        binding?.profileEmail?.text = firebaseUser?.email
+        binding?.profileKarmaScore?.text = firebaseUser?.email
 
         Glide.with(this)
             .applyDefaultRequestOptions(RequestOptions()
@@ -61,26 +61,8 @@ class ProfileFragment : Fragment(), View.OnClickListener {
 
     override fun onClick(view: View?) {
         when(view?.id){
-            R.id.profile_logout_btn -> {
-                sharedPrefs?.edit()?.putBoolean(NUMBER_VERIFIED, false)?.apply()
-
-                when(sharedPrefs?.getInt(NAV_SIGN_UP_TYPE, NavSignUpType.EMAIL_LOGIN.ordinal)){
-                    NavSignUpType.EMAIL_LOGIN.ordinal ->{
-                        profileViewModel.logOutOfEmailAndPass()
-                        view.findNavController().navigate(R.id.action_profileFragment_to_loginFragment)
-                    }
-                    NavSignUpType.GOOGLE_LOGIN.ordinal ->{
-                        context?.let {
-                            profileViewModel.configureGoogleAuth()
-                            profileViewModel.logOutOfGoogle()
-                            view.findNavController().navigate(R.id.action_profileFragment_to_loginFragment)
-                        }
-                    }
-                    NavSignUpType.FACEBOOK_LOGIN.ordinal ->{
-                        profileViewModel.logOutOfFacebook()
-                        view.findNavController().navigate(R.id.action_profileFragment_to_loginFragment)
-                    }
-                }
+            R.id.profile_settings_btn->{
+                view.findNavController().navigate(R.id.action_profileFragment_to_settingsFragment)
             }
         }
     }

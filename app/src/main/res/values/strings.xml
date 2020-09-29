@@ -54,5 +54,6 @@
     <string name="reset_email_not_sent">Reset password email failed to send</string>
     <string name="account_already_exists">An account with this email already exists. Please sign in.</string>
     <string name="no_account_with_email">There is no account associated with this email</string>
+    <string name="sign_out">Sign Out</string>
 
 </resources>

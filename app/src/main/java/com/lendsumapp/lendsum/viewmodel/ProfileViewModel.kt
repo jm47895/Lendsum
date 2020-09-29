@@ -10,30 +10,8 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
 class ProfileViewModel @ViewModelInject constructor(
-    private val loginRepository: LoginRepository,
-    @ActivityContext private var context: Context
+
 ): ViewModel(){
 
-    fun logOutOfGoogle(){
-        viewModelScope.launch(Dispatchers.IO) {
-            loginRepository.logOutOfGoogle()
-        }
-    }
-
-    fun configureGoogleAuth(){
-        loginRepository.configureGoogleAuth(context)
-    }
-
-    fun logOutOfEmailAndPass(){
-        viewModelScope.launch(Dispatchers.IO) {
-            loginRepository.logOutOfEmailAndPass()
-        }
-    }
-
-    fun logOutOfFacebook(){
-        viewModelScope.launch(Dispatchers.IO) {
-            loginRepository.logOutOfFacebook()
-        }
-    }
 
 }

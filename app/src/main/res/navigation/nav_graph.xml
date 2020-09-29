@@ -16,10 +16,8 @@
         android:label="ProfileFragment"
         tools:layout="@layout/fragment_profile">
         <action
-            android:id="@+id/action_profileFragment_to_loginFragment"
-            app:destination="@id/loginFragment"
-            app:popUpTo="@id/bottom_nav_graph"
-            app:popUpToInclusive="true" />
+            android:id="@+id/action_profileFragment_to_settingsFragment"
+            app:destination="@id/settingsFragment" />
     </fragment>
     <fragment
         android:id="@+id/bundlesFragment"
@@ -122,5 +120,16 @@
         <action
             android:id="@+id/action_financialInfoFragment_to_termsConditionsFragment"
             app:destination="@id/termsConditionsFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/settingsFragment"
+        android:name="com.lendsumapp.lendsum.ui.SettingsFragment"
+        android:label="fragment_settings"
+        tools:layout="@layout/fragment_settings" >
+        <action
+            android:id="@+id/action_settingsFragment_to_loginFragment"
+            app:destination="@id/loginFragment"
+            app:popUpTo="@id/bottom_nav_graph"
+            app:popUpToInclusive="true" />
     </fragment>
 </navigation>

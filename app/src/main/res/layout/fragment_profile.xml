@@ -53,20 +53,6 @@
         app:layout_constraintStart_toEndOf="@+id/profile_profile_edit_btn"
         app:layout_constraintTop_toTopOf="@+id/profile_profile_edit_btn" />
 
-
-    <Button
-        android:id="@+id/profile_logout_btn"
-        style="@style/LoginButtonTheme"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_margin="0dp"
-        android:layout_weight="1"
-        android:padding="0dp"
-        android:text="Sign Out"
-        tools:layout_editor_absoluteX="256dp"
-        tools:layout_editor_absoluteY="196dp"
-        android:visibility="gone"/>
-
     <ImageView
         android:id="@+id/profile_pic_image"
         android:layout_width="0dp"
@@ -93,7 +79,7 @@
     <TextView
         android:id="@+id/profile_username"
         style="@style/SecondaryText"
-        app:layout_constraintBottom_toTopOf="@+id/profile_email"
+        app:layout_constraintBottom_toTopOf="@+id/profile_karma_score"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0"
         app:layout_constraintStart_toStartOf="@+id/vertical_50_guide"
@@ -101,14 +87,14 @@
         tools:text="Username Placeholder" />
 
     <TextView
-        android:id="@+id/profile_email"
+        android:id="@+id/profile_karma_score"
         style="@style/SecondaryText"
         app:layout_constraintBottom_toTopOf="@+id/horizontal_33_guide"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0"
         app:layout_constraintStart_toStartOf="@+id/vertical_50_guide"
         app:layout_constraintTop_toBottomOf="@+id/profile_username"
-        tools:text="Email Placeholder" />
+        tools:text="Karma Score Placeholder" />
 
     <TextView
         android:id="@+id/profile_bundle_title"
