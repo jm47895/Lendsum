@@ -142,7 +142,7 @@ class LoginFragment : Fragment(), View.OnClickListener{
                     action = R.id.action_loginFragment_to_forgotPasswordFragment
                 }
                 R.id.login_sign_in_btn -> {
-                    loginViewModel.getEmailSignInStatus().observe(this, emailSignInObserver)
+                    loginViewModel.getEmailSignInStatus().observe(viewLifecycleOwner, emailSignInObserver)
                     signInEmail = binding?.loginEmailEt?.text?.trim().toString()
                     signInPassword = binding?.loginPasswordEt?.text?.trim().toString()
 
@@ -161,7 +161,7 @@ class LoginFragment : Fragment(), View.OnClickListener{
                     action = R.id.action_loginFragment_to_createAccountFragment
                 }
                 R.id.login_sign_in_with_google -> {
-                    loginViewModel.getGoogleLoginState().observe(this, googleAuthObserver)
+                    loginViewModel.getGoogleLoginState().observe(viewLifecycleOwner, googleAuthObserver)
                     loginViewModel.configureGoogleAuth()
                     startActivityForResult(
                         loginViewModel.getGoogleAuthIntent(),
@@ -169,7 +169,7 @@ class LoginFragment : Fragment(), View.OnClickListener{
                     )
                 }
                 R.id.login_sign_in_with_facebook -> {
-                    loginViewModel.getFacebookAuthState().observe(this, facebookAuthObserver)
+                    loginViewModel.getFacebookAuthState().observe(viewLifecycleOwner, facebookAuthObserver)
                     LoginManager.getInstance().logInWithReadPermissions(
                         this,
                         listOf("user_photos", "email", "user_birthday", "public_profile")

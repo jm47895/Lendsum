@@ -77,7 +77,7 @@ class ForgotPasswordFragment : Fragment(), View.OnClickListener {
             when (view?.id) {
                 R.id.forgot_send_reset_pass_btn -> {
 
-                    forgotPasswordViewModel.getResetEmailStatus().observe(this, resetEmailStatusObserver)
+                    forgotPasswordViewModel.getResetEmailStatus().observe(viewLifecycleOwner, resetEmailStatusObserver)
 
                     context?.let { androidUtils.hideKeyboard(it, view) }
 

@@ -17,7 +17,7 @@ class ProfileViewModel @ViewModelInject constructor(
 
     private val user: MutableLiveData<User> = MutableLiveData()
 
-    fun getCacheDisplayName(){
+    fun getCachedUser(){
          viewModelScope.launch(Dispatchers.IO) {
              val cacheUser = profileRepository.getCacheUser(firebaseAuth?.currentUser?.uid.toString())
              user.postValue(cacheUser)

@@ -11,6 +11,7 @@ import androidx.core.content.ContextCompat
 import com.google.android.material.snackbar.Snackbar
 import com.lendsumapp.lendsum.R
 import dagger.hilt.android.scopes.FragmentScoped
+import java.io.File
 import javax.inject.Inject
 
 @FragmentScoped
@@ -31,5 +32,10 @@ class AndroidUtils @Inject constructor(){
 
     fun isValidEmail(target: CharSequence): Boolean {
         return !TextUtils.isEmpty(target) && Patterns.EMAIL_ADDRESS.matcher(target).matches()
+    }
+
+    fun doesDatabaseExist(context: Context, dbName: String): Boolean{
+        val dbFile: File = context.getDatabasePath(dbName)
+        return dbFile.exists()
     }
 }

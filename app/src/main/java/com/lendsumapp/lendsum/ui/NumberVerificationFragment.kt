@@ -116,7 +116,7 @@ class NumberVerificationFragment : Fragment(), View.OnClickListener, CountryCode
                             phoneNumber?.let { number -> numberVerificationViewModel.sendSMSCode(number, mainActivity) }
                         }
 
-                        numberVerificationViewModel.getGeneratedPhoneAuthCode().observe(this, phoneNumberCredentialObserver)
+                        numberVerificationViewModel.getGeneratedPhoneAuthCode().observe(viewLifecycleOwner, phoneNumberCredentialObserver)
 
                     }else{
                         Log.d(TAG, "Phone number not sending")
