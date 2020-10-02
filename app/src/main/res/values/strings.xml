@@ -55,5 +55,7 @@
     <string name="account_already_exists">An account with this email already exists. Please sign in.</string>
     <string name="no_account_with_email">There is no account associated with this email</string>
     <string name="sign_out">Sign Out</string>
+    <string name="database_name">lendsum.db</string>
+    <string name="karma_score">Karma Score: %1$d"</string>
 
 </resources>

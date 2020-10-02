@@ -15,4 +15,6 @@ data class User(
     @ColumnInfo(name = "karmaScore") var karmaScore: Int,
     //TODO Change to type Friend object when feature is implemented
     @ColumnInfo(name = "friendsList") var friendList: List<String>?
-)
+){
+    constructor() : this("", "", "","","","",0, emptyList())
+}

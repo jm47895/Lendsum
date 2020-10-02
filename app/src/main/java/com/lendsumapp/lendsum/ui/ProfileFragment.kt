@@ -16,6 +16,7 @@ import com.lendsumapp.lendsum.R
 import com.lendsumapp.lendsum.data.model.User
 import com.lendsumapp.lendsum.databinding.FragmentProfileBinding
 import com.lendsumapp.lendsum.util.AndroidUtils
+import com.lendsumapp.lendsum.util.DatabaseUtils
 import com.lendsumapp.lendsum.viewmodel.ProfileViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
@@ -29,17 +30,17 @@ class ProfileFragment : Fragment(), View.OnClickListener {
     private val sharedPrefs by lazy { activity?.getSharedPreferences(R.string.app_name.toString(), Context.MODE_PRIVATE) }
     private val profileViewModel: ProfileViewModel by viewModels()
     private lateinit var userObserver: Observer<User>
-    @Inject lateinit var androidUtils: AndroidUtils
+    @Inject lateinit var databaseUtils: DatabaseUtils
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        if(androidUtils.doesDatabaseExist(requireContext(), "lendsum.db")){
+        if(databaseUtils.doesCacheDatabaseExist(requireContext(), getString(R.string.database_name))){
             Log.d(TAG, "Database Exists")
             profileViewModel.getCachedUser()
         }else{
-            //TODO Read in remote database and cache responses
             Log.d(TAG, "Database does not Exists")
+            profileViewModel.requestRemoteUserData()
         }
     }
 
@@ -60,7 +61,7 @@ class ProfileFragment : Fragment(), View.OnClickListener {
 
             binding?.profileName?.text = user.name
             binding?.profileUsername?.text = user.username
-            binding?.profileKarmaScore?.text = user.karmaScore.toString()
+            binding?.profileKarmaScore?.text = getString(R.string.karma_score, user.karmaScore)
 
             Glide.with(this)
                 .applyDefaultRequestOptions(

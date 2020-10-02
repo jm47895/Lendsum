@@ -7,5 +7,6 @@ object GlobalConstants {
     const val RETURNING_USER = "returningUser"
     const val NUMBER_VERIFIED = "numberVerified"
 
-
+    /*Firestore Collection Paths*/
+    const val USER_COLLECTION_PATH = "users"
 }

@@ -33,9 +33,4 @@ class AndroidUtils @Inject constructor(){
     fun isValidEmail(target: CharSequence): Boolean {
         return !TextUtils.isEmpty(target) && Patterns.EMAIL_ADDRESS.matcher(target).matches()
     }
-
-    fun doesDatabaseExist(context: Context, dbName: String): Boolean{
-        val dbFile: File = context.getDatabasePath(dbName)
-        return dbFile.exists()
-    }
 }

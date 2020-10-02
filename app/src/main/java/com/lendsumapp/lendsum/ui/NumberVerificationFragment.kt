@@ -50,14 +50,15 @@ class NumberVerificationFragment : Fragment(), View.OnClickListener, CountryCode
                 sharedPrefs?.edit()?.putBoolean(NUMBER_VERIFIED, true)?.apply()
 
                 if(sharedPrefs?.getBoolean(RETURNING_USER, false) == false){
-                    cacheUserCredentials()
+                    numberVerificationViewModel.storeUserCredentialsInCacheAndFirestore()
                     findNavController().navigate(R.id.action_numberVerificationFragment_to_termsConditionsFragment)
                 }else{
                     findNavController().navigate(R.id.action_numberVerificationFragment_to_marketplaceFragment)
                 }
 
             }else{
-                //This hits when a user already has an account linked
+                /*This should never be hit unless something on firebase's side messes up. There is an instance where if the account already exists
+                * it will trigger this but there is a check {if (code == credential?.smsCode)} in this code block to prevent that*/
                 activity?.let { androidUtils.showSnackBar(it, "There seems to be a problem linking your phone number to your account") }
             }
         }
@@ -158,10 +159,6 @@ class NumberVerificationFragment : Fragment(), View.OnClickListener, CountryCode
         }else{
             activity?.let { androidUtils.showSnackBar(it, getString(R.string.not_connected_internet)) }
         }
-    }
-
-    private fun cacheUserCredentials(){
-        numberVerificationViewModel.insertUserIntoSqlCache()
     }
 
     override fun onValidityChanged(isValidNumber: Boolean) {
