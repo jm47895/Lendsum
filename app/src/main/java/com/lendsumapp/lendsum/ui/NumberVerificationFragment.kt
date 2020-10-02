@@ -32,6 +32,7 @@ class NumberVerificationFragment : Fragment(), View.OnClickListener, CountryCode
     private val numberVerificationViewModel: NumberVerificationViewModel by viewModels()
     private lateinit var phoneNumberCredentialObserver: Observer<PhoneAuthCredential>
     private lateinit var linkPhoneNumberStatusObserver: Observer<Boolean>
+    private lateinit var signInCacheStatusObserver: Observer<Boolean>
     private var credential: PhoneAuthCredential? = null
     private var isPhoneNumberValid = false
     @Inject lateinit var androidUtils: AndroidUtils
@@ -39,6 +40,18 @@ class NumberVerificationFragment : Fragment(), View.OnClickListener, CountryCode
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        /*The sign in cache observer checks for a sql cache in the app on sign in with an existing user
+        who installs app on a new phone or re-installs the app. If either case, we re-cache the user during number
+        verification to not break cache calls in the main app*/
+        numberVerificationViewModel.checkIfSignInCacheDbExists(getString(R.string.database_name))
+        signInCacheStatusObserver = Observer { doesSignInCacheExist->
+            if(!doesSignInCacheExist && sharedPrefs?.getBoolean(RETURNING_USER, false) == true){
+                Log.d(TAG, "Database cache does not exist, getting info from remote db")
+                numberVerificationViewModel.getExistingUserFromFirestore()
+            }
+        }
+        numberVerificationViewModel.getCacheStatus().observe(this, signInCacheStatusObserver)
 
         phoneNumberCredentialObserver = Observer { phoneAuthCredential ->
             credential = phoneAuthCredential
@@ -50,7 +63,8 @@ class NumberVerificationFragment : Fragment(), View.OnClickListener, CountryCode
                 sharedPrefs?.edit()?.putBoolean(NUMBER_VERIFIED, true)?.apply()
 
                 if(sharedPrefs?.getBoolean(RETURNING_USER, false) == false){
-                    numberVerificationViewModel.storeUserCredentialsInCacheAndFirestore()
+                    numberVerificationViewModel.insertNewUserIntoSqlCache()
+                    numberVerificationViewModel.insertNewUserIntoFirestoreDb()
                     findNavController().navigate(R.id.action_numberVerificationFragment_to_termsConditionsFragment)
                 }else{
                     findNavController().navigate(R.id.action_numberVerificationFragment_to_marketplaceFragment)
@@ -88,6 +102,7 @@ class NumberVerificationFragment : Fragment(), View.OnClickListener, CountryCode
 
         numberVerificationViewModel.getPhoneNumberLinkStatus().removeObserver(linkPhoneNumberStatusObserver)
         numberVerificationViewModel.getGeneratedPhoneAuthCode().removeObserver(phoneNumberCredentialObserver)
+        numberVerificationViewModel.getCacheStatus().removeObserver(signInCacheStatusObserver)
 
     }
 

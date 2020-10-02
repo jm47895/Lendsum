@@ -14,12 +14,10 @@ import kotlinx.coroutines.launch
 
 class ProfileViewModel @ViewModelInject constructor(
     private val profileRepository: ProfileRepository,
-    private val numberVerificationRepository: NumberVerificationRepository,
     private var firebaseAuth: FirebaseAuth?
 ): ViewModel(){
 
     private val user: MutableLiveData<User> = MutableLiveData()
-    private lateinit var remoteUserObserver: Observer<User>
 
     fun getCachedUser(){
          viewModelScope.launch(Dispatchers.IO) {
@@ -32,27 +30,4 @@ class ProfileViewModel @ViewModelInject constructor(
         return user
     }
 
-    fun requestRemoteUserData() {
-        viewModelScope.launch(Dispatchers.IO) {
-            profileRepository.requestRemoteUser(firebaseAuth?.currentUser?.uid.toString())
-        }
-
-
-        remoteUserObserver = Observer {remoteUser->
-            user.postValue(remoteUser)
-            insertUserIntoSqlCache(remoteUser)
-            removeRemoteUserObserver()
-        }
-        profileRepository.getRemoteUser().observeForever(remoteUserObserver)
-    }
-
-    private fun insertUserIntoSqlCache(user: User) {
-        viewModelScope.launch(Dispatchers.IO) {
-            numberVerificationRepository.insertUserIntoSqlCache(user)
-        }
-    }
-
-    private fun removeRemoteUserObserver(){
-        profileRepository.getRemoteUser().removeObserver(remoteUserObserver)
-    }
 }

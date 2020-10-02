@@ -30,18 +30,12 @@ class ProfileFragment : Fragment(), View.OnClickListener {
     private val sharedPrefs by lazy { activity?.getSharedPreferences(R.string.app_name.toString(), Context.MODE_PRIVATE) }
     private val profileViewModel: ProfileViewModel by viewModels()
     private lateinit var userObserver: Observer<User>
-    @Inject lateinit var databaseUtils: DatabaseUtils
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        if(databaseUtils.doesCacheDatabaseExist(requireContext(), getString(R.string.database_name))){
-            Log.d(TAG, "Database Exists")
-            profileViewModel.getCachedUser()
-        }else{
-            Log.d(TAG, "Database does not Exists")
-            profileViewModel.requestRemoteUserData()
-        }
+        profileViewModel.getCachedUser()
+
     }
 
     override fun onCreateView(
