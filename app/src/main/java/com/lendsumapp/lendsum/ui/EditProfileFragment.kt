@@ -35,7 +35,7 @@ class EditProfileFragment : Fragment(), CompoundButton.OnCheckedChangeListener {
     private val binding get() = _binding
     private val editProfileViewModel: EditProfileViewModel by viewModels()
     @Inject lateinit var androidUtils: AndroidUtils
-    private lateinit var userObserver: Observer<User>
+    private lateinit var userCacheObserver: Observer<User>
     private lateinit var updateUserStatusObserver: Observer<Int>
     private lateinit var updateAuthEmailStatusObserver: Observer<Boolean>
     private var user: User = User()
@@ -62,7 +62,7 @@ class EditProfileFragment : Fragment(), CompoundButton.OnCheckedChangeListener {
         binding?.editProfileUsernameToggle?.setOnCheckedChangeListener(this)
         binding?.editProfileEmailToggle?.setOnCheckedChangeListener(this)
 
-        userObserver = Observer { cachedUser ->
+        userCacheObserver = Observer { cachedUser ->
 
             user = cachedUser
 
@@ -81,7 +81,7 @@ class EditProfileFragment : Fragment(), CompoundButton.OnCheckedChangeListener {
                 .circleCrop()
                 .into(binding?.editProfilePic!!)
         }
-        editProfileViewModel.getUser().observe(viewLifecycleOwner, userObserver)
+        editProfileViewModel.getUser().observe(viewLifecycleOwner, userCacheObserver)
 
         updateAuthEmailStatusObserver = Observer { isAuthEmailUpdated->
             if(isAuthEmailUpdated){
@@ -105,8 +105,9 @@ class EditProfileFragment : Fragment(), CompoundButton.OnCheckedChangeListener {
 
     override fun onStop() {
         super.onStop()
-        editProfileViewModel.getUser().removeObserver(userObserver)
+        editProfileViewModel.getUser().removeObserver(userCacheObserver)
         editProfileViewModel.getUpdateCacheUserStatus().removeObserver(updateUserStatusObserver)
+        editProfileViewModel.getUpdateAuthEmailStatus().removeObserver(updateAuthEmailStatusObserver)
     }
 
     override fun onDestroyView() {
@@ -118,32 +119,33 @@ class EditProfileFragment : Fragment(), CompoundButton.OnCheckedChangeListener {
         when(button?.id){
             R.id.edit_profile_name_toggle->{
 
-                handleEditInfoAnimationAndData(isChecked, binding?.editProfileNameTv!!, binding?.editProfileNameEt!!, binding?.editProfileNameToggle!!, EditProfileInfoType.PROFILE_NAME.ordinal)
+                handleUpdateInfoUI(isChecked, binding?.editProfileNameTv!!, binding?.editProfileNameEt!!, binding?.editProfileNameToggle!!)
+                handleUpdateInfoData(isChecked, binding?.editProfileNameTv!!, EditProfileInfoType.PROFILE_NAME.ordinal)
 
             }
             R.id.edit_profile_username_toggle->{
 
-                handleEditInfoAnimationAndData(isChecked, binding?.editProfileUsernameTv!!, binding?.editProfileUsernameEt!!, binding?.editProfileUsernameToggle!!, EditProfileInfoType.PROFILE_USERNAME.ordinal)
+                handleUpdateInfoUI(isChecked, binding?.editProfileUsernameTv!!, binding?.editProfileUsernameEt!!, binding?.editProfileUsernameToggle!!)
+                handleUpdateInfoData(isChecked, binding?.editProfileUsernameTv!!, EditProfileInfoType.PROFILE_USERNAME.ordinal)
 
             }
             R.id.edit_profile_email_toggle->{
 
-                handleEditInfoAnimationAndData(isChecked, binding?.editProfileEmailTv!!, binding?.editProfileEmailEt!!, binding?.editProfileEmailToggle!!, EditProfileInfoType.PROFILE_EMAIL.ordinal)
+                handleUpdateInfoUI(isChecked, binding?.editProfileEmailTv!!, binding?.editProfileEmailEt!!, binding?.editProfileEmailToggle!!)
+                handleUpdateInfoData(isChecked, binding?.editProfileEmailTv!!, EditProfileInfoType.PROFILE_EMAIL.ordinal)
 
             }
         }
     }
 
-    private fun handleEditInfoAnimationAndData(isChecked: Boolean, textView: TextView, editText: EditText, toggleButton: ToggleButton, infoType: Int){
-        if(isChecked){
+    private fun handleUpdateInfoUI(isEditing: Boolean, textView: TextView, editText: EditText, toggleButton: ToggleButton) {
+        if(isEditing) {
             androidUtils.hideView(textView)
             androidUtils.showView(editText)
             editText.setText(textView.text)
             toggleButton.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.colorSecondaryLight))
             toggleButton.setTextColor(ContextCompat.getColor(requireContext(), R.color.colorAccentBlack))
-
         }else{
-
             androidUtils.hideKeyboard(requireContext(), textView)
 
             textView.text = editText.text
@@ -151,6 +153,11 @@ class EditProfileFragment : Fragment(), CompoundButton.OnCheckedChangeListener {
             androidUtils.hideView(editText)
             toggleButton.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.colorPrimary))
             toggleButton.setTextColor(ContextCompat.getColor(requireContext(), R.color.colorSecondaryLight))
+        }
+    }
+
+    private fun handleUpdateInfoData(isEditing: Boolean, textView: TextView, infoType: Int){
+        if(!isEditing){
 
             when(infoType){
                 EditProfileInfoType.PROFILE_NAME.ordinal->{
