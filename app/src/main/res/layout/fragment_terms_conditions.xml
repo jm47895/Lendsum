@@ -18,7 +18,7 @@
 
     <Button
         android:id="@+id/terms_back_btn"
-        style="@style/LoginButtonTheme"
+        style="@style/ButtonTheme"
         android:layout_width="0dp"
         android:text="@string/cap_back"
         app:layout_constraintEnd_toStartOf="@+id/terms_next_btn"
@@ -29,7 +29,7 @@
 
     <Button
         android:id="@+id/terms_next_btn"
-        style="@style/LoginButtonTheme"
+        style="@style/ButtonTheme"
         android:layout_width="0dp"
         android:text="@string/next"
         app:layout_constraintBottom_toBottomOf="@+id/terms_back_btn"

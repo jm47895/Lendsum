@@ -1,0 +1,148 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/opacity80Black"
+    tools:context=".ui.EditProfileFragment">
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/vertical_50_guide"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintGuide_percent=".50" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/horizontal_33_guide"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintGuide_percent=".3333" />
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/horizontal_66_guide"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintGuide_percent=".6666" />
+
+    <ImageView
+        android:id="@+id/edit_profile_pic"
+        android:layout_width="200dp"
+        android:layout_height="0dp"
+        android:layout_margin="32dp"
+        app:layout_constraintBottom_toTopOf="@+id/horizontal_33_guide"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/edit_profile_name_tv"
+        style="@style/SecondaryText"
+        android:text="@string/profile_name_place_holder"
+        app:layout_constraintBottom_toBottomOf="@+id/edit_profile_name_et"
+        app:layout_constraintEnd_toEndOf="@+id/edit_profile_name_et"
+        app:layout_constraintHorizontal_bias="0"
+        app:layout_constraintStart_toStartOf="@+id/edit_profile_name_et"
+        app:layout_constraintTop_toTopOf="@+id/edit_profile_name_et" />
+
+    <EditText
+        android:id="@+id/edit_profile_name_et"
+        style="@style/EditTextTheme"
+        android:layout_width="0dp"
+        android:backgroundTint="@color/colorPrimary"
+        android:textColor="@color/colorSecondaryLight"
+        android:textCursorDrawable="@color/colorSecondaryLight"
+        android:visibility="invisible"
+        app:layout_constraintBottom_toTopOf="@+id/edit_profile_username_et"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/edit_profile_name_toggle"
+        app:layout_constraintHorizontal_chainStyle="spread_inside"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/horizontal_33_guide" />
+
+    <ToggleButton
+        android:id="@+id/edit_profile_name_toggle"
+        style="@style/ButtonTheme"
+        android:textOff="@string/edit"
+        android:textOn="@string/save"
+        app:layout_constraintBottom_toBottomOf="@+id/edit_profile_name_et"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/edit_profile_name_et"
+        app:layout_constraintTop_toTopOf="@+id/edit_profile_name_et" />
+
+    <TextView
+        android:id="@+id/edit_profile_username_tv"
+        style="@style/SecondaryText"
+        android:text="@string/username_placeholder"
+        app:layout_constraintBottom_toBottomOf="@+id/edit_profile_username_et"
+        app:layout_constraintEnd_toEndOf="@+id/edit_profile_username_et"
+        app:layout_constraintHorizontal_bias="0"
+        app:layout_constraintStart_toStartOf="@+id/edit_profile_username_et"
+        app:layout_constraintTop_toTopOf="@+id/edit_profile_username_et" />
+
+    <EditText
+        android:id="@+id/edit_profile_username_et"
+        style="@style/EditTextTheme"
+        android:layout_width="0dp"
+        android:backgroundTint="@color/colorPrimary"
+        android:textColor="@color/colorSecondaryLight"
+        android:textCursorDrawable="@color/colorSecondaryLight"
+        android:visibility="invisible"
+        app:layout_constraintBottom_toTopOf="@+id/edit_profile_email_et"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/edit_profile_username_toggle"
+        app:layout_constraintHorizontal_chainStyle="spread_inside"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/edit_profile_name_et" />
+
+    <ToggleButton
+        android:id="@+id/edit_profile_username_toggle"
+        style="@style/ButtonTheme"
+        android:textOff="@string/edit"
+        android:textOn="@string/save"
+        app:layout_constraintBottom_toBottomOf="@+id/edit_profile_username_et"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/edit_profile_username_et"
+        app:layout_constraintTop_toTopOf="@+id/edit_profile_username_et" />
+
+
+    <TextView
+        android:id="@+id/edit_profile_email_tv"
+        style="@style/SecondaryText"
+        android:text="@string/email_placeholder"
+        app:layout_constraintBottom_toBottomOf="@+id/edit_profile_email_et"
+        app:layout_constraintEnd_toEndOf="@+id/edit_profile_email_et"
+        app:layout_constraintHorizontal_bias="0"
+        app:layout_constraintStart_toStartOf="@+id/edit_profile_email_et"
+        app:layout_constraintTop_toTopOf="@+id/edit_profile_email_et" />
+
+    <EditText
+        android:id="@+id/edit_profile_email_et"
+        style="@style/EditTextTheme"
+        android:layout_width="0dp"
+        android:backgroundTint="@color/colorPrimary"
+        android:textColor="@color/colorSecondaryLight"
+        android:textCursorDrawable="@color/colorSecondaryLight"
+        android:visibility="invisible"
+        app:layout_constraintBottom_toTopOf="@+id/horizontal_66_guide"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/edit_profile_email_toggle"
+        app:layout_constraintHorizontal_chainStyle="spread_inside"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/edit_profile_username_et" />
+
+    <ToggleButton
+        android:id="@+id/edit_profile_email_toggle"
+        style="@style/ButtonTheme"
+        android:textOff="@string/edit"
+        android:textOn="@string/save"
+        app:layout_constraintBottom_toBottomOf="@+id/edit_profile_email_et"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/edit_profile_email_et"
+        app:layout_constraintTop_toTopOf="@+id/edit_profile_email_et" />
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>

@@ -84,8 +84,8 @@ class LoginRepository @Inject constructor(
         emailAndPassAuthComponent.sendPasswordResetEmail(email)
     }
 
-    fun getResetEmailStatus(): MutableLiveData<Boolean> {
-        return emailAndPassAuthComponent.getResetEmailStatus()
+    fun getResetPasswordEmailStatus(): MutableLiveData<Boolean> {
+        return emailAndPassAuthComponent.getResetPasswordEmailStatus()
     }
 
     fun getLinkWithCredentialStatus(): MutableLiveData<Boolean> {

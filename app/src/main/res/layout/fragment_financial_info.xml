@@ -17,7 +17,7 @@
 
     <Button
         android:id="@+id/financial_info_back_btn"
-        style="@style/LoginButtonTheme"
+        style="@style/ButtonTheme"
         android:layout_width="0dp"
         android:text="@string/cap_back"
         app:layout_constraintEnd_toStartOf="@+id/financial_info_next_btn"
@@ -28,7 +28,7 @@
 
     <Button
         android:id="@+id/financial_info_next_btn"
-        style="@style/LoginButtonTheme"
+        style="@style/ButtonTheme"
         android:layout_width="0dp"
         android:text="@string/next"
         app:layout_constraintBottom_toBottomOf="@+id/financial_info_back_btn"

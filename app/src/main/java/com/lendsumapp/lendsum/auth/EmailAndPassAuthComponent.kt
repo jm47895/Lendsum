@@ -4,10 +4,7 @@ import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import com.google.android.gms.tasks.OnCompleteListener
 import com.google.android.gms.tasks.Task
-import com.google.firebase.auth.AuthResult
-import com.google.firebase.auth.EmailAuthCredential
-import com.google.firebase.auth.EmailAuthProvider
-import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.*
 import dagger.hilt.android.scopes.ActivityScoped
 import javax.inject.Inject
 
@@ -16,8 +13,9 @@ class EmailAndPassAuthComponent @Inject constructor(): OnCompleteListener<AuthRe
 
     private val firebaseAuth : FirebaseAuth = FirebaseAuth.getInstance()
     private val emailSignInStatus: MutableLiveData<Boolean> = MutableLiveData()
-    private val resetEmailStatus: MutableLiveData<Boolean> = MutableLiveData()
+    private val resetPasswordEmailStatus: MutableLiveData<Boolean> = MutableLiveData()
     private val linkWithEmailStatus: MutableLiveData<Boolean> = MutableLiveData()
+    private val updateAuthEmailStatus: MutableLiveData<Boolean> = MutableLiveData()
 
     fun signInWithEmailAndPass(email: String, password: String)
     {
@@ -43,6 +41,25 @@ class EmailAndPassAuthComponent @Inject constructor(): OnCompleteListener<AuthRe
         }
     }
 
+    suspend fun updateAuthEmail(email: String){
+        val user = firebaseAuth.currentUser
+        user?.updateEmail(email)?.addOnCompleteListener { task->
+            if (task.isSuccessful){
+                Log.d(TAG, "User email updated in firebase auth")
+                updateAuthEmailStatus.postValue(true)
+            }else{
+                Log.d(TAG, task.exception.toString())
+                updateAuthEmailStatus.postValue(false)
+            }
+        }
+    }
+
+    fun getUpdateAuthEmailStatus(): MutableLiveData<Boolean>{
+        return updateAuthEmailStatus
+    }
+
+
+
     override fun onComplete(task: Task<AuthResult>) {
         if (task.isSuccessful){
             emailSignInStatus.postValue(true)
@@ -65,16 +82,16 @@ class EmailAndPassAuthComponent @Inject constructor(): OnCompleteListener<AuthRe
         firebaseAuth.sendPasswordResetEmail(email).addOnCompleteListener{ task ->
             if(task.isSuccessful){
                 Log.d(TAG, "Reset Password email sent.")
-                resetEmailStatus.postValue(true)
+                resetPasswordEmailStatus.postValue(true)
             }else{
                 Log.d(TAG, "Reset Password email failed to send." + task.exception)
-                resetEmailStatus.postValue(false)
+                resetPasswordEmailStatus.postValue(false)
             }
         }
     }
 
-    fun getResetEmailStatus(): MutableLiveData<Boolean> {
-        return resetEmailStatus
+    fun getResetPasswordEmailStatus(): MutableLiveData<Boolean> {
+        return resetPasswordEmailStatus
     }
 
     fun getLinkWithCredentialStatus(): MutableLiveData<Boolean> {

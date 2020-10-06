@@ -5,3 +5,9 @@ enum class NavSignUpType {
     GOOGLE_LOGIN,
     FACEBOOK_LOGIN
 }
+
+enum class EditProfileInfoType{
+    PROFILE_NAME,
+    PROFILE_USERNAME,
+    PROFILE_EMAIL
+}

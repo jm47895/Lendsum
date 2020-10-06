@@ -38,7 +38,7 @@
     <string name="re_enter_password">Re-enter Password</string>
     <string name="first_name_error_msg">First name cannot be left blank</string>
     <string name="last_name_err_msg">Last name cannot be left blank</string>
-    <string name="invalid_email_err_msg">Invalid Email</string>
+    <string name="invalid_email_err_msg">Invalid Email.</string>
     <string name="password_param_err_msg">Password must contain between 6 and 20 characters long and have at least one UpperCase, one number, and one symbol</string>
     <string name="pass_dont_match_err_msg">Passwords don\'t match</string>
     <string name="enter_phone_number">Enter phone number</string>
@@ -57,5 +57,18 @@
     <string name="sign_out">Sign Out</string>
     <string name="database_name">lendsum.db</string>
     <string name="karma_score">Karma Score: %1$d"</string>
+    <string name="profile_name_place_holder">Profile name place holder</string>
+    <string name="username_placeholder">Username placeholder</string>
+    <string name="email_placeholder">email placeholder</string>
+    <string name="edit">edit</string>
+    <string name="save">save</string>
+    <string name="invalid_email_data_not_saved">Invalid email, data not saved</string>
+    <string name="user_info_updated">User info updated!</string>
+    <string name="empty_username">The username cannot be empty. Username was not saved.</string>
+    <string name="empty_profile_name">The profile name cannot be empty. Profile name was not saved.</string>
+    <string name="no_at_symbol_err">Username must start with the @ symbol. Data not saved.</string>
+    <string name="username_too_short_err">Username must be at least 3 characters. Data not saved.</string>
+    <string name="profile_name_too_short_err">Profile name must be at least 3 characters. Data not saved.</string>
+    <string name="sign_in_again_msg">You need to sign in again to do this.</string>
 
 </resources>

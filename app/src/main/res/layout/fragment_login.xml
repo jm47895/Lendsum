@@ -27,7 +27,7 @@
 
     <EditText
         android:id="@+id/login_email_et"
-        style="@style/LoginEditTextTheme"
+        style="@style/EditTextTheme"
         android:hint="@string/email"
         android:inputType="textEmailAddress"
         app:layout_constraintBottom_toTopOf="@+id/login_password_et"
@@ -38,7 +38,7 @@
 
     <EditText
         android:id="@+id/login_password_et"
-        style="@style/LoginEditTextTheme"
+        style="@style/EditTextTheme"
         android:hint="@string/password"
         android:inputType="textPassword"
         app:layout_constraintBottom_toTopOf="@+id/login_forgot_password_tv"
@@ -60,7 +60,7 @@
 
     <Button
         android:id="@+id/login_sign_in_btn"
-        style="@style/LoginButtonTheme"
+        style="@style/ButtonTheme"
         android:layout_width="0dp"
         android:text="@string/sign_in"
         app:layout_constraintBottom_toTopOf="@+id/horizontal_50_guideline"
@@ -103,7 +103,7 @@
 
     <Button
         android:id="@+id/login_sign_up_email_btn"
-        style="@style/LoginButtonTheme"
+        style="@style/ButtonTheme"
         android:layout_width="0dp"
         android:text="@string/sign_up_with_email"
         app:layout_constraintBottom_toTopOf="@+id/login_sign_in_with_google"

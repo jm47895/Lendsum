@@ -33,4 +33,12 @@ class AndroidUtils @Inject constructor(){
     fun isValidEmail(target: CharSequence): Boolean {
         return !TextUtils.isEmpty(target) && Patterns.EMAIL_ADDRESS.matcher(target).matches()
     }
+
+    fun hideView(view: View){
+        view.visibility = View.INVISIBLE
+    }
+
+    fun showView(view: View){
+        view.visibility = View.VISIBLE
+    }
 }

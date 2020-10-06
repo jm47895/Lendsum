@@ -18,7 +18,7 @@ class ForgotPasswordViewModel @ViewModelInject constructor(
         }
     }
 
-    fun getResetEmailStatus(): MutableLiveData<Boolean> {
-        return loginRepository.getResetEmailStatus()
+    fun getResetPasswordEmailStatus(): MutableLiveData<Boolean> {
+        return loginRepository.getResetPasswordEmailStatus()
     }
 }

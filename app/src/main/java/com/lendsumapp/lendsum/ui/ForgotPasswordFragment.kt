@@ -7,16 +7,13 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
-import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.fragment.findNavController
 import com.lendsumapp.lendsum.R
 import com.lendsumapp.lendsum.databinding.FragmentForgotPasswordBinding
-import com.lendsumapp.lendsum.databinding.FragmentLoginBinding
 import com.lendsumapp.lendsum.util.AndroidUtils
 import com.lendsumapp.lendsum.util.NetworkUtils
 import com.lendsumapp.lendsum.viewmodel.ForgotPasswordViewModel
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.android.synthetic.main.fragment_forgot_password.*
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -60,7 +57,7 @@ class ForgotPasswordFragment : Fragment(), View.OnClickListener {
     override fun onStop() {
         super.onStop()
 
-        forgotPasswordViewModel.getResetEmailStatus().removeObserver(resetEmailStatusObserver)
+        forgotPasswordViewModel.getResetPasswordEmailStatus().removeObserver(resetEmailStatusObserver)
 
     }
 
@@ -77,7 +74,7 @@ class ForgotPasswordFragment : Fragment(), View.OnClickListener {
             when (view?.id) {
                 R.id.forgot_send_reset_pass_btn -> {
 
-                    forgotPasswordViewModel.getResetEmailStatus().observe(viewLifecycleOwner, resetEmailStatusObserver)
+                    forgotPasswordViewModel.getResetPasswordEmailStatus().observe(viewLifecycleOwner, resetEmailStatusObserver)
 
                     context?.let { androidUtils.hideKeyboard(it, view) }
 

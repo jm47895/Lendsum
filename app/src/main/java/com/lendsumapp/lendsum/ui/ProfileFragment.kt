@@ -50,6 +50,7 @@ class ProfileFragment : Fragment(), View.OnClickListener {
         super.onViewCreated(view, savedInstanceState)
 
         binding?.profileSettingsBtn?.setOnClickListener(this)
+        binding?.profileProfileEditBtn?.setOnClickListener(this)
 
         userObserver = Observer { user ->
 
@@ -83,6 +84,9 @@ class ProfileFragment : Fragment(), View.OnClickListener {
 
     override fun onClick(view: View?) {
         when(view?.id){
+            R.id.profile_profile_edit_btn->{
+                view.findNavController().navigate(R.id.action_profileFragment_to_editProfileFragment)
+            }
             R.id.profile_settings_btn->{
                 view.findNavController().navigate(R.id.action_profileFragment_to_settingsFragment)
             }

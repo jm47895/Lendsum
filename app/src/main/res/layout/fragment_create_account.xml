@@ -8,7 +8,7 @@
 
     <EditText
         android:id="@+id/create_user_first_name_et"
-        style="@style/LoginEditTextTheme"
+        style="@style/EditTextTheme"
         android:hint="@string/first_name"
         android:inputType="text"
         app:layout_constraintBottom_toTopOf="@+id/create_user_last_name_et"
@@ -21,7 +21,7 @@
 
     <EditText
         android:id="@+id/create_user_last_name_et"
-        style="@style/LoginEditTextTheme"
+        style="@style/EditTextTheme"
         android:hint="@string/last_name"
         android:inputType="text"
         app:layout_constraintBottom_toTopOf="@+id/create_user_email_et"
@@ -32,7 +32,7 @@
 
     <EditText
         android:id="@+id/create_user_email_et"
-        style="@style/LoginEditTextTheme"
+        style="@style/EditTextTheme"
         android:hint="@string/email"
         android:inputType="textEmailAddress"
         app:layout_constraintBottom_toTopOf="@+id/create_user_password_et"
@@ -43,7 +43,7 @@
 
     <EditText
         android:id="@+id/create_user_password_et"
-        style="@style/LoginEditTextTheme"
+        style="@style/EditTextTheme"
         android:hint="@string/password"
         android:inputType="textPassword"
         app:layout_constraintBottom_toTopOf="@+id/create_user_match_password_et"
@@ -54,7 +54,7 @@
 
     <EditText
         android:id="@+id/create_user_match_password_et"
-        style="@style/LoginEditTextTheme"
+        style="@style/EditTextTheme"
         android:hint="@string/re_enter_password"
         android:inputType="textPassword"
         app:layout_constraintBottom_toTopOf="@+id/create_account_back_btn"
@@ -65,7 +65,7 @@
 
     <Button
         android:id="@+id/create_account_back_btn"
-        style="@style/LoginButtonTheme"
+        style="@style/ButtonTheme"
         android:text="@string/cap_back"
         android:layout_width="0dp"
         app:layout_constraintBottom_toBottomOf="parent"
@@ -76,7 +76,7 @@
 
     <Button
         android:id="@+id/create_account_next_btn"
-        style="@style/LoginButtonTheme"
+        style="@style/ButtonTheme"
         android:layout_width="0dp"
         android:text="@string/next"
         app:layout_constraintBottom_toBottomOf="@+id/create_account_back_btn"

@@ -7,6 +7,9 @@ object GlobalConstants {
     const val RETURNING_USER = "returningUser"
     const val NUMBER_VERIFIED = "numberVerified"
 
-    /*Firestore Collection Paths*/
+    /*Firestore Constants*/
     const val USER_COLLECTION_PATH = "users"
+    const val EMAIL_KEY = "email"
+    const val USERNAME_KEY = "username"
+    const val PROFILE_NAME = "name"
 }
