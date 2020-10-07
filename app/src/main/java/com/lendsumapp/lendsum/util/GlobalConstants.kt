@@ -12,4 +12,5 @@ object GlobalConstants {
     const val EMAIL_KEY = "email"
     const val USERNAME_KEY = "username"
     const val PROFILE_NAME = "name"
+    const val PROFILE_PIC_URI = "profilePicUrl"
 }

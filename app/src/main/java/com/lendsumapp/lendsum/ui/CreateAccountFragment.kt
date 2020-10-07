@@ -99,12 +99,6 @@ class CreateAccountFragment : Fragment(), View.OnClickListener {
 
     }
 
-    override fun onStop() {
-        super.onStop()
-        createAccountViewModel.getEmailSignUpStatus().removeObserver(emailSignUpObserver)
-        createAccountViewModel.getLinkWithCredentialStatus().removeObserver(linkWithEmailObserver)
-    }
-
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null

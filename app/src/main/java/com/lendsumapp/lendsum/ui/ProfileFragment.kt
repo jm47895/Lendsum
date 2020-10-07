@@ -72,11 +72,6 @@ class ProfileFragment : Fragment(), View.OnClickListener {
         profileViewModel.getUser().observe(viewLifecycleOwner, userObserver)
     }
 
-    override fun onStop() {
-        super.onStop()
-        profileViewModel.getUser().removeObserver(userObserver)
-    }
-
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null

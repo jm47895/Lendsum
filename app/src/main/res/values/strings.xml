@@ -63,12 +63,13 @@
     <string name="edit">edit</string>
     <string name="save">save</string>
     <string name="invalid_email_data_not_saved">Invalid email, data not saved</string>
-    <string name="user_info_updated">User info updated!</string>
+    <string name="user_profile_updated">Profile updated!</string>
     <string name="empty_username">The username cannot be empty. Username was not saved.</string>
     <string name="empty_profile_name">The profile name cannot be empty. Profile name was not saved.</string>
     <string name="no_at_symbol_err">Username must start with the @ symbol. Data not saved.</string>
     <string name="username_too_short_err">Username must be at least 3 characters. Data not saved.</string>
     <string name="profile_name_too_short_err">Profile name must be at least 3 characters. Data not saved.</string>
     <string name="sign_in_again_msg">You need to sign in again to do this.</string>
+    <string name="profile_pic_img">profilePicImg</string>
 
 </resources>

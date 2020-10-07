@@ -54,8 +54,10 @@ class EditProfileViewModel @ViewModelInject constructor(
         return editProfileRepository.getUpdateAuthEmailStatus()
     }
 
-    fun updateFirebaseAuthDisplayName(displayName: String){
-        editProfileRepository.updateFirebaseAuthDisplayName(displayName)
+    fun updateFirebaseAuthProfile(key: String, value: String){
+        viewModelScope.launch(Dispatchers.IO) {
+            editProfileRepository.updateFirebaseAuthProfile(key, value)
+        }
     }
     //End of firebase auth functions
 

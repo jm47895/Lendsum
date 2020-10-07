@@ -122,15 +122,6 @@ class LoginFragment : Fragment(), View.OnClickListener{
 
     }
 
-    override fun onStop() {
-        super.onStop()
-
-        loginViewModel.getEmailSignInStatus().removeObserver(emailSignInObserver)
-        loginViewModel.getFacebookAuthState().removeObserver(facebookAuthObserver)
-        loginViewModel.getGoogleLoginState().removeObserver(googleAuthObserver)
-
-    }
-
     override fun onClick(view: View?) {
 
         var action: Int = -1

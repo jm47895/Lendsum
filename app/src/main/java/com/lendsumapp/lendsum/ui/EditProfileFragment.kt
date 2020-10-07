@@ -1,5 +1,7 @@
 package com.lendsumapp.lendsum.ui
 
+import android.app.Activity
+import android.content.Intent
 import android.os.Bundle
 import android.text.TextUtils
 import android.util.Log
@@ -7,10 +9,7 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.CompoundButton
-import android.widget.EditText
-import android.widget.TextView
-import android.widget.ToggleButton
+import android.widget.*
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
@@ -23,13 +22,14 @@ import com.lendsumapp.lendsum.util.AndroidUtils
 import com.lendsumapp.lendsum.util.EditProfileInfoType
 import com.lendsumapp.lendsum.util.GlobalConstants.EMAIL_KEY
 import com.lendsumapp.lendsum.util.GlobalConstants.PROFILE_NAME
+import com.lendsumapp.lendsum.util.GlobalConstants.PROFILE_PIC_URI
 import com.lendsumapp.lendsum.util.GlobalConstants.USERNAME_KEY
 import com.lendsumapp.lendsum.viewmodel.EditProfileViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
 @AndroidEntryPoint
-class EditProfileFragment : Fragment(), CompoundButton.OnCheckedChangeListener {
+class EditProfileFragment : Fragment(), View.OnClickListener, CompoundButton.OnCheckedChangeListener {
 
     private var _binding: FragmentEditProfileBinding? = null
     private val binding get() = _binding
@@ -58,6 +58,7 @@ class EditProfileFragment : Fragment(), CompoundButton.OnCheckedChangeListener {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        binding?.editProfilePic?.setOnClickListener(this)
         binding?.editProfileNameToggle?.setOnCheckedChangeListener(this)
         binding?.editProfileUsernameToggle?.setOnCheckedChangeListener(this)
         binding?.editProfileEmailToggle?.setOnCheckedChangeListener(this)
@@ -70,16 +71,8 @@ class EditProfileFragment : Fragment(), CompoundButton.OnCheckedChangeListener {
             binding?.editProfileUsernameTv?.text = cachedUser.username
             binding?.editProfileEmailTv?.text = cachedUser.email
 
-            Glide.with(this)
-                .applyDefaultRequestOptions(
-                    RequestOptions()
-                        .placeholder(R.drawable.com_facebook_profile_picture_blank_portrait)
-                        .error(R.drawable.com_facebook_profile_picture_blank_portrait)
-                        .circleCrop()
-                )
-                .load(cachedUser.profilePicUrl)
-                .circleCrop()
-                .into(binding?.editProfilePic!!)
+            loadProfilePic(cachedUser.profilePicUrl!!, binding?.editProfilePic!!)
+
         }
         editProfileViewModel.getUser().observe(viewLifecycleOwner, userCacheObserver)
 
@@ -95,7 +88,7 @@ class EditProfileFragment : Fragment(), CompoundButton.OnCheckedChangeListener {
         updateUserStatusObserver = Observer { rowsUpdated->
             if(rowsUpdated > 0){
                 Log.d(TAG, "User object updated in room cache")
-                androidUtils.showSnackBar(requireActivity(), getString(R.string.user_info_updated))
+                androidUtils.showSnackBar(requireActivity(), getString(R.string.user_profile_updated))
             }else{
                 Log.d(TAG, "User object not updated in room cache")
             }
@@ -103,16 +96,36 @@ class EditProfileFragment : Fragment(), CompoundButton.OnCheckedChangeListener {
         editProfileViewModel.getUpdateCacheUserStatus().observe(viewLifecycleOwner, updateUserStatusObserver)
     }
 
-    override fun onStop() {
-        super.onStop()
-        editProfileViewModel.getUser().removeObserver(userCacheObserver)
-        editProfileViewModel.getUpdateCacheUserStatus().removeObserver(updateUserStatusObserver)
-        editProfileViewModel.getUpdateAuthEmailStatus().removeObserver(updateAuthEmailStatusObserver)
+    private fun loadProfilePic(profilePicUri: String, imageView: ImageView) {
+        Glide.with(this)
+            .applyDefaultRequestOptions(
+                RequestOptions()
+                    .placeholder(R.drawable.com_facebook_profile_picture_blank_portrait)
+                    .error(R.drawable.com_facebook_profile_picture_blank_portrait)
+                    .circleCrop()
+            )
+            .load(profilePicUri)
+            .circleCrop()
+            .into(imageView)
     }
 
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        if(resultCode == Activity.RESULT_OK && requestCode == GALLERY_REQUEST_CODE){
+
+            user.profilePicUrl = data?.data.toString()
+
+            loadProfilePic(user.profilePicUrl.toString(), binding?.editProfilePic!!)
+
+            editProfileViewModel.updateCachedUser(user)
+            editProfileViewModel.updateUserValueInFirestore(PROFILE_PIC_URI, user.profilePicUrl.toString())
+            editProfileViewModel.updateFirebaseAuthProfile(PROFILE_PIC_URI, user.profilePicUrl.toString())
+        }
     }
 
     override fun onCheckedChanged(button: CompoundButton?, isChecked: Boolean) {
@@ -136,6 +149,21 @@ class EditProfileFragment : Fragment(), CompoundButton.OnCheckedChangeListener {
 
             }
         }
+    }
+
+    override fun onClick(view: View?) {
+        when(view?.id){
+            R.id.edit_profile_pic->{
+                openGalleryForImage()
+            }
+        }
+    }
+
+    private fun openGalleryForImage() {
+        Log.d(TAG, "Open gallery")
+        val intent = Intent(Intent.ACTION_PICK)
+        intent.type = "image/*"
+        startActivityForResult(intent, GALLERY_REQUEST_CODE)
     }
 
     private fun handleUpdateInfoUI(isEditing: Boolean, textView: TextView, editText: EditText, toggleButton: ToggleButton) {
@@ -172,7 +200,7 @@ class EditProfileFragment : Fragment(), CompoundButton.OnCheckedChangeListener {
                             user.name = textView.text.toString().trim()
                             editProfileViewModel.updateCachedUser(user)
                             editProfileViewModel.updateUserValueInFirestore(PROFILE_NAME, user.name)
-                            editProfileViewModel.updateFirebaseAuthDisplayName(user.name)
+                            editProfileViewModel.updateFirebaseAuthProfile(PROFILE_NAME, user.name)
                         }
                     }
                 }
@@ -191,7 +219,6 @@ class EditProfileFragment : Fragment(), CompoundButton.OnCheckedChangeListener {
                             user.username = textView.text.toString().trim()
                             editProfileViewModel.updateCachedUser(user)
                             editProfileViewModel.updateUserValueInFirestore(USERNAME_KEY, user.username)
-
                         }
                     }
                 }
@@ -216,5 +243,7 @@ class EditProfileFragment : Fragment(), CompoundButton.OnCheckedChangeListener {
 
     companion object {
         private val TAG = EditProfileFragment::class.simpleName
+        private const val GALLERY_REQUEST_CODE = 5340
     }
+
 }

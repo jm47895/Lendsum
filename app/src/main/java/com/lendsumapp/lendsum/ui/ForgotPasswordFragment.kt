@@ -54,13 +54,6 @@ class ForgotPasswordFragment : Fragment(), View.OnClickListener {
 
     }
 
-    override fun onStop() {
-        super.onStop()
-
-        forgotPasswordViewModel.getResetPasswordEmailStatus().removeObserver(resetEmailStatusObserver)
-
-    }
-
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null

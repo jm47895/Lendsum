@@ -2,6 +2,7 @@ package com.lendsumapp.lendsum.repository
 
 import android.net.Uri
 import android.util.Log
+import androidx.core.net.toUri
 import androidx.lifecycle.MutableLiveData
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.UserProfileChangeRequest
@@ -10,6 +11,8 @@ import com.lendsumapp.lendsum.auth.EmailAndPassAuthComponent
 import com.lendsumapp.lendsum.data.model.User
 import com.lendsumapp.lendsum.data.persistence.LendsumDatabase
 import com.lendsumapp.lendsum.util.GlobalConstants
+import com.lendsumapp.lendsum.util.GlobalConstants.PROFILE_NAME
+import com.lendsumapp.lendsum.util.GlobalConstants.PROFILE_PIC_URI
 import dagger.hilt.android.scopes.ActivityScoped
 import javax.inject.Inject
 
@@ -37,18 +40,28 @@ class EditProfileRepository @Inject constructor(
         return emailAndPassAuthComponent.getUpdateAuthEmailStatus()
     }
 
-    fun updateFirebaseAuthDisplayName(displayName: String){
+    fun updateFirebaseAuthProfile(key: String, value: String){
 
         val currentUser = firebaseAuth.currentUser
 
-        val profileUpdates = UserProfileChangeRequest.Builder()
-            .setDisplayName(displayName).build()
+        val profileUpdates: UserProfileChangeRequest? = when(key){
+            PROFILE_NAME->{
+                UserProfileChangeRequest.Builder().setDisplayName(value).build()
+            }
+            PROFILE_PIC_URI->{
+                UserProfileChangeRequest.Builder().setPhotoUri(value.toUri()).build()
+            }
+            else-> null
+        }
 
-        currentUser?.updateProfile(profileUpdates)?.addOnCompleteListener { task->
-            if(task.isSuccessful){
-                Log.d(TAG, "Firebase auth display name updated: " + firebaseAuth.currentUser?.displayName.toString())
-            }else{
-                Log.d(TAG, "Firebase auth failed to update display name.")
+
+        profileUpdates?.let {
+            currentUser?.updateProfile(it)?.addOnCompleteListener { task->
+                if(task.isSuccessful){
+                    Log.d(TAG, "Firebase auth $key updated")
+                }else{
+                    Log.d(TAG, "Firebase auth failed to update $key.")
+                }
             }
         }
     }

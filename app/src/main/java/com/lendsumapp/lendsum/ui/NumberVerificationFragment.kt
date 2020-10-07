@@ -97,15 +97,6 @@ class NumberVerificationFragment : Fragment(), View.OnClickListener, CountryCode
         binding?.numberVerificationNextBtn?.setOnClickListener(this)
     }
 
-    override fun onStop() {
-        super.onStop()
-
-        numberVerificationViewModel.getPhoneNumberLinkStatus().removeObserver(linkPhoneNumberStatusObserver)
-        numberVerificationViewModel.getGeneratedPhoneAuthCode().removeObserver(phoneNumberCredentialObserver)
-        numberVerificationViewModel.getCacheStatus().removeObserver(signInCacheStatusObserver)
-
-    }
-
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
