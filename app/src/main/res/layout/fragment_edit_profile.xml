@@ -33,22 +33,23 @@
         android:layout_width="200dp"
         android:layout_height="0dp"
         android:layout_margin="32dp"
+        android:contentDescription="@string/profile_pic_img"
         app:layout_constraintBottom_toTopOf="@+id/horizontal_33_guide"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        android:contentDescription="@string/profile_pic_img" />
+        app:layout_constraintTop_toTopOf="parent" />
 
     <ImageView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:src="@drawable/ic_edit_32"
-        app:layout_constraintTop_toTopOf="@+id/edit_profile_pic"
         app:layout_constraintBottom_toBottomOf="@+id/edit_profile_pic"
-        app:layout_constraintStart_toStartOf="@+id/edit_profile_pic"
         app:layout_constraintEnd_toEndOf="@+id/edit_profile_pic"
         app:layout_constraintHorizontal_bias="1"
-        app:layout_constraintVertical_bias="1"/>
+        app:layout_constraintStart_toStartOf="@+id/edit_profile_pic"
+        app:layout_constraintTop_toTopOf="@+id/edit_profile_pic"
+        app:layout_constraintVertical_bias="1"
+        android:contentDescription="@string/edit_profile_icon" />
 
     <TextView
         android:id="@+id/edit_profile_name_tv"
@@ -68,12 +69,15 @@
         android:textColor="@color/colorSecondaryLight"
         android:textCursorDrawable="@color/colorSecondaryLight"
         android:visibility="invisible"
+        android:inputType="text"
+        android:hint="@string/enter_new_profile_name"
+        android:textColorHint="@color/colorSecondaryDark"
         app:layout_constraintBottom_toTopOf="@+id/edit_profile_username_et"
-        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintEnd_toStartOf="@+id/edit_profile_name_toggle"
         app:layout_constraintHorizontal_chainStyle="spread_inside"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/horizontal_33_guide" />
+        app:layout_constraintTop_toTopOf="@+id/horizontal_33_guide"
+        tools:ignore="Autofill"/>
 
     <ToggleButton
         android:id="@+id/edit_profile_name_toggle"
@@ -99,16 +103,19 @@
         android:id="@+id/edit_profile_username_et"
         style="@style/EditTextTheme"
         android:layout_width="0dp"
+        android:inputType="text"
+        android:hint="@string/enter_new_username"
+        android:textColorHint="@color/colorSecondaryDark"
         android:backgroundTint="@color/colorPrimary"
         android:textColor="@color/colorSecondaryLight"
         android:textCursorDrawable="@color/colorSecondaryLight"
         android:visibility="invisible"
         app:layout_constraintBottom_toTopOf="@+id/edit_profile_email_et"
-        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintEnd_toStartOf="@+id/edit_profile_username_toggle"
         app:layout_constraintHorizontal_chainStyle="spread_inside"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/edit_profile_name_et" />
+        app:layout_constraintTop_toBottomOf="@+id/edit_profile_name_et"
+        tools:ignore="Autofill"/>
 
     <ToggleButton
         android:id="@+id/edit_profile_username_toggle"
@@ -138,13 +145,16 @@
         android:backgroundTint="@color/colorPrimary"
         android:textColor="@color/colorSecondaryLight"
         android:textCursorDrawable="@color/colorSecondaryLight"
+        android:hint="@string/enter_new_email"
+        android:textColorHint="@color/colorSecondaryDark"
+        android:inputType="textEmailAddress"
         android:visibility="invisible"
         app:layout_constraintBottom_toTopOf="@+id/horizontal_66_guide"
-        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintEnd_toStartOf="@+id/edit_profile_email_toggle"
         app:layout_constraintHorizontal_chainStyle="spread_inside"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/edit_profile_username_et" />
+        app:layout_constraintTop_toBottomOf="@+id/edit_profile_username_et"
+        tools:ignore="Autofill"/>
 
     <ToggleButton
         android:id="@+id/edit_profile_email_toggle"
@@ -155,6 +165,49 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@+id/edit_profile_email_et"
         app:layout_constraintTop_toTopOf="@+id/edit_profile_email_et" />
+
+    <EditText
+        android:id="@+id/edit_profile_password_et"
+        style="@style/EditTextTheme"
+        android:layout_width="0dp"
+        android:backgroundTint="@color/colorPrimary"
+        android:hint="@string/enter_new_password"
+        android:textColorHint="@color/colorSecondaryDark"
+        android:inputType="textPassword"
+        android:textColor="@color/colorSecondaryLight"
+        android:textCursorDrawable="@color/colorSecondaryLight"
+        app:layout_constraintBottom_toTopOf="@+id/edit_profile_match_password_et"
+        app:layout_constraintEnd_toStartOf="@+id/edit_profile_update_pass_btn"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/horizontal_66_guide"
+        app:layout_constraintVertical_bias="0"
+        app:layout_constraintVertical_chainStyle="packed"
+        tools:ignore="Autofill"/>
+
+    <EditText
+        android:id="@+id/edit_profile_match_password_et"
+        style="@style/EditTextTheme"
+        android:layout_width="0dp"
+        android:backgroundTint="@color/colorPrimary"
+        android:hint="@string/re_enter_new_password"
+        android:inputType="textPassword"
+        android:textColor="@color/colorSecondaryLight"
+        android:textColorHint="@color/colorSecondaryDark"
+        android:textCursorDrawable="@color/colorSecondaryLight"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/edit_profile_update_pass_btn"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/edit_profile_password_et"
+        tools:ignore="Autofill"/>
+
+    <Button
+        android:id="@+id/edit_profile_update_pass_btn"
+        style="@style/ButtonTheme"
+        android:text="@string/update_password"
+        app:layout_constraintBottom_toBottomOf="@+id/edit_profile_match_password_et"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="@+id/vertical_50_guide"
+        app:layout_constraintTop_toTopOf="@+id/edit_profile_match_password_et" />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

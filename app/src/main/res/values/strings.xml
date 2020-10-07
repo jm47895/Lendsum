@@ -71,5 +71,10 @@
     <string name="profile_name_too_short_err">Profile name must be at least 3 characters. Data not saved.</string>
     <string name="sign_in_again_msg">You need to sign in again to do this.</string>
     <string name="profile_pic_img">profilePicImg</string>
+    <string name="update_password">Update Password</string>
+    <string name="edit_profile_icon">Edit profile icon</string>
+    <string name="enter_new_profile_name">Enter new profile name</string>
+    <string name="enter_new_username">Enter new username</string>
+    <string name="enter_new_email">Enter new email</string>
 
 </resources>
