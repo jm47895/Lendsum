@@ -39,6 +39,17 @@
         app:layout_constraintTop_toTopOf="parent"
         android:contentDescription="@string/profile_pic_img" />
 
+    <ImageView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/ic_edit_32"
+        app:layout_constraintTop_toTopOf="@+id/edit_profile_pic"
+        app:layout_constraintBottom_toBottomOf="@+id/edit_profile_pic"
+        app:layout_constraintStart_toStartOf="@+id/edit_profile_pic"
+        app:layout_constraintEnd_toEndOf="@+id/edit_profile_pic"
+        app:layout_constraintHorizontal_bias="1"
+        app:layout_constraintVertical_bias="1"/>
+
     <TextView
         android:id="@+id/edit_profile_name_tv"
         style="@style/SecondaryText"
