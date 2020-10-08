@@ -42,8 +42,12 @@ class CreateAccountViewModel @ViewModelInject constructor(
         }
     }
 
-    fun getEmailSignUpStatus(): MutableLiveData<Boolean> {
-        return loginRepository.getEmailSignUpStatus()
+    fun getEmailCreateAccountStatus(): MutableLiveData<Boolean> {
+        return loginRepository.getEmailCreateAccountStatus()
+    }
+
+    fun updateCreateAccountAuthProfile(key: String, value: String){
+        loginRepository.updateCreateAccountAuthProfile(key, value)
     }
 
     fun getLinkWithCredentialStatus(): MutableLiveData<Boolean> {

@@ -1,18 +1,24 @@
 package com.lendsumapp.lendsum.auth
 
 import android.util.Log
+import androidx.core.net.toUri
 import androidx.lifecycle.MutableLiveData
 import com.google.android.gms.tasks.OnCompleteListener
 import com.google.android.gms.tasks.Task
 import com.google.firebase.auth.*
+import com.lendsumapp.lendsum.repository.EditProfileRepository
+import com.lendsumapp.lendsum.util.GlobalConstants
+import com.lendsumapp.lendsum.util.GlobalConstants.PROFILE_NAME
+import com.lendsumapp.lendsum.util.GlobalConstants.PROFILE_PIC_URI
 import dagger.hilt.android.scopes.ActivityScoped
 import javax.inject.Inject
 
 @ActivityScoped
-class EmailAndPassAuthComponent @Inject constructor(): OnCompleteListener<AuthResult>{
+class EmailAndPassAuthComponent @Inject constructor(){
 
     private val firebaseAuth : FirebaseAuth = FirebaseAuth.getInstance()
     private val emailSignInStatus: MutableLiveData<Boolean> = MutableLiveData()
+    private val emailCreateAccountStatus: MutableLiveData<Boolean> = MutableLiveData()
     private val resetPasswordEmailStatus: MutableLiveData<Boolean> = MutableLiveData()
     private val linkWithEmailStatus: MutableLiveData<Boolean> = MutableLiveData()
     private val updateAuthEmailStatus: MutableLiveData<Boolean> = MutableLiveData()
@@ -20,14 +26,30 @@ class EmailAndPassAuthComponent @Inject constructor(): OnCompleteListener<AuthRe
 
     fun signInWithEmailAndPass(email: String, password: String)
     {
-        firebaseAuth.signInWithEmailAndPassword(email, password).addOnCompleteListener(this)
+        firebaseAuth.signInWithEmailAndPassword(email, password).addOnCompleteListener {task->
+            if(task.isSuccessful){
+                emailSignInStatus.postValue(true)
+                Log.d(TAG, "Sign in with email was successful.")
+            }else{
+                emailSignInStatus.postValue(false)
+                Log.d(TAG, "Sign in with email failed" + task.exception)
+            }
+        }
     }
 
 
     fun registerWithEmailAndPassword(email: String, password: String){
 
         if(firebaseAuth.currentUser == null) {
-            firebaseAuth.createUserWithEmailAndPassword(email, password).addOnCompleteListener(this)
+            firebaseAuth.createUserWithEmailAndPassword(email, password).addOnCompleteListener { task ->
+                if (task.isSuccessful){
+                    Log.d(TAG, "Create new user with email and pass was a success")
+                    emailCreateAccountStatus.postValue(true)
+                }else{
+                    Log.d(TAG, "Create new user with email and pass failed " + task.exception)
+                    emailCreateAccountStatus.postValue(false)
+                }
+            }
         }else{
             val emailAndPassCredential = EmailAuthProvider.getCredential(email, password)
             firebaseAuth.currentUser?.linkWithCredential(emailAndPassCredential)?.addOnCompleteListener { task ->
@@ -73,18 +95,33 @@ class EmailAndPassAuthComponent @Inject constructor(): OnCompleteListener<AuthRe
         }
     }
 
-    fun getUpdateAuthPassStatus(): MutableLiveData<Boolean>{
-        return updateAuthPassStatus
+    fun updateFirebaseAuthProfile(key: String, value: String){
+        val currentUser = firebaseAuth.currentUser
+
+        val profileUpdates: UserProfileChangeRequest? = when(key){
+            PROFILE_NAME ->{
+                UserProfileChangeRequest.Builder().setDisplayName(value).build()
+            }
+            PROFILE_PIC_URI ->{
+                UserProfileChangeRequest.Builder().setPhotoUri(value.toUri()).build()
+            }
+            else-> null
+        }
+
+
+        profileUpdates?.let {
+            currentUser?.updateProfile(it)?.addOnCompleteListener { task->
+                if(task.isSuccessful){
+                    Log.d(TAG, "Firebase auth $key updated")
+                }else{
+                    Log.d(TAG, "Firebase auth failed to update $key.")
+                }
+            }
+        }
     }
 
-    override fun onComplete(task: Task<AuthResult>) {
-        if (task.isSuccessful){
-            emailSignInStatus.postValue(true)
-            Log.d(TAG, "register with email : Success.")
-        }else{
-            emailSignInStatus.postValue(false)
-            Log.d(TAG, "register with email : Failure" + task.exception)
-        }
+    fun getUpdateAuthPassStatus(): MutableLiveData<Boolean>{
+        return updateAuthPassStatus
     }
 
     fun signOutOfEmailAndPass(){
@@ -93,6 +130,10 @@ class EmailAndPassAuthComponent @Inject constructor(): OnCompleteListener<AuthRe
 
     fun getEmailSignInStatus(): MutableLiveData<Boolean> {
         return emailSignInStatus
+    }
+
+    fun getEmailCreateAccountStatus(): MutableLiveData<Boolean>{
+        return emailCreateAccountStatus
     }
 
     fun sendPasswordResetEmail(email: String){

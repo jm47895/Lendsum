@@ -93,10 +93,16 @@ class NumberVerificationViewModel @ViewModelInject constructor(
 
         return User(firebaseUser.uid,
             firebaseUser.displayName.toString(),
-            "@" + firebaseUser.displayName,
+            createUsername(firebaseUser.displayName.toString(), firebaseUser.uid),
             firebaseUser.email.toString(), firebaseUser.phoneNumber.toString(),firebaseUser.photoUrl.toString(), karmaScore = 100, friendList = null)
     }
 
+    private fun createUsername(name: String, uid: String): String{
+        val firstName = name.substring(0, name.indexOf(" "))
+        val firstFiveUidDigits = uid.substring(0, 5)
+
+        return "@$firstName-$firstFiveUidDigits"
+    }
 
     companion object{
         private val TAG = NumberVerificationViewModel::class.simpleName

@@ -49,29 +49,7 @@ class EditProfileRepository @Inject constructor(
     }
 
     fun updateFirebaseAuthProfile(key: String, value: String){
-
-        val currentUser = firebaseAuth.currentUser
-
-        val profileUpdates: UserProfileChangeRequest? = when(key){
-            PROFILE_NAME->{
-                UserProfileChangeRequest.Builder().setDisplayName(value).build()
-            }
-            PROFILE_PIC_URI->{
-                UserProfileChangeRequest.Builder().setPhotoUri(value.toUri()).build()
-            }
-            else-> null
-        }
-
-
-        profileUpdates?.let {
-            currentUser?.updateProfile(it)?.addOnCompleteListener { task->
-                if(task.isSuccessful){
-                    Log.d(TAG, "Firebase auth $key updated")
-                }else{
-                    Log.d(TAG, "Firebase auth failed to update $key.")
-                }
-            }
-        }
+        emailAndPassAuthComponent.updateFirebaseAuthProfile(key, value)
     }
 
     fun updateUserValueInFirestore(key: String, value: String){

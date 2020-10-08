@@ -64,6 +64,10 @@ class LoginRepository @Inject constructor(
         emailAndPassAuthComponent.registerWithEmailAndPassword(email, password)
     }
 
+    fun updateCreateAccountAuthProfile(key: String, value: String) {
+        emailAndPassAuthComponent.updateFirebaseAuthProfile(key, value)
+    }
+
     fun signInWithEmailAndPass(email: String, password: String){
         emailAndPassAuthComponent.signInWithEmailAndPass(email, password)
     }
@@ -72,8 +76,8 @@ class LoginRepository @Inject constructor(
         emailAndPassAuthComponent.signOutOfEmailAndPass()
     }
 
-    fun getEmailSignUpStatus(): MutableLiveData<Boolean>{
-        return emailAndPassAuthComponent.getEmailSignInStatus()
+    fun getEmailCreateAccountStatus(): MutableLiveData<Boolean>{
+        return emailAndPassAuthComponent.getEmailCreateAccountStatus()
     }
 
     fun getEmailSignInStatus(): MutableLiveData<Boolean> {
