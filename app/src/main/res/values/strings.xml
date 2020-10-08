@@ -76,5 +76,7 @@
     <string name="enter_new_profile_name">Enter new profile name</string>
     <string name="enter_new_username">Enter new username</string>
     <string name="enter_new_email">Enter new email</string>
+    <string name="blank_pass_no_update">One or more password fields is blank. Password not updated.</string>
+    <string name="password_has_updated">Password has been updated!</string>
 
 </resources>

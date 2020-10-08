@@ -117,7 +117,7 @@ class CreateAccountFragment : Fragment(), View.OnClickListener {
         } else if (!androidUtils.isValidEmail(email)) {
             binding?.createUserEmailEt?.error = getString(R.string.invalid_email_err_msg)
             return false
-        } else if (TextUtils.isEmpty(password) || !isValidPassword(password)
+        } else if (TextUtils.isEmpty(password) || !androidUtils.isValidPassword(password)
         ) {
             binding?.createUserPasswordEt?.error = getString(R.string.password_param_err_msg)
             return false
@@ -127,16 +127,6 @@ class CreateAccountFragment : Fragment(), View.OnClickListener {
             return false
         }
         return true
-    }
-
-    //Password validation with regex for at least one letter, one number, and one number in password
-    private fun isValidPassword(password: String): Boolean {
-        val matchCase: Matcher
-        val isValid: Boolean
-        val pattern: Pattern = Pattern.compile(PASSWORD_PATTERN)
-        matchCase = pattern.matcher(password)
-        isValid = matchCase.matches()
-        return isValid
     }
 
     override fun onClick(view: View?) {
@@ -195,6 +185,5 @@ class CreateAccountFragment : Fragment(), View.OnClickListener {
 
     companion object{
         private val TAG = CreateAccountFragment::class.simpleName
-        private const val PASSWORD_PATTERN = "^((?=.*\\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[@%+/\'!#$^?:,(){}~_.]).{6,20})$"
     }
 }

@@ -16,6 +16,7 @@ class EmailAndPassAuthComponent @Inject constructor(): OnCompleteListener<AuthRe
     private val resetPasswordEmailStatus: MutableLiveData<Boolean> = MutableLiveData()
     private val linkWithEmailStatus: MutableLiveData<Boolean> = MutableLiveData()
     private val updateAuthEmailStatus: MutableLiveData<Boolean> = MutableLiveData()
+    private val updateAuthPassStatus: MutableLiveData<Boolean> = MutableLiveData()
 
     fun signInWithEmailAndPass(email: String, password: String)
     {
@@ -58,7 +59,23 @@ class EmailAndPassAuthComponent @Inject constructor(): OnCompleteListener<AuthRe
         return updateAuthEmailStatus
     }
 
+    suspend fun updateAuthPassword(password: String){
+        val user = firebaseAuth.currentUser
 
+        user?.updatePassword(password)?.addOnCompleteListener { task ->
+             if(task.isSuccessful){
+                 Log.d(TAG, "Password is updated")
+                 updateAuthPassStatus.postValue(true)
+             }else{
+                 Log.d(TAG, "Password failed to update " + task.exception)
+                 updateAuthPassStatus.postValue(false)
+             }
+        }
+    }
+
+    fun getUpdateAuthPassStatus(): MutableLiveData<Boolean>{
+        return updateAuthPassStatus
+    }
 
     override fun onComplete(task: Task<AuthResult>) {
         if (task.isSuccessful){

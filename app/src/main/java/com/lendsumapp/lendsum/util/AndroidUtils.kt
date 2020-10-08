@@ -10,8 +10,12 @@ import android.view.inputmethod.InputMethodManager
 import androidx.core.content.ContextCompat
 import com.google.android.material.snackbar.Snackbar
 import com.lendsumapp.lendsum.R
+import com.lendsumapp.lendsum.ui.CreateAccountFragment
+import com.lendsumapp.lendsum.util.GlobalConstants.PASSWORD_PATTERN
 import dagger.hilt.android.scopes.FragmentScoped
 import java.io.File
+import java.util.regex.Matcher
+import java.util.regex.Pattern
 import javax.inject.Inject
 
 @FragmentScoped
@@ -32,6 +36,15 @@ class AndroidUtils @Inject constructor(){
 
     fun isValidEmail(target: CharSequence): Boolean {
         return !TextUtils.isEmpty(target) && Patterns.EMAIL_ADDRESS.matcher(target).matches()
+    }
+
+    fun isValidPassword(password: String): Boolean {
+        val matchCase: Matcher
+        val isValid: Boolean
+        val pattern: Pattern = Pattern.compile(PASSWORD_PATTERN)
+        matchCase = pattern.matcher(password)
+        isValid = matchCase.matches()
+        return isValid
     }
 
     fun hideView(view: View){

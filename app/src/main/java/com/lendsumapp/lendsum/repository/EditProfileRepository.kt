@@ -40,6 +40,14 @@ class EditProfileRepository @Inject constructor(
         return emailAndPassAuthComponent.getUpdateAuthEmailStatus()
     }
 
+    suspend fun updateAuthPass(password: String){
+        emailAndPassAuthComponent.updateAuthPassword(password)
+    }
+
+    fun getUpdateAuthPassStatus(): MutableLiveData<Boolean>{
+        return emailAndPassAuthComponent.getUpdateAuthPassStatus()
+    }
+
     fun updateFirebaseAuthProfile(key: String, value: String){
 
         val currentUser = firebaseAuth.currentUser

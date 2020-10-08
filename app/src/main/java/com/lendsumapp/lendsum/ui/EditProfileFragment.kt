@@ -26,6 +26,7 @@ import com.lendsumapp.lendsum.util.GlobalConstants.PROFILE_PIC_URI
 import com.lendsumapp.lendsum.util.GlobalConstants.USERNAME_KEY
 import com.lendsumapp.lendsum.viewmodel.EditProfileViewModel
 import dagger.hilt.android.AndroidEntryPoint
+import org.w3c.dom.Text
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -38,6 +39,7 @@ class EditProfileFragment : Fragment(), View.OnClickListener, CompoundButton.OnC
     private lateinit var userCacheObserver: Observer<User>
     private lateinit var updateUserStatusObserver: Observer<Int>
     private lateinit var updateAuthEmailStatusObserver: Observer<Boolean>
+    private lateinit var updateAuthPassStatusObserver: Observer<Boolean>
     private var user: User = User()
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -59,6 +61,7 @@ class EditProfileFragment : Fragment(), View.OnClickListener, CompoundButton.OnC
         super.onViewCreated(view, savedInstanceState)
 
         binding?.editProfilePic?.setOnClickListener(this)
+        binding?.editProfileUpdatePassBtn?.setOnClickListener(this)
         binding?.editProfileNameToggle?.setOnCheckedChangeListener(this)
         binding?.editProfileUsernameToggle?.setOnCheckedChangeListener(this)
         binding?.editProfileEmailToggle?.setOnCheckedChangeListener(this)
@@ -83,6 +86,15 @@ class EditProfileFragment : Fragment(), View.OnClickListener, CompoundButton.OnC
             }else{
                 androidUtils.showSnackBar(requireActivity(), getString(R.string.sign_in_again_msg))
             }
+        }
+
+        updateAuthPassStatusObserver = Observer {   isAuthPassUpdated->
+            if(isAuthPassUpdated){
+                androidUtils.showSnackBar(requireActivity(), getString(R.string.password_has_updated))
+            }else{
+                androidUtils.showSnackBar(requireActivity(), getString(R.string.sign_in_again_msg))
+            }
+
         }
 
         updateUserStatusObserver = Observer { rowsUpdated->
@@ -155,6 +167,40 @@ class EditProfileFragment : Fragment(), View.OnClickListener, CompoundButton.OnC
         when(view?.id){
             R.id.edit_profile_pic->{
                 openGalleryForImage()
+            }
+            R.id.edit_profile_update_pass_btn->{
+
+                androidUtils.hideKeyboard(requireContext(), view)
+
+                val password = binding?.editProfilePasswordEt?.text.toString().trim()
+                val passwordMatch = binding?.editProfileMatchPasswordEt?.text.toString().trim()
+
+                if(isPasswordValidated(password, passwordMatch)){
+                    editProfileViewModel.getUpdateAuthPassStatus().observe(viewLifecycleOwner, updateAuthPassStatusObserver)
+                    editProfileViewModel.updateAuthPass(binding?.editProfileMatchPasswordEt.toString())
+                }
+            }
+        }
+    }
+
+    private fun isPasswordValidated(password:String, passwordMatch: String):Boolean{
+        when {
+            TextUtils.isEmpty(password) || TextUtils.isEmpty(passwordMatch) -> {
+                binding?.editProfilePasswordEt?.error = getString(R.string.blank_pass_no_update)
+                binding?.editProfileMatchPasswordEt?.error = getString(R.string.blank_pass_no_update)
+                return false
+            }
+            !androidUtils.isValidPassword(password) -> {
+                binding?.editProfilePasswordEt?.error = getString(R.string.password_param_err_msg)
+                return false
+            }
+            password != passwordMatch -> {
+                binding?.editProfilePasswordEt?.error = getString(R.string.pass_dont_match_err_msg)
+                binding?.editProfileMatchPasswordEt?.error = getString(R.string.pass_dont_match_err_msg)
+                return false
+            }
+            else -> {
+                return true
             }
         }
     }

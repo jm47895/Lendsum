@@ -59,6 +59,16 @@ class EditProfileViewModel @ViewModelInject constructor(
             editProfileRepository.updateFirebaseAuthProfile(key, value)
         }
     }
+
+    fun updateAuthPass(password: String){
+        viewModelScope.launch {
+            editProfileRepository.updateAuthPass(password)
+        }
+    }
+
+    fun getUpdateAuthPassStatus():MutableLiveData<Boolean>{
+        return editProfileRepository.getUpdateAuthPassStatus()
+    }
     //End of firebase auth functions
 
     //Firestore functions
