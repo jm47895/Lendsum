@@ -90,6 +90,8 @@ class EditProfileFragment : Fragment(), View.OnClickListener, CompoundButton.OnC
 
         updateAuthPassStatusObserver = Observer {   isAuthPassUpdated->
             if(isAuthPassUpdated){
+                binding?.editProfilePasswordEt?.setText("")
+                binding?.editProfileMatchPasswordEt?.setText("")
                 androidUtils.showSnackBar(requireActivity(), getString(R.string.password_has_updated))
             }else{
                 androidUtils.showSnackBar(requireActivity(), getString(R.string.sign_in_again_msg))
@@ -177,7 +179,7 @@ class EditProfileFragment : Fragment(), View.OnClickListener, CompoundButton.OnC
 
                 if(isPasswordValidated(password, passwordMatch)){
                     editProfileViewModel.getUpdateAuthPassStatus().observe(viewLifecycleOwner, updateAuthPassStatusObserver)
-                    editProfileViewModel.updateAuthPass(binding?.editProfileMatchPasswordEt.toString())
+                    editProfileViewModel.updateAuthPass(password)
                 }
             }
         }
