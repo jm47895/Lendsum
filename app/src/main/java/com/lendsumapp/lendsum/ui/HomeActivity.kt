@@ -7,37 +7,44 @@ import android.view.MenuItem
 import android.view.View
 import androidx.activity.addCallback
 import androidx.core.view.children
+import androidx.core.view.get
 import androidx.navigation.NavController
 import androidx.navigation.NavDestination
 import androidx.navigation.Navigation
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.lendsumapp.lendsum.R
+import com.lendsumapp.lendsum.databinding.ActivityHomeBinding
+import com.lendsumapp.lendsum.databinding.FragmentLoginBinding
+import com.lendsumapp.lendsum.util.AndroidUtils
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.android.synthetic.main.activity_home.*
 import kotlinx.android.synthetic.main.fragment_marketplace.*
 import java.util.*
+import javax.inject.Inject
 
 @AndroidEntryPoint
 class HomeActivity: AppCompatActivity(),
     BottomNavigationView.OnNavigationItemSelectedListener, NavController.OnDestinationChangedListener{
 
+    private lateinit var binding: ActivityHomeBinding
     private lateinit var navController: NavController
-    private lateinit var menuItemStack: Stack<MenuItem>
+    @Inject lateinit var androidUtils: AndroidUtils
 
     override fun onCreate(savedInstanceState: Bundle?){
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_home)
+        binding = ActivityHomeBinding.inflate(layoutInflater)
+        val view = binding.root
+        setContentView(view)
 
         setupBottomNavigation()
 
     }
 
     private fun setupBottomNavigation() {
-        menuItemStack = Stack()
-        hideBottomNavigation()
-        bottom_navigation.menu.setGroupCheckable(R.id.home_group, false, true)
+        androidUtils.hideView(binding.bottomNavigation)
+        binding.bottomNavigation.menu.setGroupCheckable(R.id.home_group, false, true)
         navController = Navigation.findNavController(this, R.id.nav_host_fragment)
-        bottom_navigation.setOnNavigationItemSelectedListener(this)
+        binding.bottomNavigation.setOnNavigationItemSelectedListener(this)
         navController.addOnDestinationChangedListener(this)
 
     }
@@ -45,80 +52,59 @@ class HomeActivity: AppCompatActivity(),
 
 
     override fun onNavigationItemSelected(item: MenuItem): Boolean {
-
-
+        item.isCheckable = true
         when(item.itemId){
             R.id.profile -> {
-                item.isCheckable = true
                 item.isChecked = true
-                menuItemStack.push(item)
                 navController.navigate(R.id.profileFragment)
             }
             R.id.messages -> {
-                item.isCheckable = true
                 item.isChecked = true
-                menuItemStack.push(item)
                 navController.navigate(R.id.messagesFragment)
             }
             R.id.marketplace -> {
-                item.isCheckable = true
                 item.isChecked = true
-                menuItemStack.push(item)
                 navController.navigate(R.id.marketplaceFragment)
             }
             R.id.bundles -> {
-                item.isCheckable = true
                 item.isChecked = true
-                menuItemStack.push(item)
                 navController.navigate(R.id.bundlesFragment)
 
             }
             R.id.services -> {
-                item.isCheckable = true
                 item.isChecked = true
-                menuItemStack.push(item)
                 navController.navigate(R.id.servicesFragment)
 
             }
         }
 
-
-        Log.d("HomeActivity", "ItemStackSize: " + menuItemStack.size)
         return false
     }
 
-    private fun showBottomNavigation(){
-        bottom_navigation.visibility = View.VISIBLE
-    }
-
-    private fun hideBottomNavigation(){
-        bottom_navigation.visibility = View.GONE
-    }
-
-    override fun onDestinationChanged(
-        controller: NavController,
-        destination: NavDestination,
-        arguments: Bundle?
-    ) {
+    override fun onDestinationChanged(controller: NavController, destination: NavDestination, arguments: Bundle?) {
         when(destination.id){
-            R.id.profileFragment -> showBottomNavigation()
-            R.id.messagesFragment -> showBottomNavigation()
-            R.id.marketplaceFragment-> showBottomNavigation()
-            R.id.bundlesFragment -> showBottomNavigation()
-            R.id.servicesFragment -> showBottomNavigation()
-            R.id.loginFragment-> hideBottomNavigation()
-            R.id.editProfileFragment->hideBottomNavigation()
-        }
-    }
-
-    override fun onBackPressed() {
-        super.onBackPressed()
-
-        if(menuItemStack.size > 1){
-            menuItemStack.pop()
-            menuItemStack.lastElement().isChecked = true
-        }else{
-            bottom_navigation.menu.setGroupCheckable(R.id.home_group, false, true)
+            R.id.profileFragment -> {
+                binding.bottomNavigation.menu[0].isChecked = true
+                androidUtils.showView(binding.bottomNavigation)
+            }
+            R.id.messagesFragment -> {
+                binding.bottomNavigation.menu[1].isChecked = true
+                androidUtils.showView(binding.bottomNavigation)
+            }
+            R.id.marketplaceFragment-> {
+                binding.bottomNavigation.menu[2].isChecked = true
+                androidUtils.showView(binding.bottomNavigation)
+            }
+            R.id.bundlesFragment ->{
+                binding.bottomNavigation.menu[3].isChecked = true
+                androidUtils.showView(binding.bottomNavigation)
+            }
+            R.id.servicesFragment ->{
+                binding.bottomNavigation.menu[4].isChecked = true
+                androidUtils.showView(binding.bottomNavigation)
+            }
+            R.id.loginFragment-> androidUtils.hideView(binding.bottomNavigation)
+            R.id.editProfileFragment-> androidUtils.hideView(binding.bottomNavigation)
         }
     }
 }

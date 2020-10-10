@@ -12,13 +12,14 @@ import com.google.android.material.snackbar.Snackbar
 import com.lendsumapp.lendsum.R
 import com.lendsumapp.lendsum.ui.CreateAccountFragment
 import com.lendsumapp.lendsum.util.GlobalConstants.PASSWORD_PATTERN
+import dagger.hilt.android.scopes.ActivityScoped
 import dagger.hilt.android.scopes.FragmentScoped
 import java.io.File
 import java.util.regex.Matcher
 import java.util.regex.Pattern
 import javax.inject.Inject
 
-@FragmentScoped
+@ActivityScoped
 class AndroidUtils @Inject constructor(){
 
     fun showSnackBar(activity: Activity, msg: String) {
