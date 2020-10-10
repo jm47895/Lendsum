@@ -78,5 +78,6 @@
     <string name="enter_new_email">Enter new email</string>
     <string name="blank_pass_no_update">One or more password fields is blank. Password not updated.</string>
     <string name="password_has_updated">Password has been updated!</string>
+    <string name="this_is_the_edit_profile_back_button">This is the edit profile back button</string>
 
 </resources>

@@ -101,8 +101,13 @@ class HomeActivity: AppCompatActivity(),
         arguments: Bundle?
     ) {
         when(destination.id){
+            R.id.profileFragment -> showBottomNavigation()
+            R.id.messagesFragment -> showBottomNavigation()
             R.id.marketplaceFragment-> showBottomNavigation()
+            R.id.bundlesFragment -> showBottomNavigation()
+            R.id.servicesFragment -> showBottomNavigation()
             R.id.loginFragment-> hideBottomNavigation()
+            R.id.editProfileFragment->hideBottomNavigation()
         }
     }
 

@@ -13,6 +13,7 @@ import android.widget.*
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
+import androidx.navigation.fragment.findNavController
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.RequestOptions
 import com.lendsumapp.lendsum.R
@@ -62,6 +63,7 @@ class EditProfileFragment : Fragment(), View.OnClickListener, CompoundButton.OnC
 
         binding?.editProfilePic?.setOnClickListener(this)
         binding?.editProfileUpdatePassBtn?.setOnClickListener(this)
+        binding?.editProfileBackBtn?.setOnClickListener(this)
         binding?.editProfileNameToggle?.setOnCheckedChangeListener(this)
         binding?.editProfileUsernameToggle?.setOnCheckedChangeListener(this)
         binding?.editProfileEmailToggle?.setOnCheckedChangeListener(this)
@@ -181,6 +183,9 @@ class EditProfileFragment : Fragment(), View.OnClickListener, CompoundButton.OnC
                     editProfileViewModel.getUpdateAuthPassStatus().observe(viewLifecycleOwner, updateAuthPassStatusObserver)
                     editProfileViewModel.updateAuthPass(password)
                 }
+            }
+            R.id.edit_profile_back_btn->{
+                findNavController().navigate(R.id.action_editProfileFragment_to_profileFragment)
             }
         }
     }
