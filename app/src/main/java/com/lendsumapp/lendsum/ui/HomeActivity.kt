@@ -103,8 +103,8 @@ class HomeActivity: AppCompatActivity(),
                 binding.bottomNavigation.menu[4].isChecked = true
                 androidUtils.showView(binding.bottomNavigation)
             }
-            R.id.loginFragment-> androidUtils.hideView(binding.bottomNavigation)
-            R.id.editProfileFragment-> androidUtils.hideView(binding.bottomNavigation)
+            R.id.loginFragment-> androidUtils.shrinkView(binding.bottomNavigation)
+            R.id.editProfileFragment-> androidUtils.shrinkView(binding.bottomNavigation)
         }
     }
 }

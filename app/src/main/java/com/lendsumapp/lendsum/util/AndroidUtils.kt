@@ -55,4 +55,8 @@ class AndroidUtils @Inject constructor(){
     fun showView(view: View){
         view.visibility = View.VISIBLE
     }
+
+    fun shrinkView(view: View){
+        view.visibility = View.GONE
+    }
 }
