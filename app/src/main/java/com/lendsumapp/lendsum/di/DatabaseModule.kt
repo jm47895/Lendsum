@@ -2,9 +2,7 @@ package com.lendsumapp.lendsum.di
 
 import android.content.Context
 import androidx.room.Room
-import com.lendsumapp.lendsum.data.persistence.LendsumDatabase
-import com.lendsumapp.lendsum.data.persistence.BundleDao
-import com.lendsumapp.lendsum.data.persistence.UserDao
+import com.lendsumapp.lendsum.data.persistence.*
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -34,5 +32,15 @@ object DatabaseModule{
     @Provides
     fun provideUserDao(database: LendsumDatabase) : UserDao{
         return database.getUserDao()
+    }
+
+    @Provides
+    fun provideChatRoomDao(database: LendsumDatabase) : ChatRoomDao{
+        return database.getChatRoomDao()
+    }
+
+    @Provides
+    fun provideChatMessageDao(database: LendsumDatabase) : ChatMessageDao{
+        return database.getChatMessageDao()
     }
 }

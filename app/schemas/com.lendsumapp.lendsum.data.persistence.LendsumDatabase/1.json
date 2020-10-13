@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 1,
-    "identityHash": "f41dd09565c5c3ba8eab56c34adec63e",
+    "identityHash": "459e028cf4c6e0228e69aaa5621e91bb",
     "entities": [
       {
         "tableName": "bundles",
@@ -181,12 +181,106 @@
         },
         "indices": [],
         "foreignKeys": []
+      },
+      {
+        "tableName": "chat_rooms",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`chatRoomId` TEXT NOT NULL, `participants` TEXT NOT NULL, `listOfMessages` TEXT NOT NULL, `lastTimestamp` INTEGER NOT NULL, PRIMARY KEY(`chatRoomId`))",
+        "fields": [
+          {
+            "fieldPath": "chatRoomId",
+            "columnName": "chatRoomId",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "participants",
+            "columnName": "participants",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "listOfMessages",
+            "columnName": "listOfMessages",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "lastTimestamp",
+            "columnName": "lastTimestamp",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "columnNames": [
+            "chatRoomId"
+          ],
+          "autoGenerate": false
+        },
+        "indices": [],
+        "foreignKeys": []
+      },
+      {
+        "tableName": "chat_messages",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`chatMessageId` TEXT NOT NULL, `chatRoom` TEXT NOT NULL, `sender` TEXT NOT NULL, `senderPic` TEXT, `messageTimestamp` INTEGER NOT NULL, `message` TEXT NOT NULL, `listOfImageUris` TEXT, PRIMARY KEY(`chatMessageId`))",
+        "fields": [
+          {
+            "fieldPath": "chatMessageId",
+            "columnName": "chatMessageId",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "chatRoom",
+            "columnName": "chatRoom",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "chatMessageSender",
+            "columnName": "sender",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "senderPic",
+            "columnName": "senderPic",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "messageTimestamp",
+            "columnName": "messageTimestamp",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "message",
+            "columnName": "message",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "listOfImageUris",
+            "columnName": "listOfImageUris",
+            "affinity": "TEXT",
+            "notNull": false
+          }
+        ],
+        "primaryKey": {
+          "columnNames": [
+            "chatMessageId"
+          ],
+          "autoGenerate": false
+        },
+        "indices": [],
+        "foreignKeys": []
       }
     ],
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'f41dd09565c5c3ba8eab56c34adec63e')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '459e028cf4c6e0228e69aaa5621e91bb')"
     ]
   }
 }

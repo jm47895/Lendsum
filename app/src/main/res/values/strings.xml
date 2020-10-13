@@ -79,5 +79,7 @@
     <string name="blank_pass_no_update">One or more password fields is blank. Password not updated.</string>
     <string name="password_has_updated">Password has been updated!</string>
     <string name="this_is_the_edit_profile_back_button">This is the edit profile back button</string>
+    <string name="you_don_t_currently_have_any_conversations">You don\'t currently have any active chats</string>
+    <string name="button_to_create_a_new_chat">Button to create a new chat</string>
 
 </resources>
