@@ -105,6 +105,7 @@ class HomeActivity: AppCompatActivity(),
             }
             R.id.loginFragment-> androidUtils.shrinkView(binding.bottomNavigation)
             R.id.editProfileFragment-> androidUtils.shrinkView(binding.bottomNavigation)
+            R.id.chatRoomFragment -> androidUtils.shrinkView(binding.bottomNavigation)
         }
     }
 }

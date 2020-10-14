@@ -81,5 +81,10 @@
     <string name="this_is_the_edit_profile_back_button">This is the edit profile back button</string>
     <string name="you_don_t_currently_have_any_conversations">You don\'t currently have any active chats</string>
     <string name="button_to_create_a_new_chat">Button to create a new chat</string>
+    <string name="this_is_the_back_button_for_the_chatroom_screen">This is the back button for the chatroom screen</string>
+    <string name="enter_message">Enter message</string>
+    <string name="this_is_the_send_message_button">This is the send message button</string>
+    <string name="user_name_placeholder">User name placeholder</string>
+    <string name="this_is_the_search_icon_for_chat_room">This is the search icon for chat room</string>
 
 </resources>

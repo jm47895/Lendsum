@@ -36,7 +36,11 @@
         android:id="@+id/messagesFragment"
         android:name="com.lendsumapp.lendsum.ui.MessagesFragment"
         android:label="MessagesFragment"
-        tools:layout="@layout/fragment_messages"/>
+        tools:layout="@layout/fragment_messages">
+        <action
+            android:id="@+id/action_messagesFragment_to_chatRoomFragment"
+            app:destination="@id/chatRoomFragment" />
+    </fragment>
     <fragment
         android:id="@+id/loginFragment"
         android:name="com.lendsumapp.lendsum.ui.LoginFragment"
@@ -143,5 +147,14 @@
         <action
             android:id="@+id/action_editProfileFragment_to_profileFragment"
             app:destination="@id/profileFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/chatRoomFragment"
+        android:name="com.lendsumapp.lendsum.ui.ChatRoomFragment"
+        android:label="fragment_chat_room"
+        tools:layout="@layout/fragment_chat_room" >
+        <action
+            android:id="@+id/action_chatRoomFragment_to_messagesFragment"
+            app:destination="@id/messagesFragment" />
     </fragment>
 </navigation>
