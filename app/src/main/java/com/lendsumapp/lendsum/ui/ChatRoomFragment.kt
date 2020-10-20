@@ -72,7 +72,6 @@ class ChatRoomFragment : Fragment(), View.OnClickListener,
         when(view?.id){
             R.id.chat_room_back_btn->{
                 findNavController().navigate(R.id.action_chatRoomFragment_to_messagesFragment)
-                AndroidUtils.hideKeyboard(requireActivity())
             }
         }
     }

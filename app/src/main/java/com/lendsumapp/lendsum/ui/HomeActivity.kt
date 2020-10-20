@@ -81,9 +81,11 @@ class HomeActivity: AppCompatActivity(),
     }
 
     override fun onDestinationChanged(controller: NavController, destination: NavDestination, arguments: Bundle?) {
+
+        AndroidUtils.hideKeyboard(this)
+
         when(destination.id){
             R.id.profileFragment -> {
-
                 binding.bottomNavigation.menu[0].isChecked = true
                 AndroidUtils.showView(binding.bottomNavigation)
             }
