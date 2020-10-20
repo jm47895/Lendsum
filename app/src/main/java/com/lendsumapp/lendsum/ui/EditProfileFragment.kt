@@ -36,7 +36,6 @@ class EditProfileFragment : Fragment(), View.OnClickListener, CompoundButton.OnC
     private var _binding: FragmentEditProfileBinding? = null
     private val binding get() = _binding
     private val editProfileViewModel: EditProfileViewModel by viewModels()
-    @Inject lateinit var androidUtils: AndroidUtils
     private lateinit var userCacheObserver: Observer<User>
     private lateinit var updateUserStatusObserver: Observer<Int>
     private lateinit var updateAuthEmailStatusObserver: Observer<Boolean>
@@ -83,7 +82,7 @@ class EditProfileFragment : Fragment(), View.OnClickListener, CompoundButton.OnC
                 editProfileViewModel.updateCachedUser(user)
                 editProfileViewModel.updateUserValueInFirestore(EMAIL_KEY, user.email, null)
             }else{
-                androidUtils.showSnackBar(requireActivity(), getString(R.string.sign_in_again_msg))
+                AndroidUtils.showSnackBar(requireActivity(), getString(R.string.sign_in_again_msg))
             }
         }
 
@@ -91,9 +90,9 @@ class EditProfileFragment : Fragment(), View.OnClickListener, CompoundButton.OnC
             if(isAuthPassUpdated){
                 binding?.editProfilePasswordEt?.setText("")
                 binding?.editProfileMatchPasswordEt?.setText("")
-                androidUtils.showSnackBar(requireActivity(), getString(R.string.password_has_updated))
+                AndroidUtils.showSnackBar(requireActivity(), getString(R.string.password_has_updated))
             }else{
-                androidUtils.showSnackBar(requireActivity(), getString(R.string.sign_in_again_msg))
+                AndroidUtils.showSnackBar(requireActivity(), getString(R.string.sign_in_again_msg))
             }
 
         }
@@ -101,7 +100,7 @@ class EditProfileFragment : Fragment(), View.OnClickListener, CompoundButton.OnC
         updateUserStatusObserver = Observer { rowsUpdated->
             if(rowsUpdated > 0){
                 Log.d(TAG, "User object updated in room cache")
-                androidUtils.showSnackBar(requireActivity(), getString(R.string.user_profile_updated))
+                AndroidUtils.showSnackBar(requireActivity(), getString(R.string.user_profile_updated))
             }else{
                 Log.d(TAG, "User object not updated in room cache")
             }
@@ -194,7 +193,7 @@ class EditProfileFragment : Fragment(), View.OnClickListener, CompoundButton.OnC
             }
             R.id.edit_profile_update_pass_btn->{
 
-                androidUtils.hideKeyboard(requireContext(), view)
+                AndroidUtils.hideKeyboard(requireActivity())
 
                 val password = binding?.editProfilePasswordEt?.text.toString().trim()
                 val passwordMatch = binding?.editProfileMatchPasswordEt?.text.toString().trim()
@@ -217,7 +216,7 @@ class EditProfileFragment : Fragment(), View.OnClickListener, CompoundButton.OnC
                 binding?.editProfileMatchPasswordEt?.error = getString(R.string.blank_pass_no_update)
                 return false
             }
-            !androidUtils.isValidPassword(password) -> {
+            !AndroidUtils.isValidPassword(password) -> {
                 binding?.editProfilePasswordEt?.error = getString(R.string.password_param_err_msg)
                 return false
             }
@@ -241,17 +240,17 @@ class EditProfileFragment : Fragment(), View.OnClickListener, CompoundButton.OnC
 
     private fun handleUpdateInfoUI(isChecked: Boolean, textView: TextView?, editText: EditText?, toggleButton: ToggleButton) {
         if(isChecked) {
-            textView?.let { androidUtils.hideView(it) }
-            editText?.let { androidUtils.showView(it) }
+            textView?.let { AndroidUtils.hideView(it) }
+            editText?.let { AndroidUtils.showView(it) }
             editText?.setText(textView?.text)
             toggleButton.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.colorSecondaryLight))
             toggleButton.setTextColor(ContextCompat.getColor(requireContext(), R.color.colorAccentBlack))
         }else{
-            textView?.let { androidUtils.hideKeyboard(requireContext(), it) }
+            textView?.let { AndroidUtils.hideKeyboard(requireActivity()) }
 
             textView?.text = editText?.text
-            textView?.let { androidUtils.showView(it) }
-            editText?.let { androidUtils.hideView(it) }
+            textView?.let { AndroidUtils.showView(it) }
+            editText?.let { AndroidUtils.hideView(it) }
             toggleButton.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.colorPrimary))
             toggleButton.setTextColor(ContextCompat.getColor(requireContext(), R.color.colorSecondaryLight))
         }
@@ -263,10 +262,10 @@ class EditProfileFragment : Fragment(), View.OnClickListener, CompoundButton.OnC
                 EditProfileInfoType.PROFILE_NAME.ordinal->{
                     when {
                         TextUtils.isEmpty(textView.text) -> {
-                            androidUtils.showSnackBar(requireActivity(), getString(R.string.empty_profile_name))
+                            AndroidUtils.showSnackBar(requireActivity(), getString(R.string.empty_profile_name))
                         }
                         textView.text.length < 3 -> {
-                            androidUtils.showSnackBar(requireActivity(), getString(R.string.username_too_short_err))
+                            AndroidUtils.showSnackBar(requireActivity(), getString(R.string.username_too_short_err))
                         }
                         else -> {
                             user.name = textView.text.toString().trim()
@@ -279,13 +278,13 @@ class EditProfileFragment : Fragment(), View.OnClickListener, CompoundButton.OnC
                 EditProfileInfoType.PROFILE_USERNAME.ordinal->{
                     when {
                         TextUtils.isEmpty(textView.text) -> {
-                            androidUtils.showSnackBar(requireActivity(), getString(R.string.empty_username))
+                            AndroidUtils.showSnackBar(requireActivity(), getString(R.string.empty_username))
                         }
                         !textView.text.startsWith("@") -> {
-                            androidUtils.showSnackBar(requireActivity(), getString(R.string.no_at_symbol_err))
+                            AndroidUtils.showSnackBar(requireActivity(), getString(R.string.no_at_symbol_err))
                         }
                         textView.text.length < 4 -> {
-                            androidUtils.showSnackBar(requireActivity(), getString(R.string.username_too_short_err))
+                            AndroidUtils.showSnackBar(requireActivity(), getString(R.string.username_too_short_err))
                         }
                         else -> {
                             user.username = textView.text.toString().trim()
@@ -296,13 +295,13 @@ class EditProfileFragment : Fragment(), View.OnClickListener, CompoundButton.OnC
                 }
                 EditProfileInfoType.PROFILE_EMAIL.ordinal->{
                     when {
-                        androidUtils.isValidEmail(textView.text.toString().trim()) && !TextUtils.isEmpty(textView.text) -> {
+                        AndroidUtils.isValidEmail(textView.text.toString().trim()) && !TextUtils.isEmpty(textView.text) -> {
                             user.email = textView.text.toString().trim()
                             editProfileViewModel.getUpdateAuthEmailStatus().observe(viewLifecycleOwner, updateAuthEmailStatusObserver)
                             editProfileViewModel.updateAuthEmail(user.email)
                         }
                         else -> {
-                            androidUtils.showSnackBar(requireActivity(), getString(R.string.invalid_email_data_not_saved))
+                            AndroidUtils.showSnackBar(requireActivity(), getString(R.string.invalid_email_data_not_saved))
                         }
                     }
                 }

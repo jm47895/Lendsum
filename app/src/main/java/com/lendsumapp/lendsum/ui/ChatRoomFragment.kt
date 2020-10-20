@@ -27,7 +27,6 @@ class ChatRoomFragment : Fragment(), View.OnClickListener,
     private var _binding: FragmentChatRoomBinding? = null
     private val binding get() = _binding
     private val chatRoomViewModel: ChatRoomViewModel by viewModels()
-    @Inject lateinit var androidUtils: AndroidUtils
     private lateinit var userSearchListAdapter: UserSearchListAdapter
     private lateinit var remoteDbUserListObserver: Observer<List<User>>
     private var user = User()
@@ -57,6 +56,7 @@ class ChatRoomFragment : Fragment(), View.OnClickListener,
 
     override fun onDestroyView() {
         super.onDestroyView()
+        binding?.chatRoomList?.adapter = null
         _binding = null
     }
 
@@ -72,12 +72,13 @@ class ChatRoomFragment : Fragment(), View.OnClickListener,
         when(view?.id){
             R.id.chat_room_back_btn->{
                 findNavController().navigate(R.id.action_chatRoomFragment_to_messagesFragment)
+                AndroidUtils.hideKeyboard(requireActivity())
             }
         }
     }
 
     override fun onItemSelected(position: Int, item: User) {
-        context?.let { androidUtils.hideKeyboard(it, requireView()) }
+        AndroidUtils.hideKeyboard(requireActivity())
         binding?.chatRoomList?.visibility = View.INVISIBLE
         binding?.chatRoomSearchView?.visibility = View.GONE
         binding?.atSymbol?.visibility = View.INVISIBLE

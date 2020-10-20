@@ -28,7 +28,6 @@ class HomeActivity: AppCompatActivity(),
 
     private lateinit var binding: ActivityHomeBinding
     private lateinit var navController: NavController
-    @Inject lateinit var androidUtils: AndroidUtils
 
     override fun onCreate(savedInstanceState: Bundle?){
         super.onCreate(savedInstanceState)
@@ -41,7 +40,7 @@ class HomeActivity: AppCompatActivity(),
     }
 
     private fun setupBottomNavigation() {
-        androidUtils.hideView(binding.bottomNavigation)
+        AndroidUtils.hideView(binding.bottomNavigation)
         binding.bottomNavigation.menu.setGroupCheckable(R.id.home_group, false, true)
         navController = Navigation.findNavController(this, R.id.nav_host_fragment)
         binding.bottomNavigation.setOnNavigationItemSelectedListener(this)
@@ -84,28 +83,29 @@ class HomeActivity: AppCompatActivity(),
     override fun onDestinationChanged(controller: NavController, destination: NavDestination, arguments: Bundle?) {
         when(destination.id){
             R.id.profileFragment -> {
+
                 binding.bottomNavigation.menu[0].isChecked = true
-                androidUtils.showView(binding.bottomNavigation)
+                AndroidUtils.showView(binding.bottomNavigation)
             }
             R.id.messagesFragment -> {
                 binding.bottomNavigation.menu[1].isChecked = true
-                androidUtils.showView(binding.bottomNavigation)
+                AndroidUtils.showView(binding.bottomNavigation)
             }
             R.id.marketplaceFragment-> {
                 binding.bottomNavigation.menu[2].isChecked = true
-                androidUtils.showView(binding.bottomNavigation)
+                AndroidUtils.showView(binding.bottomNavigation)
             }
             R.id.bundlesFragment ->{
                 binding.bottomNavigation.menu[3].isChecked = true
-                androidUtils.showView(binding.bottomNavigation)
+                AndroidUtils.showView(binding.bottomNavigation)
             }
             R.id.servicesFragment ->{
                 binding.bottomNavigation.menu[4].isChecked = true
-                androidUtils.showView(binding.bottomNavigation)
+                AndroidUtils.showView(binding.bottomNavigation)
             }
-            R.id.loginFragment-> androidUtils.shrinkView(binding.bottomNavigation)
-            R.id.editProfileFragment-> androidUtils.shrinkView(binding.bottomNavigation)
-            R.id.chatRoomFragment -> androidUtils.shrinkView(binding.bottomNavigation)
+            R.id.loginFragment-> AndroidUtils.shrinkView(binding.bottomNavigation)
+            R.id.editProfileFragment-> AndroidUtils.shrinkView(binding.bottomNavigation)
+            R.id.chatRoomFragment -> AndroidUtils.shrinkView(binding.bottomNavigation)
         }
     }
 }

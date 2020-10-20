@@ -34,7 +34,6 @@ class CreateAccountFragment : Fragment(), View.OnClickListener {
     private val createAccountViewModel: CreateAccountViewModel by viewModels()
     private lateinit var emailCreateAccountObserver: Observer<Boolean>
     private lateinit var linkWithEmailObserver: Observer<Boolean>
-    @Inject lateinit var androidUtils: AndroidUtils
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -60,7 +59,7 @@ class CreateAccountFragment : Fragment(), View.OnClickListener {
             }else{
                 Log.d(TAG, "Link email with other credential provider failed")
                 sharedPrefs?.edit()?.putBoolean(RETURNING_USER, true)?.apply()
-                activity?.let { androidUtils.showSnackBar(it, getString(R.string.account_already_exists)) }
+                activity?.let { AndroidUtils.showSnackBar(it, getString(R.string.account_already_exists)) }
             }
         }
 
@@ -110,10 +109,10 @@ class CreateAccountFragment : Fragment(), View.OnClickListener {
             binding?.createUserFirstNameEt?.error = getString(R.string.first_name_error_msg)
             binding?.createUserLastNameEt?.error = getString(R.string.last_name_err_msg)
             return false
-        } else if (!androidUtils.isValidEmail(email)) {
+        } else if (!AndroidUtils.isValidEmail(email)) {
             binding?.createUserEmailEt?.error = getString(R.string.invalid_email_err_msg)
             return false
-        } else if (TextUtils.isEmpty(password) || !androidUtils.isValidPassword(password)
+        } else if (TextUtils.isEmpty(password) || !AndroidUtils.isValidPassword(password)
         ) {
             binding?.createUserPasswordEt?.error = getString(R.string.password_param_err_msg)
             return false
@@ -135,7 +134,7 @@ class CreateAccountFragment : Fragment(), View.OnClickListener {
             }
             R.id.create_account_next_btn->{
 
-                context?.let { androidUtils.hideKeyboard(it, view) }
+                AndroidUtils.hideKeyboard(requireActivity())
 
                 val firstName = binding?.createUserFirstNameEt?.text.toString().trim()
                 val lastName = binding?.createUserLastNameEt?.text.toString().trim()

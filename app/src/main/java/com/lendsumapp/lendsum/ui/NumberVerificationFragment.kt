@@ -35,7 +35,6 @@ class NumberVerificationFragment : Fragment(), View.OnClickListener, CountryCode
     private lateinit var signInCacheStatusObserver: Observer<Boolean>
     private var credential: PhoneAuthCredential? = null
     private var isPhoneNumberValid = false
-    @Inject lateinit var androidUtils: AndroidUtils
     @Inject lateinit var networkUtils: NetworkUtils
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -73,7 +72,7 @@ class NumberVerificationFragment : Fragment(), View.OnClickListener, CountryCode
             }else{
                 /*This should never be hit unless something on firebase's side messes up. There is an instance where if the account already exists
                 * it will trigger this but there is a check {if (code == credential?.smsCode)} in this code block to prevent that*/
-                activity?.let { androidUtils.showSnackBar(it, "There seems to be a problem linking your phone number to your account") }
+                activity?.let { AndroidUtils.showSnackBar(it, "There seems to be a problem linking your phone number to your account") }
             }
         }
     }
@@ -110,11 +109,11 @@ class NumberVerificationFragment : Fragment(), View.OnClickListener, CountryCode
             when (view?.id) {
                 R.id.number_verification_send_code_btn -> {
 
-                    context?.let { androidUtils.hideKeyboard(it, view) }
+                    AndroidUtils.hideKeyboard(requireActivity())
 
                     if(isPhoneNumberValid){
 
-                        activity?.let { androidUtils.showSnackBar(it, getString(R.string.verification_code_sent)) }
+                        activity?.let { AndroidUtils.showSnackBar(it, getString(R.string.verification_code_sent)) }
 
                         val phoneNumber = binding?.countryCodeSp?.fullNumberWithPlus
 
@@ -132,7 +131,7 @@ class NumberVerificationFragment : Fragment(), View.OnClickListener, CountryCode
                 }
                 R.id.number_verification_verify_code_btn -> {
 
-                    context?.let { androidUtils.hideKeyboard(it, view) }
+                    AndroidUtils.hideKeyboard(requireActivity())
 
                     val code = binding?.numberVerificationCodeEt?.text?.trim().toString()
 
@@ -151,7 +150,7 @@ class NumberVerificationFragment : Fragment(), View.OnClickListener, CountryCode
 
                         Log.d(TAG, "Code: $code does not match $credential")
 
-                        activity?.let { androidUtils.showSnackBar(it, getString(R.string.code_not_match)) }
+                        activity?.let { AndroidUtils.showSnackBar(it, getString(R.string.code_not_match)) }
                     }
                 }
                 R.id.number_verification_back_btn -> {
@@ -163,7 +162,7 @@ class NumberVerificationFragment : Fragment(), View.OnClickListener, CountryCode
                 }
             }
         }else{
-            activity?.let { androidUtils.showSnackBar(it, getString(R.string.not_connected_internet)) }
+            activity?.let { AndroidUtils.showSnackBar(it, getString(R.string.not_connected_internet)) }
         }
     }
 

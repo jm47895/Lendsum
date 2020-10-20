@@ -19,44 +19,51 @@ import java.util.regex.Matcher
 import java.util.regex.Pattern
 import javax.inject.Inject
 
-@ActivityScoped
-class AndroidUtils @Inject constructor(){
+class AndroidUtils{
 
-    fun showSnackBar(activity: Activity, msg: String) {
+    companion object {
+        fun showSnackBar(activity: Activity, msg: String) {
 
-        Snackbar.make(activity.findViewById(android.R.id.content), msg, Snackbar.LENGTH_LONG)
-            .setAction("Dismiss") {
-        }.setActionTextColor(ContextCompat.getColor(activity, R.color.colorSecondaryLight))
-            .show()
-    }
+            Snackbar.make(activity.findViewById(android.R.id.content), msg, Snackbar.LENGTH_LONG)
+                .setAction("Dismiss") {
+                }.setActionTextColor(ContextCompat.getColor(activity, R.color.colorSecondaryLight))
+                .show()
+        }
 
-    fun hideKeyboard(context: Context, view: View){
-        val inputMethodManager = context.getSystemService(INPUT_METHOD_SERVICE) as InputMethodManager
-        inputMethodManager.hideSoftInputFromWindow(view.windowToken, 0)
-    }
+        fun hideKeyboard(activity: Activity) {
+            val imm: InputMethodManager =
+                activity.getSystemService(Activity.INPUT_METHOD_SERVICE) as InputMethodManager
+            var view: View? = activity.currentFocus
+            if (view == null) {
+                view = View(activity)
+            }
+            imm.hideSoftInputFromWindow(view.windowToken, 0)
+        }
 
-    fun isValidEmail(target: CharSequence): Boolean {
-        return !TextUtils.isEmpty(target) && Patterns.EMAIL_ADDRESS.matcher(target).matches()
-    }
 
-    fun isValidPassword(password: String): Boolean {
-        val matchCase: Matcher
-        val isValid: Boolean
-        val pattern: Pattern = Pattern.compile(PASSWORD_PATTERN)
-        matchCase = pattern.matcher(password)
-        isValid = matchCase.matches()
-        return isValid
-    }
+        fun isValidEmail(target: CharSequence): Boolean {
+            return !TextUtils.isEmpty(target) && Patterns.EMAIL_ADDRESS.matcher(target).matches()
+        }
 
-    fun hideView(view: View){
-        view.visibility = View.INVISIBLE
-    }
+        fun isValidPassword(password: String): Boolean {
+            val matchCase: Matcher
+            val isValid: Boolean
+            val pattern: Pattern = Pattern.compile(PASSWORD_PATTERN)
+            matchCase = pattern.matcher(password)
+            isValid = matchCase.matches()
+            return isValid
+        }
 
-    fun showView(view: View){
-        view.visibility = View.VISIBLE
-    }
+        fun hideView(view: View) {
+            view.visibility = View.INVISIBLE
+        }
 
-    fun shrinkView(view: View){
-        view.visibility = View.GONE
+        fun showView(view: View) {
+            view.visibility = View.VISIBLE
+        }
+
+        fun shrinkView(view: View) {
+            view.visibility = View.GONE
+        }
     }
 }

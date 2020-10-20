@@ -35,7 +35,6 @@ class LoginFragment : Fragment(), View.OnClickListener{
     private val sharedPrefs by lazy { activity?.getSharedPreferences(R.string.app_name.toString(), Context.MODE_PRIVATE) }
     private val loginViewModel: LoginViewModel by viewModels()
     @Inject lateinit var networkUtils: NetworkUtils
-    @Inject lateinit var androidUtils: AndroidUtils
     private lateinit var signInEmail: String
     private lateinit var signInPassword: String
     private lateinit var emailSignInObserver: Observer<Boolean>
@@ -174,7 +173,7 @@ class LoginFragment : Fragment(), View.OnClickListener{
             }
 
         }else{
-            activity?.let { androidUtils.showSnackBar(it, getString(R.string.not_connected_internet)) }
+            activity?.let { AndroidUtils.showSnackBar(it, getString(R.string.not_connected_internet)) }
         }
     }
 
