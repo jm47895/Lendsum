@@ -1,18 +1,13 @@
 package com.lendsumapp.lendsum.repository
 
-import android.net.Uri
 import android.util.Log
-import androidx.core.net.toUri
 import androidx.lifecycle.MutableLiveData
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.auth.UserProfileChangeRequest
 import com.google.firebase.firestore.FirebaseFirestore
 import com.lendsumapp.lendsum.auth.EmailAndPassAuthComponent
 import com.lendsumapp.lendsum.data.model.User
 import com.lendsumapp.lendsum.data.persistence.LendsumDatabase
 import com.lendsumapp.lendsum.util.GlobalConstants
-import com.lendsumapp.lendsum.util.GlobalConstants.PROFILE_NAME
-import com.lendsumapp.lendsum.util.GlobalConstants.PROFILE_PIC_URI
 import dagger.hilt.android.scopes.ActivityScoped
 import javax.inject.Inject
 

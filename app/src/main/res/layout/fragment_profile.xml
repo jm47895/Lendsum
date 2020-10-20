@@ -13,7 +13,7 @@
         app:layout_constraintGuide_percent=".50" />
 
     <androidx.constraintlayout.widget.Guideline
-        android:id="@+id/horizontal_33_guide"
+        android:id="@+id/horizontal_30_guide"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
@@ -33,7 +33,7 @@
         android:layout_margin="12dp"
         android:background="@null"
         android:src="@drawable/ic_edit_32"
-        app:layout_constraintBottom_toTopOf="@id/horizontal_33_guide"
+        app:layout_constraintBottom_toTopOf="@id/horizontal_30_guide"
         app:layout_constraintEnd_toStartOf="@+id/profile_settings_btn"
         app:layout_constraintHorizontal_chainStyle="packed"
         app:layout_constraintStart_toEndOf="@+id/vertical_50_guide"
@@ -58,7 +58,7 @@
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:layout_margin="32dp"
-        app:layout_constraintBottom_toTopOf="@+id/horizontal_33_guide"
+        app:layout_constraintBottom_toTopOf="@+id/horizontal_30_guide"
         app:layout_constraintEnd_toStartOf="@+id/vertical_50_guide"
         app:layout_constraintHorizontal_bias="1.0"
         app:layout_constraintStart_toStartOf="parent"
@@ -89,7 +89,7 @@
     <TextView
         android:id="@+id/profile_karma_score"
         style="@style/SecondaryText"
-        app:layout_constraintBottom_toTopOf="@+id/horizontal_33_guide"
+        app:layout_constraintBottom_toTopOf="@+id/horizontal_30_guide"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0"
         app:layout_constraintStart_toStartOf="@+id/vertical_50_guide"
@@ -109,7 +109,7 @@
         app:layout_constraintBottom_toTopOf="@+id/horizontal_66_guide"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/horizontal_33_guide"
+        app:layout_constraintTop_toTopOf="@+id/horizontal_30_guide"
         app:layout_constraintVertical_bias="0" />
 
     <androidx.recyclerview.widget.RecyclerView

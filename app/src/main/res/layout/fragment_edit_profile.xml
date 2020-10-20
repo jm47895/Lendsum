@@ -15,7 +15,7 @@
         app:layout_constraintGuide_percent=".50" />
 
     <androidx.constraintlayout.widget.Guideline
-        android:id="@+id/horizontal_33_guide"
+        android:id="@+id/horizontal_30_guide"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
@@ -34,7 +34,7 @@
         android:layout_height="0dp"
         android:layout_margin="32dp"
         android:contentDescription="@string/profile_pic_img"
-        app:layout_constraintBottom_toTopOf="@+id/horizontal_33_guide"
+        app:layout_constraintBottom_toTopOf="@+id/horizontal_30_guide"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
@@ -91,7 +91,7 @@
         app:layout_constraintEnd_toStartOf="@+id/edit_profile_name_toggle"
         app:layout_constraintHorizontal_chainStyle="spread_inside"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/horizontal_33_guide"
+        app:layout_constraintTop_toTopOf="@+id/horizontal_30_guide"
         tools:ignore="Autofill"/>
 
     <ToggleButton

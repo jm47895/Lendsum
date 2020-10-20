@@ -3,13 +3,9 @@ package com.lendsumapp.lendsum.auth
 import android.util.Log
 import androidx.core.net.toUri
 import androidx.lifecycle.MutableLiveData
-import com.google.android.gms.tasks.OnCompleteListener
-import com.google.android.gms.tasks.Task
 import com.google.firebase.auth.*
-import com.lendsumapp.lendsum.repository.EditProfileRepository
-import com.lendsumapp.lendsum.util.GlobalConstants
-import com.lendsumapp.lendsum.util.GlobalConstants.PROFILE_NAME
-import com.lendsumapp.lendsum.util.GlobalConstants.PROFILE_PIC_URI
+import com.lendsumapp.lendsum.util.GlobalConstants.PROFILE_NAME_KEY
+import com.lendsumapp.lendsum.util.GlobalConstants.PROFILE_PIC_URI_KEY
 import dagger.hilt.android.scopes.ActivityScoped
 import javax.inject.Inject
 
@@ -99,10 +95,10 @@ class EmailAndPassAuthComponent @Inject constructor(){
         val currentUser = firebaseAuth.currentUser
 
         val profileUpdates: UserProfileChangeRequest? = when(key){
-            PROFILE_NAME ->{
+            PROFILE_NAME_KEY ->{
                 UserProfileChangeRequest.Builder().setDisplayName(value).build()
             }
-            PROFILE_PIC_URI ->{
+            PROFILE_PIC_URI_KEY ->{
                 UserProfileChangeRequest.Builder().setPhotoUri(value.toUri()).build()
             }
             else-> null

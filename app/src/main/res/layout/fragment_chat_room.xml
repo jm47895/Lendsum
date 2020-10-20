@@ -23,36 +23,46 @@
         app:layout_constraintVertical_bias="0" />
 
     <TextView
+        android:id="@+id/atSymbol"
+        style="@style/TitleText"
+        android:text="@string/at_symbol"
+        app:layout_constraintBottom_toTopOf="@+id/chat_room_list"
+        app:layout_constraintEnd_toStartOf="@+id/chat_room_search_view"
+        app:layout_constraintHorizontal_chainStyle="packed"
+        app:layout_constraintStart_toEndOf="@+id/chat_room_back_btn"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
         android:id="@+id/chat_room_recipient_tv"
         style="@style/PrimaryText"
         android:layout_width="0dp"
         android:text="@string/user_name_placeholder"
+        android:visibility="gone"
         app:layout_constraintBottom_toBottomOf="@+id/chat_room_back_btn"
         app:layout_constraintEnd_toStartOf="@+id/chat_room_search_view"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toEndOf="@+id/chat_room_back_btn"
-        app:layout_constraintTop_toTopOf="@+id/chat_room_back_btn"
-        android:visibility="gone"/>
+        app:layout_constraintTop_toTopOf="@+id/chat_room_back_btn" />
 
     <androidx.appcompat.widget.SearchView
         android:id="@+id/chat_room_search_view"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_margin="12dp"
         android:background="@color/colorPrimary"
-        app:queryHint="Search users"
         app:closeIcon="@drawable/ic_close_24"
-        app:searchIcon="@drawable/ic_search_32"
-        app:layout_constraintBottom_toBottomOf="@+id/chat_room_back_btn"
+        app:layout_constraintBottom_toTopOf="@+id/chat_room_list"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@+id/chat_room_recipient_tv"
-        app:layout_constraintTop_toTopOf="@+id/chat_room_back_btn" />
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toEndOf="@+id/atSymbol"
+        app:layout_constraintTop_toTopOf="parent"
+        app:queryHint="Search users"
+        app:searchIcon="@drawable/ic_search_32" />
 
     <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/chat_room_msg_list"
+        android:id="@+id/chat_room_list"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        android:layout_margin="12dp"
+        android:layout_marginTop="8dp"
         app:layout_constraintBottom_toTopOf="@id/chat_room_msg_et"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"

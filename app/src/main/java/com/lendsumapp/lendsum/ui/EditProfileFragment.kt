@@ -22,12 +22,11 @@ import com.lendsumapp.lendsum.databinding.FragmentEditProfileBinding
 import com.lendsumapp.lendsum.util.AndroidUtils
 import com.lendsumapp.lendsum.util.EditProfileInfoType
 import com.lendsumapp.lendsum.util.GlobalConstants.EMAIL_KEY
-import com.lendsumapp.lendsum.util.GlobalConstants.PROFILE_NAME
-import com.lendsumapp.lendsum.util.GlobalConstants.PROFILE_PIC_URI
+import com.lendsumapp.lendsum.util.GlobalConstants.PROFILE_NAME_KEY
+import com.lendsumapp.lendsum.util.GlobalConstants.PROFILE_PIC_URI_KEY
 import com.lendsumapp.lendsum.util.GlobalConstants.USERNAME_KEY
 import com.lendsumapp.lendsum.viewmodel.EditProfileViewModel
 import dagger.hilt.android.AndroidEntryPoint
-import org.w3c.dom.Text
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -139,8 +138,8 @@ class EditProfileFragment : Fragment(), View.OnClickListener, CompoundButton.OnC
             loadProfilePic(user.profilePicUrl.toString(), binding?.editProfilePic!!)
 
             editProfileViewModel.updateCachedUser(user)
-            editProfileViewModel.updateUserValueInFirestore(PROFILE_PIC_URI, user.profilePicUrl.toString())
-            editProfileViewModel.updateFirebaseAuthProfile(PROFILE_PIC_URI, user.profilePicUrl.toString())
+            editProfileViewModel.updateUserValueInFirestore(PROFILE_PIC_URI_KEY, user.profilePicUrl.toString())
+            editProfileViewModel.updateFirebaseAuthProfile(PROFILE_PIC_URI_KEY, user.profilePicUrl.toString())
         }
     }
 
@@ -252,8 +251,8 @@ class EditProfileFragment : Fragment(), View.OnClickListener, CompoundButton.OnC
                         else -> {
                             user.name = textView.text.toString().trim()
                             editProfileViewModel.updateCachedUser(user)
-                            editProfileViewModel.updateUserValueInFirestore(PROFILE_NAME, user.name)
-                            editProfileViewModel.updateFirebaseAuthProfile(PROFILE_NAME, user.name)
+                            editProfileViewModel.updateUserValueInFirestore(PROFILE_NAME_KEY, user.name)
+                            editProfileViewModel.updateFirebaseAuthProfile(PROFILE_NAME_KEY, user.name)
                         }
                     }
                 }

@@ -86,5 +86,9 @@
     <string name="this_is_the_send_message_button">This is the send message button</string>
     <string name="user_name_placeholder">User name placeholder</string>
     <string name="this_is_the_search_icon_for_chat_room">This is the search icon for chat room</string>
+    <string name="this_is_the_user_search_list">This is the user search list</string>
+    <string name="user_list_item_name_holder">Placeholder name</string>
+    <string name="message">Message</string>
+    <string name="at_symbol">\@</string>
 
 </resources>
