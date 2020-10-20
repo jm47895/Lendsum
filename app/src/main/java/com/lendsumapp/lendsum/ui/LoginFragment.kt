@@ -34,7 +34,6 @@ class LoginFragment : Fragment(), View.OnClickListener{
     private val binding get() =  _binding
     private val sharedPrefs by lazy { activity?.getSharedPreferences(R.string.app_name.toString(), Context.MODE_PRIVATE) }
     private val loginViewModel: LoginViewModel by viewModels()
-    @Inject lateinit var networkUtils: NetworkUtils
     private lateinit var signInEmail: String
     private lateinit var signInPassword: String
     private lateinit var emailSignInObserver: Observer<Boolean>
@@ -124,7 +123,7 @@ class LoginFragment : Fragment(), View.OnClickListener{
     override fun onClick(view: View?) {
 
         var action: Int = -1
-        val isOnline = context?.let { networkUtils.isNetworkAvailable(it) }
+        val isOnline = context?.let { NetworkUtils.isNetworkAvailable(it) }
 
         if(isOnline!!) {
             when (view?.id) {

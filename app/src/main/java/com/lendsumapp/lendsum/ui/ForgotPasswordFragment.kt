@@ -23,7 +23,6 @@ class ForgotPasswordFragment : Fragment(), View.OnClickListener {
     private val binding get() =  _binding
     private val forgotPasswordViewModel: ForgotPasswordViewModel by viewModels()
     private lateinit var resetEmailStatusObserver: Observer<Boolean>
-    @Inject lateinit var networkUtils: NetworkUtils
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -60,7 +59,7 @@ class ForgotPasswordFragment : Fragment(), View.OnClickListener {
 
     override fun onClick(view: View?) {
 
-        val isOnline = context?.let { networkUtils.isNetworkAvailable(it) }
+        val isOnline = context?.let { NetworkUtils.isNetworkAvailable(it) }
 
         if(isOnline!!) {
             when (view?.id) {

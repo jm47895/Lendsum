@@ -22,7 +22,6 @@ import javax.inject.Inject
 class NumberVerificationRepository @Inject constructor(
     private val cacheDb: LendsumDatabase,
     private val firestoreDb: FirebaseFirestore,
-    private val databaseUtils: DatabaseUtils,
     @ActivityContext private val  context: Context
 ) {
 
@@ -34,7 +33,7 @@ class NumberVerificationRepository @Inject constructor(
     }
 
     fun doesDbCacheExist(dbName: String): Boolean{
-        return databaseUtils.doesCacheDatabaseExist(context, dbName)
+        return DatabaseUtils.doesCacheDatabaseExist(context, dbName)
     }
     //End cache functions
 

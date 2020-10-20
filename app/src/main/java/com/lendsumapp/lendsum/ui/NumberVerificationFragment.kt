@@ -35,7 +35,6 @@ class NumberVerificationFragment : Fragment(), View.OnClickListener, CountryCode
     private lateinit var signInCacheStatusObserver: Observer<Boolean>
     private var credential: PhoneAuthCredential? = null
     private var isPhoneNumberValid = false
-    @Inject lateinit var networkUtils: NetworkUtils
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -103,7 +102,7 @@ class NumberVerificationFragment : Fragment(), View.OnClickListener, CountryCode
 
     override fun onClick(view: View?) {
 
-        val isOnline = context?.let { networkUtils.isNetworkAvailable(it) }
+        val isOnline = context?.let { NetworkUtils.isNetworkAvailable(it) }
 
         if(isOnline!!) {
             when (view?.id) {
