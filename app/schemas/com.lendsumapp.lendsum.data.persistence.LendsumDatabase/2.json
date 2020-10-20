@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 2,
-    "identityHash": "459e028cf4c6e0228e69aaa5621e91bb",
+    "identityHash": "25e5b0629198269d520749bd810f705e",
     "entities": [
       {
         "tableName": "bundles",
@@ -122,7 +122,7 @@
       },
       {
         "tableName": "user",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`userId` TEXT NOT NULL, `name` TEXT NOT NULL, `username` TEXT NOT NULL, `email` TEXT NOT NULL, `phoneNumber` TEXT NOT NULL, `profilePicUrl` TEXT, `karmaScore` INTEGER NOT NULL, `friendsList` TEXT, PRIMARY KEY(`userId`))",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`userId` TEXT NOT NULL, `name` TEXT NOT NULL, `username` TEXT NOT NULL, `email` TEXT NOT NULL, `phoneNumber` TEXT NOT NULL, `profilePicUri` TEXT, `karmaScore` INTEGER NOT NULL, `friendsList` TEXT, `isProfilePublic` INTEGER NOT NULL, PRIMARY KEY(`userId`))",
         "fields": [
           {
             "fieldPath": "userId",
@@ -155,8 +155,8 @@
             "notNull": true
           },
           {
-            "fieldPath": "profilePicUrl",
-            "columnName": "profilePicUrl",
+            "fieldPath": "profilePicUri",
+            "columnName": "profilePicUri",
             "affinity": "TEXT",
             "notNull": false
           },
@@ -171,6 +171,12 @@
             "columnName": "friendsList",
             "affinity": "TEXT",
             "notNull": false
+          },
+          {
+            "fieldPath": "isProfilePublic",
+            "columnName": "isProfilePublic",
+            "affinity": "INTEGER",
+            "notNull": true
           }
         ],
         "primaryKey": {
@@ -280,7 +286,7 @@
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '459e028cf4c6e0228e69aaa5621e91bb')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '25e5b0629198269d520749bd810f705e')"
     ]
   }
 }

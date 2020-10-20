@@ -9,5 +9,6 @@ enum class NavSignUpType {
 enum class EditProfileInfoType{
     PROFILE_NAME,
     PROFILE_USERNAME,
-    PROFILE_EMAIL
+    PROFILE_EMAIL,
+    PROFILE_VISIBILITY
 }

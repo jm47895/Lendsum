@@ -22,6 +22,7 @@ import com.lendsumapp.lendsum.databinding.FragmentEditProfileBinding
 import com.lendsumapp.lendsum.util.AndroidUtils
 import com.lendsumapp.lendsum.util.EditProfileInfoType
 import com.lendsumapp.lendsum.util.GlobalConstants.EMAIL_KEY
+import com.lendsumapp.lendsum.util.GlobalConstants.IS_PROFILE_PUBLIC_KEY
 import com.lendsumapp.lendsum.util.GlobalConstants.PROFILE_NAME_KEY
 import com.lendsumapp.lendsum.util.GlobalConstants.PROFILE_PIC_URI_KEY
 import com.lendsumapp.lendsum.util.GlobalConstants.USERNAME_KEY
@@ -66,16 +67,13 @@ class EditProfileFragment : Fragment(), View.OnClickListener, CompoundButton.OnC
         binding?.editProfileNameToggle?.setOnCheckedChangeListener(this)
         binding?.editProfileUsernameToggle?.setOnCheckedChangeListener(this)
         binding?.editProfileEmailToggle?.setOnCheckedChangeListener(this)
+        binding?.editProfileVisibilityToggle?.setOnCheckedChangeListener(this)
 
         userCacheObserver = Observer { cachedUser ->
 
             user = cachedUser
 
-            binding?.editProfileNameTv?.text = cachedUser.name
-            binding?.editProfileUsernameTv?.text = cachedUser.username
-            binding?.editProfileEmailTv?.text = cachedUser.email
-
-            loadProfilePic(cachedUser.profilePicUrl!!, binding?.editProfilePic!!)
+            loadCachedUserProfile(user)
 
         }
         editProfileViewModel.getUser().observe(viewLifecycleOwner, userCacheObserver)
@@ -83,7 +81,7 @@ class EditProfileFragment : Fragment(), View.OnClickListener, CompoundButton.OnC
         updateAuthEmailStatusObserver = Observer { isAuthEmailUpdated->
             if(isAuthEmailUpdated){
                 editProfileViewModel.updateCachedUser(user)
-                editProfileViewModel.updateUserValueInFirestore(EMAIL_KEY, user.email)
+                editProfileViewModel.updateUserValueInFirestore(EMAIL_KEY, user.email, null)
             }else{
                 androidUtils.showSnackBar(requireActivity(), getString(R.string.sign_in_again_msg))
             }
@@ -111,6 +109,24 @@ class EditProfileFragment : Fragment(), View.OnClickListener, CompoundButton.OnC
         editProfileViewModel.getUpdateCacheUserStatus().observe(viewLifecycleOwner, updateUserStatusObserver)
     }
 
+    private fun loadCachedUserProfile(user: User?) {
+
+        user?.let {
+            if(!user.isProfilePublic){
+                binding?.editProfileVisibilityToggle?.setOnCheckedChangeListener(null)
+                binding?.editProfileVisibilityToggle?.isChecked = true
+                handleUpdateInfoUI(binding?.editProfileVisibilityToggle?.isChecked!!, null, null, binding?.editProfileVisibilityToggle!!)
+                binding?.editProfileVisibilityToggle?.setOnCheckedChangeListener(this)
+            }
+
+            binding?.editProfileNameTv?.text = it.name
+            binding?.editProfileUsernameTv?.text = it.username
+            binding?.editProfileEmailTv?.text = it.email
+
+            loadProfilePic(it.profilePicUri!!, binding?.editProfilePic!!)
+        }
+    }
+
     private fun loadProfilePic(profilePicUri: String, imageView: ImageView) {
         Glide.with(this)
             .applyDefaultRequestOptions(
@@ -133,13 +149,13 @@ class EditProfileFragment : Fragment(), View.OnClickListener, CompoundButton.OnC
         super.onActivityResult(requestCode, resultCode, data)
         if(resultCode == Activity.RESULT_OK && requestCode == GALLERY_REQUEST_CODE){
 
-            user.profilePicUrl = data?.data.toString()
+            user.profilePicUri = data?.data.toString()
 
-            loadProfilePic(user.profilePicUrl.toString(), binding?.editProfilePic!!)
+            loadProfilePic(user.profilePicUri.toString(), binding?.editProfilePic!!)
 
             editProfileViewModel.updateCachedUser(user)
-            editProfileViewModel.updateUserValueInFirestore(PROFILE_PIC_URI_KEY, user.profilePicUrl.toString())
-            editProfileViewModel.updateFirebaseAuthProfile(PROFILE_PIC_URI_KEY, user.profilePicUrl.toString())
+            editProfileViewModel.updateUserValueInFirestore(PROFILE_PIC_URI_KEY, user.profilePicUri.toString(), null)
+            editProfileViewModel.updateFirebaseAuthProfile(PROFILE_PIC_URI_KEY, user.profilePicUri.toString())
         }
     }
 
@@ -162,6 +178,11 @@ class EditProfileFragment : Fragment(), View.OnClickListener, CompoundButton.OnC
                 handleUpdateInfoUI(isChecked, binding?.editProfileEmailTv!!, binding?.editProfileEmailEt!!, binding?.editProfileEmailToggle!!)
                 handleUpdateInfoData(isChecked, binding?.editProfileEmailTv!!, EditProfileInfoType.PROFILE_EMAIL.ordinal)
 
+            }
+            R.id.edit_profile_visibility_toggle->{
+
+                handleUpdateInfoUI(isChecked, null, null, binding?.editProfileVisibilityToggle!!)
+                handleUpdateInfoData(isChecked, binding?.editProfileVisibilityTv!!, EditProfileInfoType.PROFILE_VISIBILITY.ordinal)
             }
         }
     }
@@ -218,27 +239,26 @@ class EditProfileFragment : Fragment(), View.OnClickListener, CompoundButton.OnC
         startActivityForResult(intent, GALLERY_REQUEST_CODE)
     }
 
-    private fun handleUpdateInfoUI(isEditing: Boolean, textView: TextView, editText: EditText, toggleButton: ToggleButton) {
-        if(isEditing) {
-            androidUtils.hideView(textView)
-            androidUtils.showView(editText)
-            editText.setText(textView.text)
+    private fun handleUpdateInfoUI(isChecked: Boolean, textView: TextView?, editText: EditText?, toggleButton: ToggleButton) {
+        if(isChecked) {
+            textView?.let { androidUtils.hideView(it) }
+            editText?.let { androidUtils.showView(it) }
+            editText?.setText(textView?.text)
             toggleButton.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.colorSecondaryLight))
             toggleButton.setTextColor(ContextCompat.getColor(requireContext(), R.color.colorAccentBlack))
         }else{
-            androidUtils.hideKeyboard(requireContext(), textView)
+            textView?.let { androidUtils.hideKeyboard(requireContext(), it) }
 
-            textView.text = editText.text
-            androidUtils.showView(textView)
-            androidUtils.hideView(editText)
+            textView?.text = editText?.text
+            textView?.let { androidUtils.showView(it) }
+            editText?.let { androidUtils.hideView(it) }
             toggleButton.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.colorPrimary))
             toggleButton.setTextColor(ContextCompat.getColor(requireContext(), R.color.colorSecondaryLight))
         }
     }
 
-    private fun handleUpdateInfoData(isEditing: Boolean, textView: TextView, infoType: Int){
-        if(!isEditing){
-
+    private fun handleUpdateInfoData(isChecked: Boolean, textView: TextView, infoType: Int){
+        if(!isChecked){
             when(infoType){
                 EditProfileInfoType.PROFILE_NAME.ordinal->{
                     when {
@@ -251,7 +271,7 @@ class EditProfileFragment : Fragment(), View.OnClickListener, CompoundButton.OnC
                         else -> {
                             user.name = textView.text.toString().trim()
                             editProfileViewModel.updateCachedUser(user)
-                            editProfileViewModel.updateUserValueInFirestore(PROFILE_NAME_KEY, user.name)
+                            editProfileViewModel.updateUserValueInFirestore(PROFILE_NAME_KEY, user.name, null)
                             editProfileViewModel.updateFirebaseAuthProfile(PROFILE_NAME_KEY, user.name)
                         }
                     }
@@ -270,7 +290,7 @@ class EditProfileFragment : Fragment(), View.OnClickListener, CompoundButton.OnC
                         else -> {
                             user.username = textView.text.toString().trim()
                             editProfileViewModel.updateCachedUser(user)
-                            editProfileViewModel.updateUserValueInFirestore(USERNAME_KEY, user.username)
+                            editProfileViewModel.updateUserValueInFirestore(USERNAME_KEY, user.username, null)
                         }
                     }
                 }
@@ -285,6 +305,19 @@ class EditProfileFragment : Fragment(), View.OnClickListener, CompoundButton.OnC
                             androidUtils.showSnackBar(requireActivity(), getString(R.string.invalid_email_data_not_saved))
                         }
                     }
+                }
+                EditProfileInfoType.PROFILE_VISIBILITY.ordinal->{
+                    user.isProfilePublic = true
+                    editProfileViewModel.updateCachedUser(user)
+                    editProfileViewModel.updateUserValueInFirestore(IS_PROFILE_PUBLIC_KEY, null, true)
+                }
+            }
+        }else{
+            when(infoType){
+                EditProfileInfoType.PROFILE_VISIBILITY.ordinal->{
+                    user.isProfilePublic = false
+                    editProfileViewModel.updateCachedUser(user)
+                    editProfileViewModel.updateUserValueInFirestore(IS_PROFILE_PUBLIC_KEY, null, false)
                 }
             }
         }

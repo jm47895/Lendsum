@@ -65,7 +65,7 @@ class ProfileFragment : Fragment(), View.OnClickListener {
                         .error(R.drawable.com_facebook_profile_picture_blank_portrait)
                         .circleCrop()
                 )
-                .load(user.profilePicUrl)
+                .load(user.profilePicUri)
                 .circleCrop()
                 .into(binding?.profilePicImage!!)
         }

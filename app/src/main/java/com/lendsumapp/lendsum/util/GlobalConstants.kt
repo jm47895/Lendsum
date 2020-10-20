@@ -13,7 +13,7 @@ object GlobalConstants {
     const val USERNAME_KEY = "username"
     const val PROFILE_NAME_KEY = "name"
     const val PROFILE_PIC_URI_KEY = "profilePicUrl"
-    const val IS_PROFILE_PUBLIC_KEY = "isPublic"
+    const val IS_PROFILE_PUBLIC_KEY = "isProfilePublic"
     /*Android specific constants*/
     //Pattern is for One upper case, one lower case, one symbol, and between 6 and 20 characters
     const val PASSWORD_PATTERN = "^((?=.*\\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[@%+/\'!#$^?:,(){}~_.]).{6,20})$"

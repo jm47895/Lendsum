@@ -47,17 +47,30 @@ class EditProfileRepository @Inject constructor(
         emailAndPassAuthComponent.updateFirebaseAuthProfile(key, value)
     }
 
-    fun updateUserValueInFirestore(key: String, value: String){
+    fun updateUserValueInFirestore(key: String, stringValue: String?, booleanValue: Boolean?){
         val userDoc = firestoreDb.collection(GlobalConstants.USER_COLLECTION_PATH)
             .document(firebaseAuth.currentUser?.uid.toString())
 
-        userDoc.update(key, value).addOnCompleteListener { task->
-            if(task.isSuccessful){
-                Log.d(TAG, "$key updated in firestore")
-            }else{
-                Log.d(TAG, "$key failed to update in firestore")
+        stringValue?.let {
+            userDoc.update(key, it).addOnCompleteListener { task->
+                if(task.isSuccessful){
+                    Log.d(TAG, "$key updated in firestore")
+                }else{
+                    Log.d(TAG, "$key failed to update in firestore")
+                }
             }
         }
+
+        booleanValue?.let {
+            userDoc.update(key, it).addOnCompleteListener { task->
+                if(task.isSuccessful){
+                    Log.d(TAG, "$key updated in firestore")
+                }else{
+                    Log.d(TAG, "$key failed to update in firestore")
+                }
+            }
+        }
+
     }
 
     companion object {

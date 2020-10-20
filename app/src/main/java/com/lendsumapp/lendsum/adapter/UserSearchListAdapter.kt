@@ -65,7 +65,7 @@ class UserSearchListAdapter(private val interaction: Interaction? = null) :
                         .error(R.drawable.com_facebook_profile_picture_blank_portrait)
                         .circleCrop()
                 )
-                .load(item.profilePicUrl)
+                .load(item.profilePicUri)
                 .circleCrop()
                 .into(itemView.user_list_item_prof_pic)
 

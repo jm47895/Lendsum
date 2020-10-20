@@ -72,9 +72,9 @@ class EditProfileViewModel @ViewModelInject constructor(
     //End of firebase auth functions
 
     //Firestore functions
-    fun updateUserValueInFirestore(key: String, value: String){
+    fun updateUserValueInFirestore(key: String, stringValue: String?, booleanValue: Boolean?){
         viewModelScope.launch(Dispatchers.IO) {
-            editProfileRepository.updateUserValueInFirestore(key, value)
+            editProfileRepository.updateUserValueInFirestore(key, stringValue, booleanValue)
         }
     }
     //End of firestore functions

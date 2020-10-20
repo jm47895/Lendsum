@@ -90,5 +90,8 @@
     <string name="user_list_item_name_holder">Placeholder name</string>
     <string name="message">Message</string>
     <string name="at_symbol">\@</string>
+    <string name="profile_visibility">Profile visibility:</string>
+    <string name="Private">Private</string>
+    <string name="Public">Public</string>
 
 </resources>

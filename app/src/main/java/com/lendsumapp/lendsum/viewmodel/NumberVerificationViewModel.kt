@@ -94,7 +94,7 @@ class NumberVerificationViewModel @ViewModelInject constructor(
         return User(firebaseUser.uid,
             firebaseUser.displayName.toString(),
             createUsername(firebaseUser.displayName.toString(), firebaseUser.uid),
-            firebaseUser.email.toString(), firebaseUser.phoneNumber.toString(),firebaseUser.photoUrl.toString(), karmaScore = 100, friendList = null)
+            firebaseUser.email.toString(), firebaseUser.phoneNumber.toString(),firebaseUser.photoUrl.toString(), karmaScore = 100, friendList = null, isProfilePublic = true)
     }
 
     private fun createUsername(name: String, uid: String): String{
