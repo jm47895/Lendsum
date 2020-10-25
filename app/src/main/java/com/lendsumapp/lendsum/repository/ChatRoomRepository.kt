@@ -3,7 +3,9 @@ package com.lendsumapp.lendsum.repository
 import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import com.google.firebase.firestore.FirebaseFirestore
+import com.lendsumapp.lendsum.data.model.ChatRoom
 import com.lendsumapp.lendsum.data.model.User
+import com.lendsumapp.lendsum.data.persistence.LendsumDatabase
 import com.lendsumapp.lendsum.util.GlobalConstants.IS_PROFILE_PUBLIC_KEY
 import com.lendsumapp.lendsum.util.GlobalConstants.USERNAME_KEY
 import com.lendsumapp.lendsum.util.GlobalConstants.USER_COLLECTION_PATH
@@ -13,7 +15,8 @@ import javax.inject.Inject
 
 @ActivityScoped
 class ChatRoomRepository @Inject constructor(
-    private val firestoreDb: FirebaseFirestore
+    private val firestoreDb: FirebaseFirestore,
+    private val database: LendsumDatabase
 ){
     private val userList: MutableLiveData<List<User>> = MutableLiveData()
 
@@ -29,6 +32,10 @@ class ChatRoomRepository @Inject constructor(
                     Log.d(TAG, "Name lookup failed: " + task.exception)
                 }
             }
+    }
+
+    suspend fun getMessages(chatRoom: ChatRoom){
+        database.getChatMessageDao().getChatRoomMessages(chatRoom.chatRoomId)
     }
 
     fun getRemoteDbUserList(): MutableLiveData<List<User>>{

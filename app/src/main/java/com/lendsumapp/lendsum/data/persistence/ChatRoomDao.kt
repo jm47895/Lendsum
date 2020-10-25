@@ -1,9 +1,6 @@
 package com.lendsumapp.lendsum.data.persistence
 
-import androidx.room.Dao
-import androidx.room.Delete
-import androidx.room.Insert
-import androidx.room.Update
+import androidx.room.*
 import com.lendsumapp.lendsum.data.model.ChatRoom
 
 @Dao
@@ -17,5 +14,6 @@ interface ChatRoomDao {
 
     @Delete
     suspend fun deleteChatRoom(chatRoom: ChatRoom)
+
 
 }

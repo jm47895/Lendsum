@@ -15,6 +15,8 @@ import com.lendsumapp.lendsum.util.GlobalConstants.PASSWORD_PATTERN
 import dagger.hilt.android.scopes.ActivityScoped
 import dagger.hilt.android.scopes.FragmentScoped
 import java.io.File
+import java.text.DateFormat
+import java.util.*
 import java.util.regex.Matcher
 import java.util.regex.Pattern
 import javax.inject.Inject
@@ -64,6 +66,12 @@ class AndroidUtils{
 
         fun shrinkView(view: View) {
             view.visibility = View.GONE
+        }
+
+        fun getDateAndTime():String{
+            val currentTime = Calendar.getInstance().time
+
+            return DateFormat.getDateTimeInstance(DateFormat.LONG, DateFormat.SHORT).format(currentTime)
         }
     }
 }

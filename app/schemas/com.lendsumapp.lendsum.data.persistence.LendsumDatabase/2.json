@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 2,
-    "identityHash": "25e5b0629198269d520749bd810f705e",
+    "identityHash": "5039b0541ea2adad5fe58d8e183402fa",
     "entities": [
       {
         "tableName": "bundles",
@@ -190,7 +190,7 @@
       },
       {
         "tableName": "chat_rooms",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`chatRoomId` TEXT NOT NULL, `participants` TEXT NOT NULL, `listOfMessages` TEXT NOT NULL, `lastTimestamp` INTEGER NOT NULL, PRIMARY KEY(`chatRoomId`))",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`chatRoomId` TEXT NOT NULL, `participants` TEXT, `listOfMessages` TEXT, `lastMessage` TEXT, PRIMARY KEY(`chatRoomId`))",
         "fields": [
           {
             "fieldPath": "chatRoomId",
@@ -202,19 +202,19 @@
             "fieldPath": "participants",
             "columnName": "participants",
             "affinity": "TEXT",
-            "notNull": true
+            "notNull": false
           },
           {
             "fieldPath": "listOfMessages",
             "columnName": "listOfMessages",
             "affinity": "TEXT",
-            "notNull": true
+            "notNull": false
           },
           {
             "fieldPath": "lastTimestamp",
-            "columnName": "lastTimestamp",
-            "affinity": "INTEGER",
-            "notNull": true
+            "columnName": "lastMessage",
+            "affinity": "TEXT",
+            "notNull": false
           }
         ],
         "primaryKey": {
@@ -228,11 +228,11 @@
       },
       {
         "tableName": "chat_messages",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`chatMessageId` TEXT NOT NULL, `chatRoom` TEXT NOT NULL, `sender` TEXT NOT NULL, `senderPic` TEXT, `messageTimestamp` INTEGER NOT NULL, `message` TEXT NOT NULL, `listOfImageUris` TEXT, PRIMARY KEY(`chatMessageId`))",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`timestamp` TEXT NOT NULL, `chatRoom` TEXT NOT NULL, `sender` TEXT NOT NULL, `guestPic` TEXT, `message` TEXT NOT NULL, `listOfImageUris` TEXT, PRIMARY KEY(`timestamp`))",
         "fields": [
           {
-            "fieldPath": "chatMessageId",
-            "columnName": "chatMessageId",
+            "fieldPath": "messageTimestamp",
+            "columnName": "timestamp",
             "affinity": "TEXT",
             "notNull": true
           },
@@ -243,22 +243,16 @@
             "notNull": true
           },
           {
-            "fieldPath": "chatMessageSender",
+            "fieldPath": "messageSender",
             "columnName": "sender",
             "affinity": "TEXT",
             "notNull": true
           },
           {
-            "fieldPath": "senderPic",
-            "columnName": "senderPic",
+            "fieldPath": "guestPic",
+            "columnName": "guestPic",
             "affinity": "TEXT",
             "notNull": false
-          },
-          {
-            "fieldPath": "messageTimestamp",
-            "columnName": "messageTimestamp",
-            "affinity": "INTEGER",
-            "notNull": true
           },
           {
             "fieldPath": "message",
@@ -275,7 +269,7 @@
         ],
         "primaryKey": {
           "columnNames": [
-            "chatMessageId"
+            "timestamp"
           ],
           "autoGenerate": false
         },
@@ -286,7 +280,7 @@
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '25e5b0629198269d520749bd810f705e')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '5039b0541ea2adad5fe58d8e183402fa')"
     ]
   }
 }

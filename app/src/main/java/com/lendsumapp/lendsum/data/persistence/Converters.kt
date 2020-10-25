@@ -3,7 +3,7 @@ package com.lendsumapp.lendsum.data.persistence
 import androidx.room.TypeConverter
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
-import com.lendsumapp.lendsum.data.model.ChatMessage
+import com.lendsumapp.lendsum.data.model.Message
 import com.lendsumapp.lendsum.data.model.User
 
 class Converters {
@@ -33,16 +33,16 @@ class Converters {
     }
 
     @TypeConverter
-    fun fromChatMessageList(value: List<ChatMessage>): String {
+    fun fromChatMessageList(value: List<Message>): String {
         val gson = Gson()
-        val type = object : TypeToken<List<ChatMessage>>() {}.type
+        val type = object : TypeToken<List<Message>>() {}.type
         return gson.toJson(value, type)
     }
 
     @TypeConverter
-    fun toChatMessageList(value: String): List<ChatMessage> {
+    fun toChatMessageList(value: String): List<Message> {
         val gson = Gson()
-        val type = object : TypeToken<List<ChatMessage>>() {}.type
+        val type = object : TypeToken<List<Message>>() {}.type
         return gson.fromJson(value, type)
     }
 

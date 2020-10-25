@@ -1,6 +1,5 @@
 package com.lendsumapp.lendsum.adapter
 
-import android.util.Log
 import androidx.recyclerview.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.View
@@ -11,7 +10,7 @@ import com.bumptech.glide.Glide
 import com.bumptech.glide.request.RequestOptions
 import com.lendsumapp.lendsum.R
 import com.lendsumapp.lendsum.data.model.User
-import kotlinx.android.synthetic.main.user_list_item.view.*
+import com.lendsumapp.lendsum.databinding.UserListItemBinding
 
 class UserSearchListAdapter(private val interaction: Interaction? = null) :
     RecyclerView.Adapter<RecyclerView.ViewHolder>() {
@@ -53,9 +52,11 @@ class UserSearchListAdapter(private val interaction: Interaction? = null) :
     class UserSearchListViewHolder constructor(itemView: View, private val interaction: Interaction?)
         : RecyclerView.ViewHolder(itemView) {
 
-        fun bind(item: User) = with(itemView) {
+        val binding = UserListItemBinding.bind(itemView)
+
+        fun bind(item: User){
             itemView.setOnClickListener {
-                interaction?.onItemSelected(adapterPosition, item)
+                interaction?.onUserItemSelected(adapterPosition, item)
             }
 
             Glide.with(itemView.context)
@@ -67,17 +68,15 @@ class UserSearchListAdapter(private val interaction: Interaction? = null) :
                 )
                 .load(item.profilePicUri)
                 .circleCrop()
-                .into(itemView.user_list_item_prof_pic)
+                .into(binding.userListItemProfPic)
 
-            itemView.user_list_item_name_tv.text = item.name
-            itemView.user_list_item_msg_btn.setOnClickListener {
-                Log.d(TAG, "Message button clicked")
-            }
+            binding.userListItemNameTv.text = item.username
+
         }
     }
 
     interface Interaction {
-        fun onItemSelected(position: Int, item: User)
+        fun onUserItemSelected(position: Int, item: User)
     }
 
     companion object{

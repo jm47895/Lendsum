@@ -1,12 +1,14 @@
 package com.lendsumapp.lendsum.util
 
-enum class NavSignUpType {
+import androidx.annotation.Keep
+
+@Keep enum class NavSignUpType {
     EMAIL_LOGIN,
     GOOGLE_LOGIN,
     FACEBOOK_LOGIN
 }
 
-enum class EditProfileInfoType{
+@Keep enum class EditProfileInfoType{
     PROFILE_NAME,
     PROFILE_USERNAME,
     PROFILE_EMAIL,

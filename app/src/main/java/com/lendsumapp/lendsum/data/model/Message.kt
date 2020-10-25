@@ -7,12 +7,11 @@ import androidx.room.PrimaryKey
 import java.util.*
 
 @Entity(tableName = "chat_messages")
-data class ChatMessage(
-    @PrimaryKey @ColumnInfo(name = "chatMessageId") var chatMessageId: String = UUID.randomUUID().toString(),
+data class Message(
+    @PrimaryKey @ColumnInfo(name = "timestamp") var messageTimestamp: String,
     @ColumnInfo(name = "chatRoom") var chatRoom: String,
-    @ColumnInfo(name = "sender") var chatMessageSender: String,
-    @ColumnInfo(name = "senderPic") var senderPic: String?,
-    @ColumnInfo(name = "messageTimestamp") var messageTimestamp: Long,
+    @ColumnInfo(name = "sender") var messageSender: String,
+    @ColumnInfo(name = "guestPic") var guestPic: String?,
     @ColumnInfo(name = "message") var message: String,
     @ColumnInfo(name = "listOfImageUris") var listOfImageUris: List<String>?
 )
