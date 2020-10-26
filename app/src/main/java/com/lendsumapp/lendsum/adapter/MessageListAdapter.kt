@@ -66,9 +66,12 @@ class MessageListAdapter(private val interaction: Interaction? = null) :
 
             binding.messageTimestampTv.text = item.messageTimestamp
 
+            if(item.messageTimestamp == ""){
+                binding.messageTimestampTv.visibility = View.GONE
+            }
+
 
             if(item.messageSender == firebaseUser?.uid){
-                timestampParams.horizontalBias = 1f
                 binding.messageHostTv.text = item.message
                 binding.messageHostTv.visibility = View.VISIBLE
             }else{
@@ -83,7 +86,6 @@ class MessageListAdapter(private val interaction: Interaction? = null) :
                     .circleCrop()
                     .into(binding.messageGuestPic)
 
-                timestampParams.horizontalBias = 0f
                 binding.messageGuestTv.text = item.message
                 binding.messageGuestTv.visibility = View.VISIBLE
             }

@@ -140,11 +140,18 @@ class ChatRoomFragment : Fragment(), View.OnClickListener,
     }
 
     private fun addNewMessage(msg: String, chatRoomId: String) {
-        listOfMessages.add(Message(AndroidUtils.getDateAndTime(), chatRoomId, hostId, guestUser.profilePicUri, msg, null))
+
+        var dateAndTime = AndroidUtils.getDateAndTime()
+
+        if (oldDate == AndroidUtils.getDateAndTime()){
+            dateAndTime = ""
+        }
+
+        listOfMessages.add(Message(dateAndTime, chatRoomId, hostId, guestUser.profilePicUri, msg, null))
         messageListAdapter.submitList(listOfMessages.toMutableList())
         binding?.chatRoomMsgEt?.text?.clear()
         binding?.chatRoomList?.smoothScrollToPosition(listOfMessages.size -1)
-
+        oldDate = AndroidUtils.getDateAndTime()
     }
 
     private fun createNewChatRoom(msg: String) {

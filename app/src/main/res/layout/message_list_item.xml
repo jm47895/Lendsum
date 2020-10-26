@@ -40,21 +40,19 @@
     <TextView
         android:id="@+id/message_timestamp_tv"
         style="@style/SecondaryText"
-        android:layout_margin="0dp"
         android:text="@string/timestamp_placeholder"
         android:textColor="@color/colorSecondaryDark"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="@+id/message_host_tv"
-        app:layout_constraintHorizontal_bias="0"
-        app:layout_constraintStart_toStartOf="@+id/horizontal_20_guide"
+        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="0" />
 
     <TextView
         android:id="@+id/message_guest_tv"
-        style="@style/SecondaryText"
+        android:layout_height="wrap_content"
         android:layout_width="0dp"
-        android:layout_margin="0dp"
+        android:layout_marginTop="12dp"
         android:padding="12dp"
         android:text=""
         android:background="@drawable/guest_msg_rounded_corners"
@@ -68,7 +66,7 @@
         android:id="@+id/message_host_tv"
         android:layout_height="wrap_content"
         android:layout_width="0dp"
-        android:layout_marginEnd="12dp"
+        android:layout_marginTop="12dp"
         android:background="@drawable/host_msg_rounded_corners"
         android:padding="12dp"
         android:fontFamily="@font/roboto"
