@@ -62,8 +62,6 @@ class MessageListAdapter(private val interaction: Interaction? = null) :
 
         fun bind(item: Message){
 
-            val timestampParams = binding.messageTimestampTv.layoutParams as ConstraintLayout.LayoutParams
-
             binding.messageTimestampTv.text = item.messageTimestamp
 
             if(item.messageTimestamp == ""){
