@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 2,
-    "identityHash": "5039b0541ea2adad5fe58d8e183402fa",
+    "identityHash": "4f1824af61ca3153f22b05cb5b1d6c3b",
     "entities": [
       {
         "tableName": "bundles",
@@ -190,7 +190,7 @@
       },
       {
         "tableName": "chat_rooms",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`chatRoomId` TEXT NOT NULL, `participants` TEXT, `listOfMessages` TEXT, `lastMessage` TEXT, PRIMARY KEY(`chatRoomId`))",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`chatRoomId` TEXT NOT NULL, `participants` TEXT, `listOfMessages` TEXT, `lastMessage` TEXT NOT NULL, `lastTimestamp` TEXT NOT NULL, PRIMARY KEY(`chatRoomId`))",
         "fields": [
           {
             "fieldPath": "chatRoomId",
@@ -211,10 +211,16 @@
             "notNull": false
           },
           {
-            "fieldPath": "lastTimestamp",
+            "fieldPath": "lastMessage",
             "columnName": "lastMessage",
             "affinity": "TEXT",
-            "notNull": false
+            "notNull": true
+          },
+          {
+            "fieldPath": "lastTimestamp",
+            "columnName": "lastTimestamp",
+            "affinity": "TEXT",
+            "notNull": true
           }
         ],
         "primaryKey": {
@@ -280,7 +286,7 @@
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '5039b0541ea2adad5fe58d8e183402fa')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '4f1824af61ca3153f22b05cb5b1d6c3b')"
     ]
   }
 }

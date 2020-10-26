@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginTop="8dp">
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/horizontal_20_guide"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintGuide_percent=".25" />
+
+    <ImageView
+        android:id="@+id/chat_room_list_item_prof_pic"
+        android:layout_width="0dp"
+        android:layout_height="75dp"
+        android:layout_margin="8dp"
+        android:contentDescription="@string/this_is_the_user_search_list"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@id/horizontal_20_guide"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/chat_room_list_item_name_tv"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="4dp"
+        android:text="@string/user_list_item_name_holder"
+        android:textColor="@color/colorSecondaryLight"
+        app:layout_constraintBottom_toTopOf="@+id/chat_room_list_item_last_msg_tv"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0"
+        app:layout_constraintStart_toStartOf="@+id/horizontal_20_guide"
+        app:layout_constraintTop_toTopOf="@+id/chat_room_list_item_prof_pic"
+        app:layout_constraintVertical_bias="0"
+        app:layout_constraintVertical_chainStyle="packed" />
+
+    <TextView
+        android:id="@+id/chat_room_list_item_last_msg_tv"
+        android:layout_height="wrap_content"
+        android:layout_width="wrap_content"
+        android:textColor="@color/colorSecondaryLight"
+        android:text="@string/last_msg_placeholder"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0"
+        app:layout_constraintStart_toStartOf="@+id/horizontal_20_guide"
+        app:layout_constraintTop_toBottomOf="@+id/chat_room_list_item_name_tv" />
+
+    <TextView
+        android:id="@+id/chat_room_list_item_date_tv"
+        style="@style/SecondaryText"
+        android:text="@string/short_date_placeholder"
+        app:layout_constraintBottom_toBottomOf="@+id/chat_room_list_item_name_tv"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="1"
+        app:layout_constraintStart_toEndOf="@+id/chat_room_list_item_name_tv"
+        app:layout_constraintTop_toTopOf="@+id/chat_room_list_item_name_tv" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

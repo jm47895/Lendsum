@@ -58,7 +58,7 @@ class MessageListAdapter(private val interaction: Interaction? = null) :
     ) : RecyclerView.ViewHolder(itemView) {
 
         private val firebaseUser = FirebaseAuth.getInstance().currentUser
-        val binding = MessageListItemBinding.bind(itemView)
+        private val binding = MessageListItemBinding.bind(itemView)
 
         fun bind(item: Message){
 

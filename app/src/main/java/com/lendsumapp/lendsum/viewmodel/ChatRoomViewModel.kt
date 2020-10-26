@@ -4,6 +4,7 @@ import androidx.hilt.lifecycle.ViewModelInject
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.lendsumapp.lendsum.data.model.ChatRoom
 import com.lendsumapp.lendsum.data.model.User
 import com.lendsumapp.lendsum.repository.ChatRoomRepository
 import kotlinx.coroutines.Dispatchers
@@ -22,6 +23,12 @@ class ChatRoomViewModel @ViewModelInject constructor(
     fun getRemoteDbUserList(): MutableLiveData<List<User>> {
 
         return chatRoomRepository.getRemoteDbUserList()
+    }
+
+    fun cacheNewChatRoom(chatRoom: ChatRoom){
+        viewModelScope.launch(Dispatchers.IO) {
+            chatRoomRepository.cacheNewChatRoom(chatRoom)
+        }
     }
 
     companion object{

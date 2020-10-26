@@ -13,7 +13,8 @@ data class ChatRoom(
     @PrimaryKey @ColumnInfo(name = "chatRoomId") var chatRoomId: String,
     @ColumnInfo(name = "participants") var participants : @RawValue List<User>?,
     @ColumnInfo(name = "listOfMessages") var listOfMessages : @RawValue MutableList<Message>?,
-    @ColumnInfo(name = "lastMessage") var lastTimestamp: String?
+    @ColumnInfo(name = "lastMessage") var lastMessage: String,
+    @ColumnInfo(name = "lastTimestamp") var lastTimestamp: String
 ) : Parcelable{
-    constructor(): this("",null,null,null)
+    constructor(): this("",null,null, "", "")
 }

@@ -94,6 +94,8 @@
     <string name="Private">Private</string>
     <string name="Public">Public</string>
     <string name="timestamp_placeholder">Oct 20, 2020 at 7:30</string>
+    <string name="last_msg_placeholder">This is the last message</string>
+    <string name="short_date_placeholder">Oct 20</string>
     <string name="pick_user_first">You must pick a user first</string>
 
 </resources>

@@ -16,7 +16,7 @@ import javax.inject.Inject
 @ActivityScoped
 class ChatRoomRepository @Inject constructor(
     private val firestoreDb: FirebaseFirestore,
-    private val database: LendsumDatabase
+    private val cacheDatabase: LendsumDatabase
 ){
     private val userList: MutableLiveData<List<User>> = MutableLiveData()
 
@@ -34,9 +34,10 @@ class ChatRoomRepository @Inject constructor(
             }
     }
 
-    suspend fun getMessages(chatRoom: ChatRoom){
-        database.getChatMessageDao().getChatRoomMessages(chatRoom.chatRoomId)
+    suspend fun cacheNewChatRoom(chatRoom: ChatRoom){
+        cacheDatabase.getChatRoomDao().insertChatRoom(chatRoom)
     }
+
 
     fun getRemoteDbUserList(): MutableLiveData<List<User>>{
         return userList

@@ -163,7 +163,9 @@ class ChatRoomFragment : Fragment(), View.OnClickListener,
 
         addNewMessage(msg, chatRoomId)
 
-        val newChatRoom = ChatRoom(chatRoomId, chatRoomUserList, listOfMessages, msg)
+        val newChatRoom = ChatRoom(chatRoomId, chatRoomUserList, listOfMessages, msg, AndroidUtils.getShortDate())
+
+        chatRoomViewModel.cacheNewChatRoom(newChatRoom)
 
         currentChatRoom = newChatRoom
     }

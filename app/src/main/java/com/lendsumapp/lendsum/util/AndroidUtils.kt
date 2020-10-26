@@ -68,6 +68,15 @@ class AndroidUtils{
             view.visibility = View.GONE
         }
 
+        fun getShortDate():String{
+
+            val currentDate = Calendar.getInstance().time
+
+            val formattedDate = DateFormat.getDateInstance(DateFormat.MEDIUM).format(currentDate)
+
+            return formattedDate.substring(0, formattedDate.indexOf(","))
+        }
+
         fun getDateAndTime():String{
             val currentTime = Calendar.getInstance().time
 

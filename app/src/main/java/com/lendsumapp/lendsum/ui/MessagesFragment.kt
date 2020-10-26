@@ -1,26 +1,45 @@
 package com.lendsumapp.lendsum.ui
 
 import android.os.Bundle
-import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.fragment.app.FragmentPagerAdapter
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.Observer
 import androidx.navigation.fragment.findNavController
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.lendsumapp.lendsum.R
+import com.lendsumapp.lendsum.adapter.ChatRoomListAdapter
+import com.lendsumapp.lendsum.data.model.ChatRoom
 import com.lendsumapp.lendsum.databinding.FragmentMessagesBinding
-import com.lendsumapp.lendsum.databinding.FragmentNumberVerificationBinding
 import com.lendsumapp.lendsum.viewmodel.MessagesViewModel
-import com.lendsumapp.lendsum.viewmodel.NumberVerificationViewModel
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
-class MessagesFragment : Fragment(), View.OnClickListener {
+class MessagesFragment : Fragment(), View.OnClickListener, ChatRoomListAdapter.Interaction {
 
     private var _binding:FragmentMessagesBinding? = null
     private val binding get() = _binding
     private val messagesViewModel: MessagesViewModel by viewModels()
+    private lateinit var chatRoomsCacheObserver: Observer<List<ChatRoom>>
+    private lateinit var chatRoomListAdapter: ChatRoomListAdapter
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+
+        messagesViewModel.getCachedChatRooms()
+
+    }
+
+    private fun initRecyclerView() {
+        binding?.chatRoomList?.apply {
+            chatRoomListAdapter = ChatRoomListAdapter(this@MessagesFragment)
+            layoutManager = LinearLayoutManager(context)
+            adapter = chatRoomListAdapter
+        }
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -33,7 +52,16 @@ class MessagesFragment : Fragment(), View.OnClickListener {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        initRecyclerView()
+
         binding?.messagesNewMessageBtn?.setOnClickListener(this)
+
+        chatRoomsCacheObserver = Observer { chatRooms->
+
+            loadChatRooms(chatRooms)
+
+        }
+        messagesViewModel.getChatRooms().observe(viewLifecycleOwner, chatRoomsCacheObserver)
     }
 
     override fun onDestroyView() {
@@ -49,7 +77,18 @@ class MessagesFragment : Fragment(), View.OnClickListener {
         }
     }
 
+    private fun loadChatRooms(chatRooms: List<ChatRoom>?) {
+        chatRooms?.let {
+            chatRoomListAdapter.submitList(it)
+            binding?.messagesNoConversationsTv?.visibility = View.INVISIBLE
+        }
+    }
+
     companion object{
         private val TAG = MessagesFragment::class.simpleName
+    }
+
+    override fun onItemSelected(position: Int, item: ChatRoom) {
+
     }
 }
