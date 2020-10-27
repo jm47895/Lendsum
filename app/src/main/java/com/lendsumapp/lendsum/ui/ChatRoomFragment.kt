@@ -23,6 +23,8 @@ import com.lendsumapp.lendsum.data.model.Message
 import com.lendsumapp.lendsum.data.model.User
 import com.lendsumapp.lendsum.databinding.FragmentChatRoomBinding
 import com.lendsumapp.lendsum.util.AndroidUtils
+import com.lendsumapp.lendsum.util.GlobalConstants.CHAT_ROOM_BUNDLE_KEY
+import com.lendsumapp.lendsum.util.GlobalConstants.CHAT_ROOM_REQUEST_KEY
 import com.lendsumapp.lendsum.viewmodel.ChatRoomViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import java.util.*
@@ -61,9 +63,9 @@ class ChatRoomFragment : Fragment(), View.OnClickListener,
         binding?.chatRoomBackBtn?.setOnClickListener(this)
         binding?.chatRoomSearchView?.setOnQueryTextListener(this)
 
-        setFragmentResultListener("chatRoomRequestKey"){ key, bundle->
+        setFragmentResultListener(CHAT_ROOM_REQUEST_KEY){ key, bundle->
 
-            currentChatRoom = bundle.getParcelable("chatRoomBundleKey")
+            currentChatRoom = bundle.getParcelable(CHAT_ROOM_BUNDLE_KEY)
 
             initRecyclerView(MESSAGE_RECYCLER_VIEW)
 
@@ -162,7 +164,6 @@ class ChatRoomFragment : Fragment(), View.OnClickListener,
         messageListAdapter.submitList(currentListOfMessages.toMutableList())
         messageListAdapter.notifyDataSetChanged()
         binding?.chatRoomMsgEt?.text?.clear()
-        binding?.chatRoomList?.smoothScrollToPosition(currentListOfMessages.size -1)
         oldDate = AndroidUtils.getDateAndTime()
 
         updateCachedChatRoom(chatRoom, msg)

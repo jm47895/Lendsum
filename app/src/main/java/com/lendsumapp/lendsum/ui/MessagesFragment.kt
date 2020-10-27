@@ -13,6 +13,8 @@ import com.lendsumapp.lendsum.R
 import com.lendsumapp.lendsum.adapter.ChatRoomListAdapter
 import com.lendsumapp.lendsum.data.model.ChatRoom
 import com.lendsumapp.lendsum.databinding.FragmentMessagesBinding
+import com.lendsumapp.lendsum.util.GlobalConstants.CHAT_ROOM_BUNDLE_KEY
+import com.lendsumapp.lendsum.util.GlobalConstants.CHAT_ROOM_REQUEST_KEY
 import com.lendsumapp.lendsum.viewmodel.MessagesViewModel
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -79,13 +81,14 @@ class MessagesFragment : Fragment(), View.OnClickListener, ChatRoomListAdapter.I
 
     private fun loadChatRooms(chatRooms: List<ChatRoom>?) {
 
-        if (!chatRooms?.isEmpty()!!){
+        if (chatRooms?.size == 0){
+            binding?.messagesNoConversationsTv?.visibility = View.VISIBLE
+        }else{
             binding?.messagesNoConversationsTv?.visibility = View.INVISIBLE
+            chatRooms?.let { chatRoomListAdapter.submitList(it) }
         }
 
-        chatRooms.let {
-            chatRoomListAdapter.submitList(it)
-        }
+
     }
 
     companion object{
@@ -93,8 +96,7 @@ class MessagesFragment : Fragment(), View.OnClickListener, ChatRoomListAdapter.I
     }
 
     override fun onItemSelected(position: Int, item: ChatRoom) {
-
+        setFragmentResult(CHAT_ROOM_REQUEST_KEY, bundleOf(CHAT_ROOM_BUNDLE_KEY to item))
         findNavController().navigate(R.id.action_messagesFragment_to_chatRoomFragment)
-        setFragmentResult("chatRoomRequestKey", bundleOf("chatRoomBundleKey" to item))
     }
 }
