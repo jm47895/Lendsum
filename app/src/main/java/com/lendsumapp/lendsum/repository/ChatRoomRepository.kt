@@ -38,6 +38,9 @@ class ChatRoomRepository @Inject constructor(
         cacheDatabase.getChatRoomDao().insertChatRoom(chatRoom)
     }
 
+    suspend fun updateExistingCachedChatRoom(chatRoom: ChatRoom){
+        cacheDatabase.getChatRoomDao().updateChatRoom(chatRoom)
+    }
 
     fun getRemoteDbUserList(): MutableLiveData<List<User>>{
         return userList

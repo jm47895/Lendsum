@@ -8,6 +8,8 @@ import android.view.ViewGroup
 import androidx.appcompat.widget.SearchView
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.clearFragmentResultListener
+import androidx.fragment.app.setFragmentResultListener
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import androidx.navigation.fragment.findNavController
@@ -23,7 +25,6 @@ import com.lendsumapp.lendsum.databinding.FragmentChatRoomBinding
 import com.lendsumapp.lendsum.util.AndroidUtils
 import com.lendsumapp.lendsum.viewmodel.ChatRoomViewModel
 import dagger.hilt.android.AndroidEntryPoint
-import java.text.DateFormat
 import java.util.*
 
 @AndroidEntryPoint
@@ -37,11 +38,13 @@ class ChatRoomFragment : Fragment(), View.OnClickListener,
     private lateinit var userSearchListAdapter: UserSearchListAdapter
     private lateinit var messageListAdapter: MessageListAdapter
     private lateinit var remoteDbUserListObserver: Observer<List<User>>
-    private var listOfMessages = mutableListOf<Message>()
+    private var currentListOfMessages = mutableListOf<Message>()
     private var guestUser = User()
-    private var currentChatRoom = ChatRoom()
+    private var isChatRoomEmpty = true
+    private var currentChatRoom: ChatRoom? = null
     private var oldDate: String = ""
     private val hostId = FirebaseAuth.getInstance().currentUser?.uid.toString()
+
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -58,23 +61,29 @@ class ChatRoomFragment : Fragment(), View.OnClickListener,
         binding?.chatRoomBackBtn?.setOnClickListener(this)
         binding?.chatRoomSearchView?.setOnQueryTextListener(this)
 
-        val previousChatRoom = arguments?.getParcelable<ChatRoom>("sdfgsdfg")
+        setFragmentResultListener("chatRoomRequestKey"){ key, bundle->
 
-        if(previousChatRoom != null){
-
-            currentChatRoom = previousChatRoom
-
-            val users = previousChatRoom.participants!!
+            currentChatRoom = bundle.getParcelable("chatRoomBundleKey")
 
             initRecyclerView(MESSAGE_RECYCLER_VIEW)
+
+            val users = currentChatRoom?.participants!!
             handleMessageUi(users)
-            listOfMessages = previousChatRoom.listOfMessages!!
 
-            messageListAdapter.submitList(listOfMessages.toMutableList())
 
-        }else {
+            currentListOfMessages = currentChatRoom?.listOfMessages!!
+
+            messageListAdapter.submitList(currentListOfMessages)
+
+            binding?.chatRoomList?.visibility = View.VISIBLE
+
+            isChatRoomEmpty = false
+        }
+
+        if(isChatRoomEmpty) {
             initRecyclerView(SEARCH_RECYCLER_VIEW)
         }
+
 
         remoteDbUserListObserver = Observer { userList->
 
@@ -84,8 +93,10 @@ class ChatRoomFragment : Fragment(), View.OnClickListener,
     }
 
     override fun onDestroyView() {
-        super.onDestroyView()
         binding?.chatRoomList?.adapter = null
+        super.onDestroyView()
+        clearFragmentResultListener("chatRoomRequestKey")
+        chatRoomViewModel.getRemoteDbUserList().removeObserver(remoteDbUserListObserver)
         _binding = null
     }
 
@@ -122,12 +133,12 @@ class ChatRoomFragment : Fragment(), View.OnClickListener,
 
                     val msg = binding?.chatRoomMsgEt?.text.toString()
 
-                    if (listOfMessages.isEmpty()) {
+                    if (currentListOfMessages.isEmpty()) {
 
                         createNewChatRoom(msg)
 
                     } else {
-                        addNewMessage(msg, currentChatRoom.chatRoomId)
+                        currentChatRoom?.let { addNewMessage(msg, it) }
                     }
                 }else{
                     AndroidUtils.hideKeyboard(requireActivity())
@@ -139,7 +150,7 @@ class ChatRoomFragment : Fragment(), View.OnClickListener,
         }
     }
 
-    private fun addNewMessage(msg: String, chatRoomId: String) {
+    private fun addNewMessage(msg: String, chatRoom: ChatRoom) {
 
         var dateAndTime = AndroidUtils.getDateAndTime()
 
@@ -147,25 +158,36 @@ class ChatRoomFragment : Fragment(), View.OnClickListener,
             dateAndTime = ""
         }
 
-        listOfMessages.add(Message(dateAndTime, chatRoomId, hostId, guestUser.profilePicUri, msg, null))
-        messageListAdapter.submitList(listOfMessages.toMutableList())
+        currentListOfMessages.add(Message(dateAndTime, chatRoom.chatRoomId, hostId, guestUser.profilePicUri, msg, null))
+        messageListAdapter.submitList(currentListOfMessages.toMutableList())
+        messageListAdapter.notifyDataSetChanged()
         binding?.chatRoomMsgEt?.text?.clear()
-        binding?.chatRoomList?.smoothScrollToPosition(listOfMessages.size -1)
+        binding?.chatRoomList?.smoothScrollToPosition(currentListOfMessages.size -1)
         oldDate = AndroidUtils.getDateAndTime()
+
+        updateCachedChatRoom(chatRoom, msg)
+
+    }
+
+    private fun updateCachedChatRoom(chatRoom: ChatRoom, lastMsg: String) {
+        chatRoom.lastMessage = lastMsg
+        chatRoom.listOfMessages = currentListOfMessages
+        chatRoom.lastTimestamp = AndroidUtils.getShortDate()
+        chatRoomViewModel.updateExistingCachedChatRoom(chatRoom)
     }
 
     private fun createNewChatRoom(msg: String) {
         val guestId = guestUser.userId
-        val idList = listOf<String>(guestId, hostId)
+        val idList = listOf(guestId, hostId)
         Collections.sort(idList)
         val chatRoomId = idList[0].substring(0, 5) + idList[1].substring(0, 5)
         val chatRoomUserList = listOf(guestUser)
 
-        addNewMessage(msg, chatRoomId)
-
-        val newChatRoom = ChatRoom(chatRoomId, chatRoomUserList, listOfMessages, msg, AndroidUtils.getShortDate())
+        val newChatRoom = ChatRoom(chatRoomId, chatRoomUserList, currentListOfMessages, msg, AndroidUtils.getShortDate())
 
         chatRoomViewModel.cacheNewChatRoom(newChatRoom)
+
+        addNewMessage(msg, newChatRoom)
 
         currentChatRoom = newChatRoom
     }

@@ -1,12 +1,11 @@
 package com.lendsumapp.lendsum.ui
 
 import android.os.Bundle
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.fragment.app.FragmentPagerAdapter
-import androidx.fragment.app.viewModels
+import androidx.core.os.bundleOf
+import androidx.fragment.app.*
 import androidx.lifecycle.Observer
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -66,6 +65,7 @@ class MessagesFragment : Fragment(), View.OnClickListener, ChatRoomListAdapter.I
 
     override fun onDestroyView() {
         super.onDestroyView()
+        binding?.chatRoomList?.adapter = null
         _binding = null
     }
 
@@ -78,9 +78,13 @@ class MessagesFragment : Fragment(), View.OnClickListener, ChatRoomListAdapter.I
     }
 
     private fun loadChatRooms(chatRooms: List<ChatRoom>?) {
-        chatRooms?.let {
-            chatRoomListAdapter.submitList(it)
+
+        if (!chatRooms?.isEmpty()!!){
             binding?.messagesNoConversationsTv?.visibility = View.INVISIBLE
+        }
+
+        chatRooms.let {
+            chatRoomListAdapter.submitList(it)
         }
     }
 
@@ -90,5 +94,7 @@ class MessagesFragment : Fragment(), View.OnClickListener, ChatRoomListAdapter.I
 
     override fun onItemSelected(position: Int, item: ChatRoom) {
 
+        findNavController().navigate(R.id.action_messagesFragment_to_chatRoomFragment)
+        setFragmentResult("chatRoomRequestKey", bundleOf("chatRoomBundleKey" to item))
     }
 }

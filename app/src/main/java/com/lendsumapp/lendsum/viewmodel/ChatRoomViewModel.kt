@@ -31,6 +31,12 @@ class ChatRoomViewModel @ViewModelInject constructor(
         }
     }
 
+    fun updateExistingCachedChatRoom(chatRoom: ChatRoom){
+        viewModelScope.launch(Dispatchers.IO) {
+            chatRoomRepository.updateExistingCachedChatRoom(chatRoom)
+        }
+    }
+
     companion object{
         private val TAG = ChatRoomViewModel::class.simpleName
     }
