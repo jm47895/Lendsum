@@ -31,7 +31,7 @@ class FacebookAuthComponent @Inject constructor(){
 
 
             FirebaseAuth.getInstance().signInWithCredential(credential)
-                .addOnCompleteListener() { task ->
+                .addOnCompleteListener { task ->
                     if (task.isSuccessful) {
                         // Sign in success, update UI with the signed-in user's information
                         facebookAuthState.postValue(true)

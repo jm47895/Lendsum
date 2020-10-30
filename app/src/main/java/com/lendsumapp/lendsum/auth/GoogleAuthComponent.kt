@@ -68,7 +68,7 @@ class GoogleAuthComponent @Inject constructor(){
         val credential = GoogleAuthProvider.getCredential(idToken, null)
 
         firebaseAuth.signInWithCredential(credential)
-            .addOnCompleteListener() { task ->
+            .addOnCompleteListener { task ->
                 if (task.isSuccessful) {
                     Log.d(TAG, "Google Firebase Sign-in Success")
                     googleAuthState.postValue(true)

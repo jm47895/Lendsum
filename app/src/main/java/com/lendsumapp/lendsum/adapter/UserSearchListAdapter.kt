@@ -15,7 +15,7 @@ import com.lendsumapp.lendsum.databinding.UserListItemBinding
 class UserSearchListAdapter(private val interaction: Interaction? = null) :
     RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
-    val DIFF_CALLBACK = object : DiffUtil.ItemCallback<User>() {
+    private val diffCallback = object : DiffUtil.ItemCallback<User>() {
 
         override fun areItemsTheSame(oldItem: User, newItem: User): Boolean {
             return oldItem.userId == newItem.userId
@@ -26,7 +26,7 @@ class UserSearchListAdapter(private val interaction: Interaction? = null) :
         }
 
     }
-    private val differ = AsyncListDiffer(this, DIFF_CALLBACK)
+    private val differ = AsyncListDiffer(this, diffCallback)
 
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
@@ -80,6 +80,6 @@ class UserSearchListAdapter(private val interaction: Interaction? = null) :
     }
 
     companion object{
-        private val TAG = UserSearchListAdapter::class.simpleName
+        //private val TAG = UserSearchListAdapter::class.simpleName
     }
 }

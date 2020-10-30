@@ -44,12 +44,16 @@ class PhoneAuthComponent @Inject constructor() {
             // for instance if the the phone number format is not valid.
             Log.d(TAG, "onVerificationFailed", e)
 
-            if (e is FirebaseAuthInvalidCredentialsException) {
-                // Invalid request
-                // ...
-            } else if (e is FirebaseTooManyRequestsException) {
-                // The SMS quota for the project has been exceeded
-                // ...
+            when (e) {
+                is FirebaseAuthInvalidCredentialsException -> {
+                    Log.d(TAG, e.toString())
+                }
+                is FirebaseTooManyRequestsException -> {
+                    Log.d(TAG, e.toString())
+                }
+                else -> {
+                    Log.d(TAG, e.toString())
+                }
             }
 
             // Show a message and update the UI

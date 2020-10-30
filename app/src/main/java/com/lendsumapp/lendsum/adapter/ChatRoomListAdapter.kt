@@ -8,7 +8,6 @@ import androidx.recyclerview.widget.AsyncListDiffer
 import androidx.recyclerview.widget.DiffUtil
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.RequestOptions
-import com.google.firebase.auth.FirebaseAuth
 import com.lendsumapp.lendsum.R
 import com.lendsumapp.lendsum.data.model.ChatRoom
 import com.lendsumapp.lendsum.data.model.User
@@ -18,7 +17,7 @@ import com.lendsumapp.lendsum.util.AndroidUtils
 class ChatRoomListAdapter(private val interaction: Interaction? = null) :
     RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
-    val DIFF_CALLBACK = object : DiffUtil.ItemCallback<ChatRoom>() {
+    private val diffCallback = object : DiffUtil.ItemCallback<ChatRoom>() {
 
         override fun areItemsTheSame(oldItem: ChatRoom, newItem: ChatRoom): Boolean {
             return oldItem.chatRoomId == newItem.chatRoomId
@@ -29,7 +28,7 @@ class ChatRoomListAdapter(private val interaction: Interaction? = null) :
         }
 
     }
-    private val differ = AsyncListDiffer(this, DIFF_CALLBACK)
+    private val differ = AsyncListDiffer(this, diffCallback)
 
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
@@ -40,7 +39,7 @@ class ChatRoomListAdapter(private val interaction: Interaction? = null) :
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
         when (holder) {
             is ChatRoomViewHolder -> {
-                holder.bind(differ.currentList.get(position))
+                holder.bind(differ.currentList[position])
             }
         }
     }
@@ -55,7 +54,6 @@ class ChatRoomListAdapter(private val interaction: Interaction? = null) :
 
     class ChatRoomViewHolder constructor(itemView: View, private val interaction: Interaction?) : RecyclerView.ViewHolder(itemView) {
 
-        private val firebaseUser = FirebaseAuth.getInstance().currentUser
         val binding = ChatRoomListItemBinding.bind(itemView)
 
         fun bind(item: ChatRoom){
@@ -66,7 +64,7 @@ class ChatRoomListAdapter(private val interaction: Interaction? = null) :
             lateinit var guestUser: User
 
             val participants = item.participants
-            participants?.let {
+            participants.let {
                 for (user in participants){
                     guestUser = user
                 }

@@ -2,11 +2,7 @@ package com.lendsumapp.lendsum.ui
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.util.Log
 import android.view.MenuItem
-import android.view.View
-import androidx.activity.addCallback
-import androidx.core.view.children
 import androidx.core.view.get
 import androidx.navigation.NavController
 import androidx.navigation.NavDestination
@@ -14,13 +10,8 @@ import androidx.navigation.Navigation
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.lendsumapp.lendsum.R
 import com.lendsumapp.lendsum.databinding.ActivityHomeBinding
-import com.lendsumapp.lendsum.databinding.FragmentLoginBinding
 import com.lendsumapp.lendsum.util.AndroidUtils
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.android.synthetic.main.activity_home.*
-import kotlinx.android.synthetic.main.fragment_marketplace.*
-import java.util.*
-import javax.inject.Inject
 
 @AndroidEntryPoint
 class HomeActivity: AppCompatActivity(),

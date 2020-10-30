@@ -101,7 +101,7 @@ class BundleDatabaseTest {
     @Throws(Exception::class)
     fun writeAndDeleteAllBundles() = runBlocking{
 
-        val bundleList = listOf<Bundle>(TestUtil.getFirstLendTestBundle(),
+        val bundleList = listOf(TestUtil.getFirstLendTestBundle(),
             TestUtil.getSecondLendTestBundle(),
             TestUtil.getThirdBorrowTestBundle(),
             TestUtil.getFourthBorrowTestBundle())

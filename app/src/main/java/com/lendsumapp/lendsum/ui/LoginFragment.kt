@@ -11,27 +11,24 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
-import androidx.navigation.findNavController
-import androidx.navigation.fragment.NavHostFragment.findNavController
+import androidx.navigation.fragment.findNavController
 import com.facebook.login.LoginManager
 import com.lendsumapp.lendsum.R
 import com.lendsumapp.lendsum.databinding.FragmentLoginBinding
 import com.lendsumapp.lendsum.util.AndroidUtils
 import com.lendsumapp.lendsum.util.GlobalConstants.NAV_SIGN_UP_TYPE
-import com.lendsumapp.lendsum.util.GlobalConstants.NUMBER_VERIFIED
 import com.lendsumapp.lendsum.util.GlobalConstants.RETURNING_USER
 import com.lendsumapp.lendsum.util.NavSignUpType
 import com.lendsumapp.lendsum.util.NetworkUtils
 import com.lendsumapp.lendsum.viewmodel.LoginViewModel
 import dagger.hilt.android.AndroidEntryPoint
-import javax.inject.Inject
 
 
 @AndroidEntryPoint
 class LoginFragment : Fragment(), View.OnClickListener{
 
     private var _binding: FragmentLoginBinding? = null
-    private val binding get() =  _binding
+    private val binding get() =  _binding!!
     private val sharedPrefs by lazy { activity?.getSharedPreferences(R.string.app_name.toString(), Context.MODE_PRIVATE) }
     private val loginViewModel: LoginViewModel by viewModels()
     private lateinit var signInEmail: String
@@ -47,13 +44,13 @@ class LoginFragment : Fragment(), View.OnClickListener{
 
         if(firebaseUser != null
             && sharedPrefs?.getBoolean(RETURNING_USER, false) == true){
-            findNavController(this).navigate(R.id.action_loginFragment_to_marketplaceFragment)
+            findNavController().navigate(R.id.action_loginFragment_to_marketplaceFragment)
         }
 
         googleAuthObserver = Observer{ isGoogleLoginSuccessful ->
             if(isGoogleLoginSuccessful){
                 sharedPrefs?.edit()?.putInt(NAV_SIGN_UP_TYPE, NavSignUpType.GOOGLE_LOGIN.ordinal)?.apply()
-                findNavController(this).navigate(R.id.action_loginFragment_to_createAccountFragment)
+                findNavController().navigate(R.id.action_loginFragment_to_createAccountFragment)
                 Log.d(TAG, "Google Auth Observer Success")
             }else{
                 Log.d(TAG, "Google Auth Observer Failure")
@@ -63,7 +60,7 @@ class LoginFragment : Fragment(), View.OnClickListener{
         facebookAuthObserver = Observer{ isFacebookLoginSuccessful ->
             if (isFacebookLoginSuccessful){
                 sharedPrefs?.edit()?.putInt(NAV_SIGN_UP_TYPE, NavSignUpType.FACEBOOK_LOGIN.ordinal)?.apply()
-                findNavController(this).navigate(R.id.action_loginFragment_to_createAccountFragment)
+                findNavController().navigate(R.id.action_loginFragment_to_createAccountFragment)
                 Log.d(TAG, "Facebook Auth Observer Success")
             }else{
                 Log.d(TAG, "Facebook Auth Observer Failure")
@@ -76,33 +73,29 @@ class LoginFragment : Fragment(), View.OnClickListener{
         savedInstanceState: Bundle?
     ): View? {
         _binding = FragmentLoginBinding.inflate(inflater, container, false)
-        return binding?.root
+        return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        binding?.loginSignUpEmailBtn?.setOnClickListener(this)
-        binding?.loginSignInBtn?.setOnClickListener(this)
-        binding?.loginForgotPasswordTv?.setOnClickListener(this)
-        binding?.loginSignInWithFacebook?.setOnClickListener(this)
-        binding?.loginSignInWithGoogle?.setOnClickListener(this)
+        binding.loginSignUpEmailBtn.setOnClickListener(this)
+        binding.loginSignInBtn.setOnClickListener(this)
+        binding.loginForgotPasswordTv.setOnClickListener(this)
+        binding.loginSignInWithFacebook.setOnClickListener(this)
+        binding.loginSignInWithGoogle.setOnClickListener(this)
 
         emailSignInObserver = Observer { isLoginSuccessful ->
             if (isLoginSuccessful){
                 Log.d(TAG, "Email login success")
                 sharedPrefs?.edit()?.putBoolean(RETURNING_USER, true)?.apply()
-                findNavController(this).navigate(R.id.action_loginFragment_to_numberVerificationFragment)
+                findNavController().navigate(R.id.action_loginFragment_to_numberVerificationFragment)
             }else{
                 Log.d(TAG, "Email login failed")
-                binding?.loginEmailEt?.error = getString(R.string.email_or_pass_wrong)
-                binding?.loginPasswordEt?.error = getString(R.string.email_or_pass_wrong)
+                binding.loginEmailEt.error = getString(R.string.email_or_pass_wrong)
+                binding.loginPasswordEt.error = getString(R.string.email_or_pass_wrong)
             }
         }
-    }
-
-    override fun onStart() {
-        super.onStart()
     }
 
     override fun onDestroyView() {
@@ -132,16 +125,16 @@ class LoginFragment : Fragment(), View.OnClickListener{
                 }
                 R.id.login_sign_in_btn -> {
                     loginViewModel.getEmailSignInStatus().observe(viewLifecycleOwner, emailSignInObserver)
-                    signInEmail = binding?.loginEmailEt?.text?.trim().toString()
-                    signInPassword = binding?.loginPasswordEt?.text?.trim().toString()
+                    signInEmail = binding.loginEmailEt.text?.trim().toString()
+                    signInPassword = binding.loginPasswordEt.text?.trim().toString()
 
                     if (!TextUtils.isEmpty(signInEmail) && !TextUtils.isEmpty(signInPassword)) {
                         loginViewModel.signInWithEmailAndPass(signInEmail, signInPassword)
                         sharedPrefs?.edit()
                             ?.putInt(NAV_SIGN_UP_TYPE, NavSignUpType.EMAIL_LOGIN.ordinal)?.apply()
                     } else {
-                        binding?.loginEmailEt?.error = getString(R.string.email_or_pass_wrong)
-                        binding?.loginPasswordEt?.error = getString(R.string.email_or_pass_wrong)
+                        binding.loginEmailEt.error = getString(R.string.email_or_pass_wrong)
+                        binding.loginPasswordEt.error = getString(R.string.email_or_pass_wrong)
                     }
                 }
                 R.id.login_sign_up_email_btn -> {
@@ -168,7 +161,7 @@ class LoginFragment : Fragment(), View.OnClickListener{
             }
 
             if (action != -1) {
-                view?.findNavController()?.navigate(action)
+                findNavController().navigate(action)
             }
 
         }else{

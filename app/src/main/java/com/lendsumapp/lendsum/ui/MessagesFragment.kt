@@ -22,7 +22,7 @@ import dagger.hilt.android.AndroidEntryPoint
 class MessagesFragment : Fragment(), View.OnClickListener, ChatRoomListAdapter.Interaction {
 
     private var _binding:FragmentMessagesBinding? = null
-    private val binding get() = _binding
+    private val binding get() = _binding!!
     private val messagesViewModel: MessagesViewModel by viewModels()
     private lateinit var chatRoomsCacheObserver: Observer<List<ChatRoom>>
     private lateinit var chatRoomListAdapter: ChatRoomListAdapter
@@ -35,7 +35,7 @@ class MessagesFragment : Fragment(), View.OnClickListener, ChatRoomListAdapter.I
     }
 
     private fun initRecyclerView() {
-        binding?.chatRoomList?.apply {
+        binding.chatRoomList.apply {
             chatRoomListAdapter = ChatRoomListAdapter(this@MessagesFragment)
             layoutManager = LinearLayoutManager(context)
             adapter = chatRoomListAdapter
@@ -47,7 +47,7 @@ class MessagesFragment : Fragment(), View.OnClickListener, ChatRoomListAdapter.I
         savedInstanceState: Bundle?
     ): View? {
         _binding = FragmentMessagesBinding.inflate(inflater, container, false)
-        return binding?.root
+        return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -55,7 +55,7 @@ class MessagesFragment : Fragment(), View.OnClickListener, ChatRoomListAdapter.I
 
         initRecyclerView()
 
-        binding?.messagesNewMessageBtn?.setOnClickListener(this)
+        binding.messagesNewMessageBtn.setOnClickListener(this)
 
         chatRoomsCacheObserver = Observer { chatRooms->
 
@@ -67,7 +67,7 @@ class MessagesFragment : Fragment(), View.OnClickListener, ChatRoomListAdapter.I
 
     override fun onDestroyView() {
         super.onDestroyView()
-        binding?.chatRoomList?.adapter = null
+        binding.chatRoomList.adapter = null
         _binding = null
     }
 
@@ -82,9 +82,9 @@ class MessagesFragment : Fragment(), View.OnClickListener, ChatRoomListAdapter.I
     private fun loadChatRooms(chatRooms: List<ChatRoom>?) {
 
         if (chatRooms?.size == 0){
-            binding?.messagesNoConversationsTv?.visibility = View.VISIBLE
+            binding.messagesNoConversationsTv.visibility = View.VISIBLE
         }else{
-            binding?.messagesNoConversationsTv?.visibility = View.INVISIBLE
+            binding.messagesNoConversationsTv.visibility = View.INVISIBLE
             chatRooms?.let { chatRoomListAdapter.submitList(it) }
         }
 
@@ -97,6 +97,6 @@ class MessagesFragment : Fragment(), View.OnClickListener, ChatRoomListAdapter.I
     }
 
     companion object{
-        private val TAG = MessagesFragment::class.simpleName
+        //private val TAG = MessagesFragment::class.simpleName
     }
 }

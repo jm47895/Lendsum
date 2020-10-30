@@ -9,11 +9,9 @@ import android.view.ViewGroup
 import androidx.fragment.app.viewModels
 import androidx.navigation.findNavController
 import com.lendsumapp.lendsum.R
-import com.lendsumapp.lendsum.databinding.FragmentProfileBinding
 import com.lendsumapp.lendsum.databinding.FragmentSettingsBinding
 import com.lendsumapp.lendsum.util.GlobalConstants
 import com.lendsumapp.lendsum.util.NavSignUpType
-import com.lendsumapp.lendsum.viewmodel.ProfileViewModel
 import com.lendsumapp.lendsum.viewmodel.SettingsViewModel
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -21,36 +19,27 @@ import dagger.hilt.android.AndroidEntryPoint
 class SettingsFragment : Fragment(), View.OnClickListener {
 
     private var _binding: FragmentSettingsBinding? = null
-    private val binding get() = _binding
+    private val binding get() = _binding!!
     private val sharedPrefs by lazy { activity?.getSharedPreferences(R.string.app_name.toString(), Context.MODE_PRIVATE) }
     private val settingsViewModel: SettingsViewModel by viewModels()
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-
-    }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
         _binding = FragmentSettingsBinding.inflate(inflater, container, false)
-        return binding?.root
+        return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        binding?.settingsLogoutBtn?.setOnClickListener(this)
+        binding.settingsLogoutBtn.setOnClickListener(this)
     }
 
     override fun onDestroy() {
         super.onDestroy()
         _binding = null
-    }
-
-    companion object {
-        private val TAG = SettingsFragment::class.simpleName
     }
 
     override fun onClick(view: View?) {
@@ -77,5 +66,9 @@ class SettingsFragment : Fragment(), View.OnClickListener {
                 }
             }
         }
+    }
+
+    companion object {
+        private val TAG = SettingsFragment::class.simpleName
     }
 }

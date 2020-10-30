@@ -14,13 +14,12 @@ import com.lendsumapp.lendsum.util.AndroidUtils
 import com.lendsumapp.lendsum.util.NetworkUtils
 import com.lendsumapp.lendsum.viewmodel.ForgotPasswordViewModel
 import dagger.hilt.android.AndroidEntryPoint
-import javax.inject.Inject
 
 @AndroidEntryPoint
 class ForgotPasswordFragment : Fragment(), View.OnClickListener {
 
     private var _binding: FragmentForgotPasswordBinding? = null
-    private val binding get() =  _binding
+    private val binding get() =  _binding!!
     private val forgotPasswordViewModel: ForgotPasswordViewModel by viewModels()
     private lateinit var resetEmailStatusObserver: Observer<Boolean>
 
@@ -42,13 +41,13 @@ class ForgotPasswordFragment : Fragment(), View.OnClickListener {
         savedInstanceState: Bundle?
     ): View? {
         _binding = FragmentForgotPasswordBinding.inflate(inflater, container, false)
-        return binding?.root
+        return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        binding?.forgotSendResetPassBtn?.setOnClickListener(this)
+        binding.forgotSendResetPassBtn.setOnClickListener(this)
 
     }
 
@@ -69,7 +68,7 @@ class ForgotPasswordFragment : Fragment(), View.OnClickListener {
 
                     AndroidUtils.hideKeyboard(requireActivity())
 
-                    val email = binding?.forgotEmailEt?.text?.trim().toString()
+                    val email = binding.forgotEmailEt.text?.trim().toString()
 
                     if (AndroidUtils.isValidEmail(email)) {
                         forgotPasswordViewModel.sendPasswordResetEmail(email)

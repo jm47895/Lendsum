@@ -1,8 +1,6 @@
 package com.lendsumapp.lendsum.ui
 
-import android.content.Context
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -15,19 +13,15 @@ import com.bumptech.glide.request.RequestOptions
 import com.lendsumapp.lendsum.R
 import com.lendsumapp.lendsum.data.model.User
 import com.lendsumapp.lendsum.databinding.FragmentProfileBinding
-import com.lendsumapp.lendsum.util.AndroidUtils
-import com.lendsumapp.lendsum.util.DatabaseUtils
 import com.lendsumapp.lendsum.viewmodel.ProfileViewModel
 import dagger.hilt.android.AndroidEntryPoint
-import javax.inject.Inject
 
 
 @AndroidEntryPoint
 class ProfileFragment : Fragment(), View.OnClickListener {
 
     private var _binding: FragmentProfileBinding? = null
-    private val binding get() = _binding
-    private val sharedPrefs by lazy { activity?.getSharedPreferences(R.string.app_name.toString(), Context.MODE_PRIVATE) }
+    private val binding get() = _binding!!
     private val profileViewModel: ProfileViewModel by viewModels()
     private lateinit var userObserver: Observer<User>
 
@@ -43,20 +37,20 @@ class ProfileFragment : Fragment(), View.OnClickListener {
         savedInstanceState: Bundle?
     ): View? {
         _binding = FragmentProfileBinding.inflate(inflater, container, false)
-        return binding?.root
+        return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        binding?.profileSettingsBtn?.setOnClickListener(this)
-        binding?.profileProfileEditBtn?.setOnClickListener(this)
+        binding.profileSettingsBtn.setOnClickListener(this)
+        binding.profileProfileEditBtn.setOnClickListener(this)
 
         userObserver = Observer { user ->
 
-            binding?.profileName?.text = user.name
-            binding?.profileUsername?.text = user.username
-            binding?.profileKarmaScore?.text = getString(R.string.karma_score, user.karmaScore)
+            binding.profileName.text = user.name
+            binding.profileUsername.text = user.username
+            binding.profileKarmaScore.text = getString(R.string.karma_score, user.karmaScore)
 
             Glide.with(this)
                 .applyDefaultRequestOptions(
@@ -67,7 +61,7 @@ class ProfileFragment : Fragment(), View.OnClickListener {
                 )
                 .load(user.profilePicUri)
                 .circleCrop()
-                .into(binding?.profilePicImage!!)
+                .into(binding.profilePicImage)
         }
         profileViewModel.getUser().observe(viewLifecycleOwner, userObserver)
     }

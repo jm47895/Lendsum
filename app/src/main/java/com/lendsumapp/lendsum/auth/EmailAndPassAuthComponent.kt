@@ -60,7 +60,7 @@ class EmailAndPassAuthComponent @Inject constructor(){
         }
     }
 
-    suspend fun updateAuthEmail(email: String){
+    fun updateAuthEmail(email: String){
         val user = firebaseAuth.currentUser
         user?.updateEmail(email)?.addOnCompleteListener { task->
             if (task.isSuccessful){
@@ -77,7 +77,7 @@ class EmailAndPassAuthComponent @Inject constructor(){
         return updateAuthEmailStatus
     }
 
-    suspend fun updateAuthPassword(password: String){
+    fun updateAuthPassword(password: String){
         val user = firebaseAuth.currentUser
 
         user?.updatePassword(password)?.addOnCompleteListener { task ->

@@ -21,13 +21,12 @@ import com.lendsumapp.lendsum.util.GlobalConstants.RETURNING_USER
 import com.lendsumapp.lendsum.util.NetworkUtils
 import com.lendsumapp.lendsum.viewmodel.NumberVerificationViewModel
 import dagger.hilt.android.AndroidEntryPoint
-import javax.inject.Inject
 
 @AndroidEntryPoint
 class NumberVerificationFragment : Fragment(), View.OnClickListener, CountryCodePicker.PhoneNumberValidityChangeListener{
 
     private var _binding: FragmentNumberVerificationBinding? = null
-    private val binding get() = _binding
+    private val binding get() = _binding!!
     private val sharedPrefs by lazy { activity?.getSharedPreferences(R.string.app_name.toString(), Context.MODE_PRIVATE) }
     private val numberVerificationViewModel: NumberVerificationViewModel by viewModels()
     private lateinit var phoneNumberCredentialObserver: Observer<PhoneAuthCredential>
@@ -81,18 +80,18 @@ class NumberVerificationFragment : Fragment(), View.OnClickListener, CountryCode
         savedInstanceState: Bundle?
     ): View? {
         _binding = FragmentNumberVerificationBinding.inflate(inflater, container, false)
-        return binding?.root
+        return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        binding?.countryCodeSp?.setPhoneNumberValidityChangeListener(this)
-        binding?.countryCodeSp?.registerCarrierNumberEditText(binding?.numberVerificationPhoneEt)
-        binding?.numberVerificationSendCodeBtn?.setOnClickListener(this)
-        binding?.numberVerificationVerifyCodeBtn?.setOnClickListener(this)
-        binding?.numberVerificationBackBtn?.setOnClickListener(this)
-        binding?.numberVerificationNextBtn?.setOnClickListener(this)
+        binding.countryCodeSp.setPhoneNumberValidityChangeListener(this)
+        binding.countryCodeSp.registerCarrierNumberEditText(binding.numberVerificationPhoneEt)
+        binding.numberVerificationSendCodeBtn.setOnClickListener(this)
+        binding.numberVerificationVerifyCodeBtn.setOnClickListener(this)
+        binding.numberVerificationBackBtn.setOnClickListener(this)
+        binding.numberVerificationNextBtn.setOnClickListener(this)
     }
 
     override fun onDestroyView() {
@@ -114,7 +113,7 @@ class NumberVerificationFragment : Fragment(), View.OnClickListener, CountryCode
 
                         activity?.let { AndroidUtils.showSnackBar(it, getString(R.string.verification_code_sent)) }
 
-                        val phoneNumber = binding?.countryCodeSp?.fullNumberWithPlus
+                        val phoneNumber = binding.countryCodeSp.fullNumberWithPlus
 
                         Log.d(TAG, "Phone number $phoneNumber sending")
                         activity?.let { mainActivity ->
@@ -125,14 +124,14 @@ class NumberVerificationFragment : Fragment(), View.OnClickListener, CountryCode
 
                     }else{
                         Log.d(TAG, "Phone number not sending")
-                        binding?.numberVerificationPhoneEt?.error = getString(R.string.phone_number_invalid)
+                        binding.numberVerificationPhoneEt.error = getString(R.string.phone_number_invalid)
                     }
                 }
                 R.id.number_verification_verify_code_btn -> {
 
                     AndroidUtils.hideKeyboard(requireActivity())
 
-                    val code = binding?.numberVerificationCodeEt?.text?.trim().toString()
+                    val code = binding.numberVerificationCodeEt.text?.trim().toString()
 
                     if (code == credential?.smsCode) {
 
@@ -167,7 +166,7 @@ class NumberVerificationFragment : Fragment(), View.OnClickListener, CountryCode
 
     override fun onValidityChanged(isValidNumber: Boolean) {
         isPhoneNumberValid = if(isValidNumber){
-            Log.d(TAG, "Phone Number: " + binding?.countryCodeSp?.fullNumberWithPlus)
+            Log.d(TAG, "Phone Number: " + binding.countryCodeSp.fullNumberWithPlus)
             true
         }else{
             false

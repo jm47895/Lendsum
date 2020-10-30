@@ -27,7 +27,6 @@ import com.lendsumapp.lendsum.util.GlobalConstants.CHAT_ROOM_BUNDLE_KEY
 import com.lendsumapp.lendsum.util.GlobalConstants.CHAT_ROOM_REQUEST_KEY
 import com.lendsumapp.lendsum.viewmodel.ChatRoomViewModel
 import dagger.hilt.android.AndroidEntryPoint
-import java.util.*
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -84,7 +83,7 @@ class ChatRoomFragment : Fragment(), View.OnClickListener,
         binding?.chatRoomSearchView?.setOnQueryTextListener(this)
 
         //This listener listens for click from the chat room list in the messages fragment and populates the data associated with the list
-        setFragmentResultListener(CHAT_ROOM_REQUEST_KEY){ key, bundle->
+        setFragmentResultListener(CHAT_ROOM_REQUEST_KEY){ _, bundle->
 
             currentChatRoom = bundle.getParcelable(CHAT_ROOM_BUNDLE_KEY)
             chatRoomViewModel.getCurrentCachedMessages(currentChatRoom?.chatRoomId.toString())
@@ -202,8 +201,7 @@ class ChatRoomFragment : Fragment(), View.OnClickListener,
     private fun createNewChatRoom(msg: String) {
         val guestId = guestUser.userId
         val hostId = hostUser.userId
-        val idList = listOf(guestId, hostId)
-        Collections.sort(idList)
+        val idList = listOf(guestId, hostId).sorted()
         val chatRoomId = idList[0].substring(0, 5) + idList[1].substring(0, 5)
         val chatRoomUserList = listOf(guestUser)
 
@@ -222,7 +220,7 @@ class ChatRoomFragment : Fragment(), View.OnClickListener,
 
         guestUser = item
 
-        val newParticipant = listOf<User>(item)
+        val newParticipant = listOf(item)
 
         initRecyclerView(MESSAGE_RECYCLER_VIEW)
         handleMessageUi(newParticipant)
