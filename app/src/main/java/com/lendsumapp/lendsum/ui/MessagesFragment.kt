@@ -91,12 +91,12 @@ class MessagesFragment : Fragment(), View.OnClickListener, ChatRoomListAdapter.I
 
     }
 
-    companion object{
-        private val TAG = MessagesFragment::class.simpleName
-    }
-
     override fun onItemSelected(position: Int, item: ChatRoom) {
         setFragmentResult(CHAT_ROOM_REQUEST_KEY, bundleOf(CHAT_ROOM_BUNDLE_KEY to item))
         findNavController().navigate(R.id.action_messagesFragment_to_chatRoomFragment)
+    }
+
+    companion object{
+        private val TAG = MessagesFragment::class.simpleName
     }
 }

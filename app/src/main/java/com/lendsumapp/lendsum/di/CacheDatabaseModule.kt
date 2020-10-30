@@ -12,7 +12,7 @@ import javax.inject.Singleton
 
 @InstallIn(ApplicationComponent::class)
 @Module
-object DatabaseModule{
+object CacheDatabaseModule{
 
     @Provides
     @Singleton

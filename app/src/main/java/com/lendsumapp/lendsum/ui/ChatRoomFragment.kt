@@ -28,6 +28,7 @@ import com.lendsumapp.lendsum.util.GlobalConstants.CHAT_ROOM_REQUEST_KEY
 import com.lendsumapp.lendsum.viewmodel.ChatRoomViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import java.util.*
+import javax.inject.Inject
 
 @AndroidEntryPoint
 class ChatRoomFragment : Fragment(), View.OnClickListener,
@@ -40,12 +41,29 @@ class ChatRoomFragment : Fragment(), View.OnClickListener,
     private lateinit var userSearchListAdapter: UserSearchListAdapter
     private lateinit var messageListAdapter: MessageListAdapter
     private lateinit var remoteDbUserListObserver: Observer<List<User>>
+    private lateinit var cachedUserObserver: Observer<User>
+    private lateinit var cachedMessagesObserver: Observer<List<Message>>
     private var currentListOfMessages = mutableListOf<Message>()
     private var guestUser = User()
+    private var hostUser = User()
     private var isChatRoomEmpty = true
     private var currentChatRoom: ChatRoom? = null
-    private var oldDate: String = ""
-    private val hostId = FirebaseAuth.getInstance().currentUser?.uid.toString()
+    @Inject lateinit var firebaseAuth: FirebaseAuth
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+
+        chatRoomViewModel.getCurrentCachedUser(firebaseAuth.currentUser?.uid.toString())
+
+        cachedUserObserver = Observer { cachedUser->
+            hostUser = cachedUser
+        }
+
+        cachedMessagesObserver = Observer { cachedListOfMessages ->
+            currentListOfMessages = cachedListOfMessages.toMutableList()
+            messageListAdapter.submitList(currentListOfMessages)
+        }
+    }
 
 
     override fun onCreateView(
@@ -59,23 +77,24 @@ class ChatRoomFragment : Fragment(), View.OnClickListener,
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        chatRoomViewModel.getUser().observe(viewLifecycleOwner, cachedUserObserver)
+
         binding?.chatRoomSendMsgBtn?.setOnClickListener(this)
         binding?.chatRoomBackBtn?.setOnClickListener(this)
         binding?.chatRoomSearchView?.setOnQueryTextListener(this)
 
+        //This listener listens for click from the chat room list in the messages fragment and populates the data associated with the list
         setFragmentResultListener(CHAT_ROOM_REQUEST_KEY){ key, bundle->
 
             currentChatRoom = bundle.getParcelable(CHAT_ROOM_BUNDLE_KEY)
+            chatRoomViewModel.getCurrentCachedMessages(currentChatRoom?.chatRoomId.toString())
 
             initRecyclerView(MESSAGE_RECYCLER_VIEW)
 
+            chatRoomViewModel.getCurrentMessages().observe(viewLifecycleOwner, cachedMessagesObserver)
+
             val users = currentChatRoom?.participants!!
             handleMessageUi(users)
-
-
-            currentListOfMessages = currentChatRoom?.listOfMessages!!
-
-            messageListAdapter.submitList(currentListOfMessages)
 
             binding?.chatRoomList?.visibility = View.VISIBLE
 
@@ -92,14 +111,16 @@ class ChatRoomFragment : Fragment(), View.OnClickListener,
             userSearchListAdapter.submitList(userList)
 
         }
+
+
     }
 
     override fun onDestroyView() {
-        binding?.chatRoomList?.adapter = null
         super.onDestroyView()
-        clearFragmentResultListener("chatRoomRequestKey")
-        chatRoomViewModel.getRemoteDbUserList().removeObserver(remoteDbUserListObserver)
+        binding?.chatRoomList?.adapter = null
         _binding = null
+        clearFragmentResultListener(CHAT_ROOM_REQUEST_KEY)
+        chatRoomViewModel.getRemoteDbUserList().removeObserver(remoteDbUserListObserver)
     }
 
     private fun initRecyclerView(recyclerViewType: Int){
@@ -127,6 +148,7 @@ class ChatRoomFragment : Fragment(), View.OnClickListener,
     override fun onClick(view: View?) {
         when(view?.id){
             R.id.chat_room_back_btn->{
+                //chatRoomViewModel.addMessagesToRealTimeDb(currentChatRoom?.chatRoomId.toString(), currentListOfMessages)
                 findNavController().navigate(R.id.action_chatRoomFragment_to_messagesFragment)
             }
             R.id.chat_room_send_msg_btn->{
@@ -154,38 +176,41 @@ class ChatRoomFragment : Fragment(), View.OnClickListener,
 
     private fun addNewMessage(msg: String, chatRoom: ChatRoom) {
 
-        var dateAndTime = AndroidUtils.getDateAndTime()
+        val newMessage = Message(AndroidUtils.getTimestampInstant(), chatRoom.chatRoomId, firebaseAuth.currentUser?.uid.toString(), guestUser.profilePicUri, msg, null)
 
-        if (oldDate == AndroidUtils.getDateAndTime()){
-            dateAndTime = ""
-        }
-
-        currentListOfMessages.add(Message(dateAndTime, chatRoom.chatRoomId, hostId, guestUser.profilePicUri, msg, null))
+        currentListOfMessages.add(newMessage)
         messageListAdapter.submitList(currentListOfMessages.toMutableList())
         messageListAdapter.notifyDataSetChanged()
+        binding?.chatRoomList?.smoothScrollToPosition(currentListOfMessages.size -1)
         binding?.chatRoomMsgEt?.text?.clear()
-        oldDate = AndroidUtils.getDateAndTime()
 
+        cacheNewMessage(newMessage)
         updateCachedChatRoom(chatRoom, msg)
 
     }
 
+    private fun cacheNewMessage(newMessage: Message) {
+        chatRoomViewModel.cacheNewMessage(newMessage)
+    }
+
     private fun updateCachedChatRoom(chatRoom: ChatRoom, lastMsg: String) {
         chatRoom.lastMessage = lastMsg
-        chatRoom.listOfMessages = currentListOfMessages
-        chatRoom.lastTimestamp = AndroidUtils.getShortDate()
+        chatRoom.lastTimestamp = AndroidUtils.getTimestampInstant()
         chatRoomViewModel.updateExistingCachedChatRoom(chatRoom)
     }
 
     private fun createNewChatRoom(msg: String) {
         val guestId = guestUser.userId
+        val hostId = hostUser.userId
         val idList = listOf(guestId, hostId)
         Collections.sort(idList)
         val chatRoomId = idList[0].substring(0, 5) + idList[1].substring(0, 5)
         val chatRoomUserList = listOf(guestUser)
 
-        val newChatRoom = ChatRoom(chatRoomId, chatRoomUserList, currentListOfMessages, msg, AndroidUtils.getShortDate())
+        val newChatRoom = ChatRoom(chatRoomId, chatRoomUserList, msg, AndroidUtils.getTimestampInstant())
 
+        //chatRoomViewModel.addParticipantsToRealTimeDb(chatRoomId, listOf(guestUser, hostUser))
+        //chatRoomViewModel.addChatroomUserToRealTimeDb(idList, chatRoomId)
         chatRoomViewModel.cacheNewChatRoom(newChatRoom)
 
         addNewMessage(msg, newChatRoom)

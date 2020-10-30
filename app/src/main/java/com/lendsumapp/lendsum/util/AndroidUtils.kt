@@ -1,8 +1,7 @@
 package com.lendsumapp.lendsum.util
 
 import android.app.Activity
-import android.content.Context
-import android.content.Context.INPUT_METHOD_SERVICE
+import android.os.Build
 import android.text.TextUtils
 import android.util.Patterns
 import android.view.View
@@ -10,16 +9,12 @@ import android.view.inputmethod.InputMethodManager
 import androidx.core.content.ContextCompat
 import com.google.android.material.snackbar.Snackbar
 import com.lendsumapp.lendsum.R
-import com.lendsumapp.lendsum.ui.CreateAccountFragment
 import com.lendsumapp.lendsum.util.GlobalConstants.PASSWORD_PATTERN
-import dagger.hilt.android.scopes.ActivityScoped
-import dagger.hilt.android.scopes.FragmentScoped
-import java.io.File
 import java.text.DateFormat
+import java.time.ZonedDateTime
 import java.util.*
 import java.util.regex.Matcher
 import java.util.regex.Pattern
-import javax.inject.Inject
 
 class AndroidUtils{
 
@@ -68,19 +63,23 @@ class AndroidUtils{
             view.visibility = View.GONE
         }
 
-        fun getShortDate():String{
-
-            val currentDate = Calendar.getInstance().time
-
-            val formattedDate = DateFormat.getDateInstance(DateFormat.MEDIUM).format(currentDate)
-
-            return formattedDate.substring(0, formattedDate.indexOf(","))
+        fun getTimestampInstant(): Long{
+            return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                ZonedDateTime.now().toInstant().toEpochMilli()
+            } else {
+                Date().time
+            }
         }
 
-        fun getDateAndTime():String{
-            val currentTime = Calendar.getInstance().time
+        fun convertTimestampToFullDate(timeStamp: Long): String{
+            return DateFormat.getDateTimeInstance(DateFormat.LONG, DateFormat.SHORT).format(timeStamp)
+        }
 
-            return DateFormat.getDateTimeInstance(DateFormat.LONG, DateFormat.SHORT).format(currentTime)
+        fun convertTimestampToShortDate(timeStamp: Long): String{
+
+            val formattedDate = DateFormat.getDateInstance(DateFormat.MEDIUM).format(timeStamp)
+
+            return formattedDate.substring(0, formattedDate.indexOf(","))
         }
     }
 }

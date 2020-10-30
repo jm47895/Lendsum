@@ -11,10 +11,9 @@ import kotlinx.android.parcel.RawValue
 @Entity(tableName = "chat_rooms")
 data class ChatRoom(
     @PrimaryKey @ColumnInfo(name = "chatRoomId") var chatRoomId: String,
-    @ColumnInfo(name = "participants") var participants : @RawValue List<User>?,
-    @ColumnInfo(name = "listOfMessages") var listOfMessages : @RawValue MutableList<Message>?,
+    @ColumnInfo(name = "participants") var participants : @RawValue List<User>,
     @ColumnInfo(name = "lastMessage") var lastMessage: String,
-    @ColumnInfo(name = "lastTimestamp") var lastTimestamp: String
+    @ColumnInfo(name = "lastTimestamp") var lastTimestamp: Long
 ) : Parcelable{
-    constructor(): this("",null,null, "", "")
+    constructor(): this("", emptyList<User>(),"", 0)
 }

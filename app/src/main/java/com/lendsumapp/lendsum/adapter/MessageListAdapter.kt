@@ -13,6 +13,7 @@ import com.google.firebase.auth.FirebaseAuth
 import com.lendsumapp.lendsum.R
 import com.lendsumapp.lendsum.data.model.Message
 import com.lendsumapp.lendsum.databinding.MessageListItemBinding
+import com.lendsumapp.lendsum.util.AndroidUtils
 import java.util.*
 
 
@@ -62,12 +63,9 @@ class MessageListAdapter(private val interaction: Interaction? = null) :
 
         fun bind(item: Message){
 
-            binding.messageTimestampTv.text = item.messageTimestamp
+            val date = AndroidUtils.convertTimestampToFullDate(item.messageTimestamp)
 
-            if(item.messageTimestamp == ""){
-                binding.messageTimestampTv.visibility = View.GONE
-            }
-
+            binding.messageTimestampTv.text = date
 
             if(item.messageSender == firebaseUser?.uid){
                 binding.messageHostTv.text = item.message

@@ -13,6 +13,7 @@ import com.lendsumapp.lendsum.R
 import com.lendsumapp.lendsum.data.model.ChatRoom
 import com.lendsumapp.lendsum.data.model.User
 import com.lendsumapp.lendsum.databinding.ChatRoomListItemBinding
+import com.lendsumapp.lendsum.util.AndroidUtils
 
 class ChatRoomListAdapter(private val interaction: Interaction? = null) :
     RecyclerView.Adapter<RecyclerView.ViewHolder>() {
@@ -83,7 +84,7 @@ class ChatRoomListAdapter(private val interaction: Interaction? = null) :
                 .into(binding.chatRoomListItemProfPic)
 
             binding.chatRoomListItemNameTv.text = guestUser.name
-            binding.chatRoomListItemDateTv.text = item.lastTimestamp
+            binding.chatRoomListItemDateTv.text = AndroidUtils.convertTimestampToShortDate(item.lastTimestamp)
             binding.chatRoomListItemLastMsgTv.text = item.lastMessage
         }
     }

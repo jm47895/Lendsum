@@ -8,8 +8,8 @@ import java.util.*
 
 @Entity(tableName = "chat_messages")
 data class Message(
-    @PrimaryKey @ColumnInfo(name = "timestamp") var messageTimestamp: String,
-    @ColumnInfo(name = "chatRoom") var chatRoom: String,
+    @PrimaryKey @ColumnInfo(name = "timestamp") var messageTimestamp: Long,
+    @ColumnInfo(name = "chatRoomId") var chatRoomId: String,
     @ColumnInfo(name = "sender") var messageSender: String,
     @ColumnInfo(name = "guestPic") var guestPic: String?,
     @ColumnInfo(name = "message") var message: String,

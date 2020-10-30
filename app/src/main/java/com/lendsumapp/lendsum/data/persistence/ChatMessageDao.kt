@@ -15,6 +15,6 @@ interface ChatMessageDao {
     @Delete
     suspend fun deleteChatMessage(message: Message)
 
-    @Query("SELECT * FROM chat_messages WHERE chatRoom = :chatRoomId")
+    @Query("SELECT * FROM chat_messages WHERE chatRoomId = :chatRoomId ORDER BY timestamp ASC")
     suspend fun getChatRoomMessages(chatRoomId: String): List<Message>
 }
