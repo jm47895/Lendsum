@@ -16,7 +16,6 @@ import dagger.hilt.android.scopes.FragmentScoped
 import javax.inject.Inject
 import javax.inject.Singleton
 
-@ActivityScoped
 class GoogleAuthComponent @Inject constructor(){
 
     private val firebaseAuth : FirebaseAuth = FirebaseAuth.getInstance()

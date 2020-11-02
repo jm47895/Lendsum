@@ -11,7 +11,6 @@ import dagger.hilt.android.scopes.ActivityScoped
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
-@ActivityScoped
 class PhoneAuthComponent @Inject constructor() {
 
     private val firebaseAuth : FirebaseAuth = FirebaseAuth.getInstance()

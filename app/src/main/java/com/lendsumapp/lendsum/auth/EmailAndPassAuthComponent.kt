@@ -7,9 +7,9 @@ import com.google.firebase.auth.*
 import com.lendsumapp.lendsum.util.GlobalConstants.PROFILE_NAME_KEY
 import com.lendsumapp.lendsum.util.GlobalConstants.PROFILE_PIC_URI_KEY
 import dagger.hilt.android.scopes.ActivityScoped
+import dagger.hilt.android.scopes.FragmentScoped
 import javax.inject.Inject
 
-@ActivityScoped
 class EmailAndPassAuthComponent @Inject constructor(){
 
     private val firebaseAuth : FirebaseAuth = FirebaseAuth.getInstance()

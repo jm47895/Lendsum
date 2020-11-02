@@ -18,7 +18,6 @@ import dagger.hilt.android.scopes.FragmentScoped
 import javax.inject.Inject
 import javax.inject.Singleton
 
-@ActivityScoped
 class FacebookAuthComponent @Inject constructor(){
 
     private val callbackManager by lazy { CallbackManager.Factory.create() }
