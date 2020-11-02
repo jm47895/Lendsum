@@ -3,12 +3,10 @@ package com.lendsumapp.lendsum.auth
 import android.app.Activity
 import android.util.Log
 import androidx.lifecycle.MutableLiveData
+import com.google.firebase.BuildConfig
 import com.google.firebase.FirebaseException
 import com.google.firebase.FirebaseTooManyRequestsException
-import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException
-import com.google.firebase.auth.PhoneAuthCredential
-import com.google.firebase.auth.PhoneAuthProvider
+import com.google.firebase.auth.*
 import dagger.hilt.android.scopes.ActivityScoped
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
@@ -19,48 +17,40 @@ class PhoneAuthComponent @Inject constructor() {
     private val firebaseAuth : FirebaseAuth = FirebaseAuth.getInstance()
     private val generatedPhoneAuthCode: MutableLiveData<PhoneAuthCredential> = MutableLiveData()
     private val linkPhoneNumWithCredentialStatus: MutableLiveData<Boolean> = MutableLiveData()
+    private val testNum = "+19995551234"
+    private val code = "123456"
 
     fun verifyPhoneNumber(phoneNumber: String, activity: Activity){
-        PhoneAuthProvider.getInstance().verifyPhoneNumber(phoneNumber, 60, TimeUnit.SECONDS, activity, callbacks)
+
+        val number: String
+
+        if(com.lendsumapp.lendsum.BuildConfig.DEBUG) {
+            number = testNum
+            firebaseAuth.firebaseAuthSettings.setAutoRetrievedSmsCodeForPhoneNumber(number, code)
+        }else{
+            number = phoneNumber
+        }
+
+        val options = PhoneAuthOptions.newBuilder(firebaseAuth)
+            .setPhoneNumber(number)       // Phone number to verify
+            .setTimeout(60L, TimeUnit.SECONDS) // Timeout and unit
+            .setActivity(activity)                 // Activity (for callback binding)
+            .setCallbacks(callbacks)          // OnVerificationStateChangedCallbacks
+            .build()
+
+        PhoneAuthProvider.verifyPhoneNumber(options)
     }
 
-    private val callbacks = object : PhoneAuthProvider.OnVerificationStateChangedCallbacks() {
-
+    private val callbacks = object: PhoneAuthProvider.OnVerificationStateChangedCallbacks(){
         override fun onVerificationCompleted(credential: PhoneAuthCredential) {
-            // This callback will be invoked in two situations:
-            // 1 - Instant verification. In some cases the phone number can be instantly
-            //     verified without needing to send or enter a verification code.
-            // 2 - Auto-retrieval. On some devices Google Play services can automatically
-            //     detect the incoming verification SMS and perform verification without
-            //     user action.
-            Log.d(TAG, "onVerificationCompleted, here is the code: ${credential.smsCode}")
-
-            generatedPhoneAuthCode.value = credential
-
+            Log.d(TAG, "Phone Auth credential retrieved")
+            generatedPhoneAuthCode.postValue(credential)
         }
 
         override fun onVerificationFailed(e: FirebaseException) {
-            // This callback is invoked in an invalid request for verification is made,
-            // for instance if the the phone number format is not valid.
-            Log.d(TAG, "onVerificationFailed", e)
-
-            when (e) {
-                is FirebaseAuthInvalidCredentialsException -> {
-                    Log.d(TAG, e.toString())
-                }
-                is FirebaseTooManyRequestsException -> {
-                    Log.d(TAG, e.toString())
-                }
-                else -> {
-                    Log.d(TAG, e.toString())
-                }
-            }
-
-            // Show a message and update the UI
-            // ...
+            Log.d(TAG, "No phone auth credential: $e")
+            generatedPhoneAuthCode.postValue(null)
         }
-
-
     }
 
     fun getGeneratedPhoneAuthCode(): MutableLiveData<PhoneAuthCredential>{
