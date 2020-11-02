@@ -7,7 +7,6 @@ import com.lendsumapp.lendsum.ui.MessagesFragment
 import dagger.hilt.android.scopes.ActivityScoped
 import javax.inject.Inject
 
-@ActivityScoped
 class MessagesRepository @Inject constructor(
     private val cacheDatabase: LendsumDatabase
 ){

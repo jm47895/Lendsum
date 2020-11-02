@@ -15,7 +15,6 @@ import com.lendsumapp.lendsum.auth.PhoneAuthComponent
 import dagger.hilt.android.scopes.ActivityScoped
 import javax.inject.Inject
 
-@ActivityScoped
 class LoginRepository @Inject constructor(
     private val googleAuthComponent: GoogleAuthComponent,
     private val facebookAuthComponent: FacebookAuthComponent,

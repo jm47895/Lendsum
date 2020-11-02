@@ -10,7 +10,6 @@ import com.lendsumapp.lendsum.data.persistence.LendsumDatabase
 import dagger.hilt.android.scopes.ActivityScoped
 import javax.inject.Inject
 
-@ActivityScoped
 class ProfileRepository @Inject constructor(
     private val database: LendsumDatabase,
     private var firebaseAuth: FirebaseAuth?

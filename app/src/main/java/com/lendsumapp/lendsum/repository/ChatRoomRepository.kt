@@ -14,8 +14,6 @@ import com.lendsumapp.lendsum.util.GlobalConstants.USER_COLLECTION_PATH
 import dagger.hilt.android.scopes.ActivityScoped
 import javax.inject.Inject
 
-
-@ActivityScoped
 class ChatRoomRepository @Inject constructor(
     private val firestoreDb: FirebaseFirestore,
     private val lendsumDatabase: LendsumDatabase,

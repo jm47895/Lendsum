@@ -11,7 +11,6 @@ import com.lendsumapp.lendsum.util.GlobalConstants
 import dagger.hilt.android.scopes.ActivityScoped
 import javax.inject.Inject
 
-@ActivityScoped
 class EditProfileRepository @Inject constructor(
     private val lendsumDatabase: LendsumDatabase,
     private val emailAndPassAuthComponent: EmailAndPassAuthComponent,

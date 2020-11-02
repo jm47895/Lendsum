@@ -18,7 +18,6 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.android.scopes.ActivityScoped
 import javax.inject.Inject
 
-@ActivityScoped
 class NumberVerificationRepository @Inject constructor(
     private val cacheDb: LendsumDatabase,
     private val firestoreDb: FirebaseFirestore,
