@@ -11,6 +11,7 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import androidx.navigation.findNavController
 import androidx.navigation.fragment.findNavController
+import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.PhoneAuthCredential
 import com.hbb20.CountryCodePicker
 import com.lendsumapp.lendsum.R
@@ -21,6 +22,7 @@ import com.lendsumapp.lendsum.util.GlobalConstants.RETURNING_USER
 import com.lendsumapp.lendsum.util.NetworkUtils
 import com.lendsumapp.lendsum.viewmodel.NumberVerificationViewModel
 import dagger.hilt.android.AndroidEntryPoint
+import javax.inject.Inject
 
 @AndroidEntryPoint
 class NumberVerificationFragment : Fragment(), View.OnClickListener, CountryCodePicker.PhoneNumberValidityChangeListener{
@@ -31,24 +33,27 @@ class NumberVerificationFragment : Fragment(), View.OnClickListener, CountryCode
     private val numberVerificationViewModel: NumberVerificationViewModel by viewModels()
     private lateinit var phoneNumberCredentialObserver: Observer<PhoneAuthCredential>
     private lateinit var linkPhoneNumberStatusObserver: Observer<Boolean>
-    private lateinit var signInCacheStatusObserver: Observer<Boolean>
+    private lateinit var localCacheStatusObserver: Observer<Boolean>
     private var credential: PhoneAuthCredential? = null
     private var isPhoneNumberValid = false
+    @Inject lateinit var firebaseAuth: FirebaseAuth
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        /*The sign in cache observer checks for a sql cache in the app on sign in with an existing user
-        who installs app on a new phone or re-installs the app. If either case, we re-cache the user during number
-        verification to not break cache calls in the main app*/
-        numberVerificationViewModel.checkIfSignInCacheDbExists(getString(R.string.database_name))
-        signInCacheStatusObserver = Observer { doesSignInCacheExist->
+        /*The local cache observer checks for a sql cache in the app on sign in with an existing user
+        who installs app on a new phone or re-installs the app. If either case, we re-cache all info
+        from remote databases*/
+        numberVerificationViewModel.doesLendsumDbCacheExist(requireContext(), getString(R.string.database_name))
+        localCacheStatusObserver = Observer { doesSignInCacheExist->
             if(!doesSignInCacheExist && sharedPrefs?.getBoolean(RETURNING_USER, false) == true){
-                Log.d(TAG, "Database cache does not exist, getting info from remote db")
-                numberVerificationViewModel.getExistingUserFromFirestore()
+                Log.d(TAG, "Database cache does not exist for returning user, syncing data from remote dbs")
+                numberVerificationViewModel.syncAllDataFromDatabases(firebaseAuth.currentUser?.uid.toString())
+            }else{
+                Log.d(TAG, "Local cache exists")
             }
         }
-        numberVerificationViewModel.getCacheStatus().observe(this, signInCacheStatusObserver)
+        numberVerificationViewModel.getCacheStatus().observe(this, localCacheStatusObserver)
 
         phoneNumberCredentialObserver = Observer { phoneAuthCredential ->
             credential = phoneAuthCredential

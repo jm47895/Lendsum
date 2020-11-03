@@ -9,6 +9,7 @@ import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.SetOptions
 import com.google.firebase.firestore.ktx.toObject
 import com.lendsumapp.lendsum.R
+import com.lendsumapp.lendsum.data.DataSyncManager
 import com.lendsumapp.lendsum.data.model.User
 import com.lendsumapp.lendsum.data.persistence.LendsumDatabase
 import com.lendsumapp.lendsum.util.DatabaseUtils
@@ -21,7 +22,7 @@ import javax.inject.Inject
 class NumberVerificationRepository @Inject constructor(
     private val cacheDb: LendsumDatabase,
     private val firestoreDb: FirebaseFirestore,
-    @ActivityContext private val  context: Context
+    private val dataSyncManager: DataSyncManager
 ) {
 
     private val remoteUserObject: MutableLiveData<User> = MutableLiveData()
@@ -31,9 +32,6 @@ class NumberVerificationRepository @Inject constructor(
         cacheDb.getUserDao().insertUser(user)
     }
 
-    fun doesDbCacheExist(dbName: String): Boolean{
-        return DatabaseUtils.doesCacheDatabaseExist(context, dbName)
-    }
     //End cache functions
 
     //Firestore functions
@@ -49,28 +47,20 @@ class NumberVerificationRepository @Inject constructor(
 
     }
 
-    fun getExistingUserFromFirestore(uid: String){
-
-        firestoreDb.collection(USER_COLLECTION_PATH)
-            .document(uid)
-            .get().addOnSuccessListener { document ->
-                if(document != null){
-                    Log.d(TAG, "Document Exists")
-                    remoteUserObject.postValue( document.toObject<User>())
-                }else{
-                    Log.d(TAG, "Document Does not exist")
-                }
-            }
-            .addOnFailureListener { exception ->
-                Log.d(TAG, exception.toString())
-            }
-
-    }
-
     fun getRemoteUser(): MutableLiveData<User> {
         return remoteUserObject
     }
     //End firestore functions
+
+    //Sync data functions
+    fun doesLendsumDbCacheExist(context: Context, dbName: String): Boolean{
+        return dataSyncManager.doesLendsumDbExist(context, dbName)
+    }
+
+    fun syncAllDataFromDatabases(uid: String){
+        dataSyncManager.syncAllDataFromDatabases(uid)
+    }
+    //End Sync data functions
 
     companion object{
         private val TAG = NumberVerificationRepository::class.simpleName

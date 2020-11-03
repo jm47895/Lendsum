@@ -1,6 +1,7 @@
 package com.lendsumapp.lendsum.viewmodel
 
 import android.app.Activity
+import android.content.Context
 import android.util.Log
 import androidx.hilt.lifecycle.ViewModelInject
 import androidx.lifecycle.MutableLiveData
@@ -21,8 +22,12 @@ class NumberVerificationViewModel @ViewModelInject constructor(
     private val firebaseAuth: FirebaseAuth
 ): ViewModel(){
 
-    private val doesCacheExist: MutableLiveData<Boolean> = MutableLiveData()
-    private lateinit var firestoreUserObserver: Observer<User>
+    private val cacheDbStatus: MutableLiveData<Boolean> = MutableLiveData()
+
+
+    fun getCacheStatus(): MutableLiveData<Boolean> {
+        return cacheDbStatus
+    }
 
     fun sendSMSCode(phoneNumber: String, activity: Activity){
         viewModelScope.launch(Dispatchers.IO) {
@@ -53,40 +58,12 @@ class NumberVerificationViewModel @ViewModelInject constructor(
         }
     }
 
-    fun checkIfSignInCacheDbExists(dbName: String){
-        viewModelScope.launch(Dispatchers.IO) {
-            doesCacheExist.postValue(numberVerificationRepository.doesDbCacheExist(dbName))
-        }
-    }
-
-    fun getCacheStatus(): MutableLiveData<Boolean>{
-        return doesCacheExist
-    }
-
     fun insertNewUserIntoFirestoreDb(){
 
         val user = getNewUserObject()
 
         numberVerificationRepository.insertUserIntoFirestore(user)
     }
-
-    fun getExistingUserFromFirestore(){
-        firestoreUserObserver = Observer {
-            Log.d(TAG, "Existing user observer hit: $it")
-            insertExistingUserIntoSqlCache(it)
-            numberVerificationRepository.getRemoteUser().removeObserver(firestoreUserObserver)
-        }
-        numberVerificationRepository.getRemoteUser().observeForever(firestoreUserObserver)
-        numberVerificationRepository.getExistingUserFromFirestore(firebaseAuth.currentUser?.uid.toString())
-    }
-
-    private fun insertExistingUserIntoSqlCache(user: User) {
-        viewModelScope.launch(Dispatchers.IO){
-            Log.d(TAG, "Caching $user")
-            numberVerificationRepository.insertUserIntoSqlCache(user)
-        }
-    }
-
 
     private fun getNewUserObject(): User{
         val firebaseUser = firebaseAuth.currentUser!!
@@ -103,6 +80,20 @@ class NumberVerificationViewModel @ViewModelInject constructor(
 
         return "@$firstName-$firstFiveUidDigits"
     }
+
+    //Sync data functions
+    fun doesLendsumDbCacheExist(context: Context, dbName: String){
+        viewModelScope.launch(Dispatchers.IO) {
+            cacheDbStatus.postValue(numberVerificationRepository.doesLendsumDbCacheExist(context, dbName))
+        }
+    }
+
+    fun syncAllDataFromDatabases(uid: String){
+        viewModelScope.launch(Dispatchers.IO) {
+            numberVerificationRepository.syncAllDataFromDatabases(uid)
+        }
+    }
+    //End sync data functions
 
     companion object{
         private val TAG = NumberVerificationViewModel::class.simpleName
