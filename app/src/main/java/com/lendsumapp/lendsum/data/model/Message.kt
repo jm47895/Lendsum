@@ -15,4 +15,6 @@ data class Message(
     @ColumnInfo(name = "message") var message: String,
     @ColumnInfo(name = "listOfImageUris") var listOfImageUris: List<String>?,
     @ColumnInfo(name = "sentToRemoteDb") var sentToRemoteDb: Boolean = false
-)
+){
+    constructor(): this(0, "", "", null, "", null)
+}

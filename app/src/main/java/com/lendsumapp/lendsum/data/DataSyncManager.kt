@@ -26,6 +26,7 @@ class DataSyncManager @Inject constructor(
 ){
     private val listOfChatIds = mutableListOf<String>()
 
+    //Full data sync on reinstall for existing user methods
     fun doesLendsumDbExist(context: Context, dbName: String): Boolean{
         return DatabaseUtils.doesCacheDatabaseExist(context, dbName)
     }
@@ -36,22 +37,46 @@ class DataSyncManager @Inject constructor(
     }
 
     private fun syncAllMessagesDataFromRealtimeDb(uid: String){
-        val messageRef = realTimeDb.child("usr").child(uid).ref
-        messageRef.addListenerForSingleValueEvent(messageListener)
+        val chatIdRef = realTimeDb.child("usr").child(uid).ref
+        chatIdRef.addListenerForSingleValueEvent(chatIdsListener)
     }
 
-    private val messageListener =  object: ValueEventListener {
+    private val chatIdsListener =  object: ValueEventListener {
 
         override fun onDataChange(snapshot: DataSnapshot) {
             for (data in snapshot.children) {
                 listOfChatIds.add(data.value.toString())
             }
+            getMessagesFromRealtimeDb(listOfChatIds)
         }
 
         override fun onCancelled(error: DatabaseError) {
             Log.d(TAG, "Failure to retrieve messages from Realtime Database: $error")
         }
 
+    }
+
+    private fun getMessagesFromRealtimeDb(listOfChatIds: MutableList<String>) {
+        for (chatIds in listOfChatIds){
+            val messagesRef = realTimeDb.child("msg").child(chatIds).ref
+            messagesRef.addListenerForSingleValueEvent(messageListener)
+        }
+    }
+
+    private val messageListener = object : ValueEventListener {
+
+        override fun onDataChange(snapshot: DataSnapshot) {
+            for (data in snapshot.children){
+                val msg: Message = data.getValue(Message::class.java)!!
+                GlobalScope.launch(Dispatchers.IO) {
+                    insertAllExistingUserMessagesIntoLocaleCache(msg)
+                }
+            }
+        }
+
+        override fun onCancelled(error: DatabaseError) {
+            Log.d(TAG, error.message)
+        }
     }
 
     private fun syncAllUserDataFromFirestore(uid: String){
@@ -62,7 +87,7 @@ class DataSyncManager @Inject constructor(
                 if(document != null){
                     Log.d(TAG, "Retrieved Existing User Firestore Document")
                     GlobalScope.launch(Dispatchers.IO) {
-                        insertExistingUserIntoLocalCache(document.toObject<User>()!!)
+                        insertAllExistingUserIntoLocalCache(document.toObject<User>()!!)
                     }
                 }else{
                     /*This will only be hit if we lose all of our remote user data, which in this case
@@ -75,16 +100,17 @@ class DataSyncManager @Inject constructor(
             }
     }
 
-    private suspend fun insertExistingUserIntoLocalCache(user: User){
+    private suspend fun insertAllExistingUserIntoLocalCache(user: User){
         lendsumDatabase.getUserDao().insertUser(user)
         Log.d(TAG, "Existing user synced into local cache")
     }
 
-    private suspend fun insertExistingUserMessagesIntoLocaleCache(listOfMessage: List<Message>){
-        for(message in listOfMessage){
-            lendsumDatabase.getChatMessageDao().insertChatMessage(message)
-        }
+    private suspend fun insertAllExistingUserMessagesIntoLocaleCache(message: Message){
+        lendsumDatabase.getChatMessageDao().insertChatMessage(message)
+
+        Log.d(TAG, "Existing message synced into local cache")
     }
+    //End of full data sync on reinstall for existing user methods
 
     companion object{
         private val TAG = DataSyncManager::class.java.simpleName
