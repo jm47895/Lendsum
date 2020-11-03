@@ -13,5 +13,6 @@ data class Message(
     @ColumnInfo(name = "sender") var messageSender: String,
     @ColumnInfo(name = "guestPic") var guestPic: String?,
     @ColumnInfo(name = "message") var message: String,
-    @ColumnInfo(name = "listOfImageUris") var listOfImageUris: List<String>?
+    @ColumnInfo(name = "listOfImageUris") var listOfImageUris: List<String>?,
+    @ColumnInfo(name = "sentToRemoteDb") var sentToRemoteDb: Boolean = false
 )

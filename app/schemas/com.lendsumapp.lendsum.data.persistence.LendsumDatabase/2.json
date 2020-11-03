@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 2,
-    "identityHash": "38d2dbcab9b609cdd7e513dc1237a0c8",
+    "identityHash": "64826327fef964a4d8cc888fd57486bd",
     "entities": [
       {
         "tableName": "bundles",
@@ -228,7 +228,7 @@
       },
       {
         "tableName": "chat_messages",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`timestamp` INTEGER NOT NULL, `chatRoomId` TEXT NOT NULL, `sender` TEXT NOT NULL, `guestPic` TEXT, `message` TEXT NOT NULL, `listOfImageUris` TEXT, PRIMARY KEY(`timestamp`))",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`timestamp` INTEGER NOT NULL, `chatRoomId` TEXT NOT NULL, `sender` TEXT NOT NULL, `guestPic` TEXT, `message` TEXT NOT NULL, `listOfImageUris` TEXT, `sentToRemoteDb` INTEGER NOT NULL, PRIMARY KEY(`timestamp`))",
         "fields": [
           {
             "fieldPath": "messageTimestamp",
@@ -265,6 +265,12 @@
             "columnName": "listOfImageUris",
             "affinity": "TEXT",
             "notNull": false
+          },
+          {
+            "fieldPath": "sentToRemoteDb",
+            "columnName": "sentToRemoteDb",
+            "affinity": "INTEGER",
+            "notNull": true
           }
         ],
         "primaryKey": {
@@ -280,7 +286,7 @@
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '38d2dbcab9b609cdd7e513dc1237a0c8')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '64826327fef964a4d8cc888fd57486bd')"
     ]
   }
 }

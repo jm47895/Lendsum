@@ -176,16 +176,20 @@ class ChatRoomFragment : Fragment(), View.OnClickListener,
     private fun addNewMessage(msg: String, chatRoom: ChatRoom) {
 
         val newMessage = Message(AndroidUtils.getTimestampInstant(), chatRoom.chatRoomId, firebaseAuth.currentUser?.uid.toString(), guestUser.profilePicUri, msg, null)
-
         currentListOfMessages.add(newMessage)
         messageListAdapter.submitList(currentListOfMessages.toMutableList())
         messageListAdapter.notifyDataSetChanged()
-        binding?.chatRoomList?.smoothScrollToPosition(currentListOfMessages.size -1)
+        binding?.chatRoomList?.smoothScrollToPosition(currentListOfMessages.size - 1)
         binding?.chatRoomMsgEt?.text?.clear()
 
         cacheNewMessage(newMessage)
+        sendMessageToRealtimeDB(chatRoom.chatRoomId, newMessage)
         updateCachedChatRoom(chatRoom, msg)
 
+    }
+
+    private fun sendMessageToRealtimeDB(chatRoomId: String, msg: Message) {
+        chatRoomViewModel.addMessageToRealTimeDb(chatRoomId, msg)
     }
 
     private fun cacheNewMessage(newMessage: Message) {
@@ -207,8 +211,7 @@ class ChatRoomFragment : Fragment(), View.OnClickListener,
 
         val newChatRoom = ChatRoom(chatRoomId, chatRoomUserList, msg, AndroidUtils.getTimestampInstant())
 
-        //chatRoomViewModel.addParticipantsToRealTimeDb(chatRoomId, listOf(guestUser, hostUser))
-        //chatRoomViewModel.addChatroomUserToRealTimeDb(idList, chatRoomId)
+        chatRoomViewModel.addUserChatRoomToRealTimeDb(idList, chatRoomId)
         chatRoomViewModel.cacheNewChatRoom(newChatRoom)
 
         addNewMessage(msg, newChatRoom)

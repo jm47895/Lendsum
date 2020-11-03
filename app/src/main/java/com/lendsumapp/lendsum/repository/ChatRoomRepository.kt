@@ -12,6 +12,9 @@ import com.lendsumapp.lendsum.util.GlobalConstants.IS_PROFILE_PUBLIC_KEY
 import com.lendsumapp.lendsum.util.GlobalConstants.USERNAME_KEY
 import com.lendsumapp.lendsum.util.GlobalConstants.USER_COLLECTION_PATH
 import dagger.hilt.android.scopes.ActivityScoped
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 class ChatRoomRepository @Inject constructor(
@@ -43,6 +46,10 @@ class ChatRoomRepository @Inject constructor(
             }
     }
 
+    suspend fun updateMsgInCache(msg: Message){
+        lendsumDatabase.getChatMessageDao().updateChatMessage(msg)
+    }
+
     suspend fun cacheNewChatRoom(chatRoom: ChatRoom){
         lendsumDatabase.getChatRoomDao().insertChatRoom(chatRoom)
     }
@@ -59,7 +66,7 @@ class ChatRoomRepository @Inject constructor(
         return userList
     }
 
-    /*fun addChatroomsToRealTimeDb(userIds: List<String>, chatRoomId: String){
+    fun addUserChatRoomToRealTimeDb(userIds: List<String>, chatRoomId: String){
 
         for(userId in userIds) {
             realTimeDb.child("usr").child(userId).push().setValue(chatRoomId)
@@ -74,19 +81,19 @@ class ChatRoomRepository @Inject constructor(
 
     }
 
-    fun addMessagesToRealTimeDb(chatRoomId: String, listOfMessages: List<Message>){
-        realTimeDb.child("msg").child(chatRoomId).setValue(listOfMessages).addOnCompleteListener { task->
+    fun addMessageToRealTimeDb(chatRoomId: String, msg: Message){
+        realTimeDb.child("msg").child(chatRoomId).push().setValue(msg).addOnCompleteListener { task->
             if(task.isSuccessful){
                 Log.d(TAG, "Messages sent to realtime db")
+                msg.sentToRemoteDb = true
+                GlobalScope.launch(Dispatchers.IO) {
+                    updateMsgInCache(msg)
+                }
             }else{
                 Log.d(TAG, task.exception.toString())
             }
         }
     }
-
-    fun addParticipantsToRealTimeDb(chatRoomId: String, listOfUser: List<User>){
-        realTimeDb.child("ptp").child(chatRoomId).setValue(listOfUser)
-    }*/
 
     companion object{
         private val TAG = ChatRoomRepository::class.simpleName

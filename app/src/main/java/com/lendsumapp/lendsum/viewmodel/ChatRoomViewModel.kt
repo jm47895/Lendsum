@@ -67,17 +67,19 @@ class ChatRoomViewModel @ViewModelInject constructor(
         }
     }
 
-    /*fun addChatroomUserToRealTimeDb(userIds: List<String>, chatRoomId: String){
-        chatRoomRepository.addChatroomsToRealTimeDb(userIds, chatRoomId)
+    fun addUserChatRoomToRealTimeDb(userIds: List<String>, chatRoomId: String){
+        viewModelScope.launch(Dispatchers.IO) {
+            chatRoomRepository.addUserChatRoomToRealTimeDb(userIds, chatRoomId)
+        }
     }
 
-    fun addMessagesToRealTimeDb(chatRoomId: String, listOfMessages: List<Message>){
-        chatRoomRepository.addMessagesToRealTimeDb(chatRoomId, listOfMessages)
+    fun addMessageToRealTimeDb(chatRoomId: String, msg: Message){
+        viewModelScope.launch(Dispatchers.IO) {
+            chatRoomRepository.addMessageToRealTimeDb(chatRoomId, msg)
+        }
     }
 
-    fun addParticipantsToRealTimeDb(chatRoomId: String, listOfUser: List<User>){
-        chatRoomRepository.addParticipantsToRealTimeDb(chatRoomId, listOfUser)
-    }*/
+
 
 
     companion object{
