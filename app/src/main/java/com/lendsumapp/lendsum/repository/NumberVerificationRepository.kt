@@ -25,8 +25,6 @@ class NumberVerificationRepository @Inject constructor(
     private val dataSyncManager: DataSyncManager
 ) {
 
-    private val remoteUserObject: MutableLiveData<User> = MutableLiveData()
-
     //Cache functions
     suspend fun insertUserIntoSqlCache(user: User){
         cacheDb.getUserDao().insertUser(user)
@@ -45,10 +43,6 @@ class NumberVerificationRepository @Inject constructor(
                 Log.w(TAG, "Error adding user to firestore: $it")
             }
 
-    }
-
-    fun getRemoteUser(): MutableLiveData<User> {
-        return remoteUserObject
     }
     //End firestore functions
 
