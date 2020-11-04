@@ -11,7 +11,6 @@ import com.lendsumapp.lendsum.data.persistence.LendsumDatabase
 import com.lendsumapp.lendsum.util.GlobalConstants.IS_PROFILE_PUBLIC_KEY
 import com.lendsumapp.lendsum.util.GlobalConstants.USERNAME_KEY
 import com.lendsumapp.lendsum.util.GlobalConstants.USER_COLLECTION_PATH
-import dagger.hilt.android.scopes.ActivityScoped
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
@@ -46,7 +45,7 @@ class ChatRoomRepository @Inject constructor(
             }
     }
 
-    suspend fun updateMsgInCache(msg: Message){
+    private suspend fun updateMsgInLocalCache(msg: Message){
         lendsumDatabase.getChatMessageDao().updateChatMessage(msg)
     }
 
@@ -58,7 +57,7 @@ class ChatRoomRepository @Inject constructor(
         lendsumDatabase.getChatMessageDao().insertChatMessage(msg)
     }
 
-    suspend fun updateExistingCachedChatRoom(chatRoom: ChatRoom){
+    suspend fun updateLocalCachedChatRoom(chatRoom: ChatRoom){
         lendsumDatabase.getChatRoomDao().updateChatRoom(chatRoom)
     }
 
@@ -66,13 +65,23 @@ class ChatRoomRepository @Inject constructor(
         return userList
     }
 
-    fun addUserChatRoomToRealTimeDb(userIds: List<String>, chatRoomId: String){
+    fun addChatRoomObjectToRealTimeDb(chatRoomId: String, chatRoom: ChatRoom){
+        realTimeDb.child("chat_rooms").child(chatRoomId).push().setValue(chatRoom).addOnCompleteListener { task ->
+            if (task.isSuccessful){
+                Log.d(TAG, "Send chat room to realtime db success")
+            }else{
+                Log.d(TAG, "Send chat room to realtime db failed: " + task.exception.toString())
+            }
+        }
+    }
+
+    fun addChatRoomIdToRealTimeDb(userIds: List<String>, chatRoomId: String){
 
         for(userId in userIds) {
-            realTimeDb.child("usr").child(userId).push().setValue(chatRoomId)
+            realTimeDb.child("users").child(userId).push().setValue(chatRoomId)
                 .addOnCompleteListener { task ->
                     if (task.isSuccessful) {
-                        Log.d(TAG, "Users sent to realtime db")
+                        Log.d(TAG, "Users sent to realtime db" + task.result)
                     } else {
                         Log.d(TAG, task.exception.toString())
                     }
@@ -82,15 +91,25 @@ class ChatRoomRepository @Inject constructor(
     }
 
     fun addMessageToRealTimeDb(chatRoomId: String, msg: Message){
-        realTimeDb.child("msg").child(chatRoomId).push().setValue(msg).addOnCompleteListener { task->
+        realTimeDb.child("messages").child(chatRoomId).push().setValue(msg).addOnCompleteListener { task->
             if(task.isSuccessful){
-                Log.d(TAG, "Messages sent to realtime db")
+                Log.d(TAG, "Message sent to realtime db")
                 msg.sentToRemoteDb = true
                 GlobalScope.launch(Dispatchers.IO) {
-                    updateMsgInCache(msg)
+                    updateMsgInLocalCache(msg)
                 }
             }else{
-                Log.d(TAG, task.exception.toString())
+                Log.d(TAG, "Message failed to send to real time db: " + task.exception.toString())
+            }
+        }
+    }
+
+    fun updateChatRoomInRealTimeDb(chatRoom: ChatRoom){
+        realTimeDb.child("chat_rooms").child(chatRoom.chatRoomId).setValue(chatRoom).addOnCompleteListener { task->
+            if (task.isSuccessful){
+                Log.d(TAG, "Chat room updated in real time db success")
+            }else{
+                Log.d(TAG, "Chat room updated in real time db failed")
             }
         }
     }

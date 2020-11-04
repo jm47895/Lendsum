@@ -12,6 +12,7 @@ import androidx.fragment.app.clearFragmentResultListener
 import androidx.fragment.app.setFragmentResultListener
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
+import androidx.lifecycle.viewModelScope
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.firebase.auth.FirebaseAuth
@@ -27,6 +28,8 @@ import com.lendsumapp.lendsum.util.GlobalConstants.CHAT_ROOM_BUNDLE_KEY
 import com.lendsumapp.lendsum.util.GlobalConstants.CHAT_ROOM_REQUEST_KEY
 import com.lendsumapp.lendsum.viewmodel.ChatRoomViewModel
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -147,7 +150,6 @@ class ChatRoomFragment : Fragment(), View.OnClickListener,
     override fun onClick(view: View?) {
         when(view?.id){
             R.id.chat_room_back_btn->{
-                //chatRoomViewModel.addMessagesToRealTimeDb(currentChatRoom?.chatRoomId.toString(), currentListOfMessages)
                 findNavController().navigate(R.id.action_chatRoomFragment_to_messagesFragment)
             }
             R.id.chat_room_send_msg_btn->{
@@ -185,7 +187,12 @@ class ChatRoomFragment : Fragment(), View.OnClickListener,
         cacheNewMessage(newMessage)
         sendMessageToRealtimeDB(chatRoom.chatRoomId, newMessage)
         updateCachedChatRoom(chatRoom, msg)
+        updateRealTimeDbChatRoom(chatRoom)
 
+    }
+
+    private fun updateRealTimeDbChatRoom(chatRoom: ChatRoom) {
+        chatRoomViewModel.updateChatRoomInRealTimeDb(chatRoom)
     }
 
     private fun sendMessageToRealtimeDB(chatRoomId: String, msg: Message) {
@@ -199,7 +206,7 @@ class ChatRoomFragment : Fragment(), View.OnClickListener,
     private fun updateCachedChatRoom(chatRoom: ChatRoom, lastMsg: String) {
         chatRoom.lastMessage = lastMsg
         chatRoom.lastTimestamp = AndroidUtils.getTimestampInstant()
-        chatRoomViewModel.updateExistingCachedChatRoom(chatRoom)
+        chatRoomViewModel.updateLocalCachedChatRoom(chatRoom)
     }
 
     private fun createNewChatRoom(msg: String) {
@@ -211,7 +218,8 @@ class ChatRoomFragment : Fragment(), View.OnClickListener,
 
         val newChatRoom = ChatRoom(chatRoomId, chatRoomUserList, msg, AndroidUtils.getTimestampInstant())
 
-        chatRoomViewModel.addUserChatRoomToRealTimeDb(idList, chatRoomId)
+        chatRoomViewModel.addChatRoomObjectToRealTimeDb(chatRoomId, newChatRoom)
+        chatRoomViewModel.addChatRoomIdToRealTimeDb(idList, chatRoomId)
         chatRoomViewModel.cacheNewChatRoom(newChatRoom)
 
         addNewMessage(msg, newChatRoom)

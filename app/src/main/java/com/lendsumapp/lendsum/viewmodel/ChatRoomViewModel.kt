@@ -61,16 +61,20 @@ class ChatRoomViewModel @ViewModelInject constructor(
         }
     }
 
-    fun updateExistingCachedChatRoom(chatRoom: ChatRoom){
+    fun updateLocalCachedChatRoom(chatRoom: ChatRoom){
         viewModelScope.launch(Dispatchers.IO) {
-            chatRoomRepository.updateExistingCachedChatRoom(chatRoom)
+            chatRoomRepository.updateLocalCachedChatRoom(chatRoom)
         }
     }
 
-    fun addUserChatRoomToRealTimeDb(userIds: List<String>, chatRoomId: String){
+    fun addChatRoomIdToRealTimeDb(userIds: List<String>, chatRoomId: String){
         viewModelScope.launch(Dispatchers.IO) {
-            chatRoomRepository.addUserChatRoomToRealTimeDb(userIds, chatRoomId)
+            chatRoomRepository.addChatRoomIdToRealTimeDb(userIds, chatRoomId)
         }
+    }
+
+    fun addChatRoomObjectToRealTimeDb(chatRoomId: String, chatRoom: ChatRoom){
+        chatRoomRepository.addChatRoomObjectToRealTimeDb(chatRoomId, chatRoom)
     }
 
     fun addMessageToRealTimeDb(chatRoomId: String, msg: Message){
@@ -79,8 +83,11 @@ class ChatRoomViewModel @ViewModelInject constructor(
         }
     }
 
-
-
+    fun updateChatRoomInRealTimeDb(chatRoom: ChatRoom){
+        viewModelScope.launch(Dispatchers.IO){
+            chatRoomRepository.updateChatRoomInRealTimeDb(chatRoom)
+        }
+    }
 
     companion object{
         private val TAG = ChatRoomViewModel::class.simpleName
