@@ -31,8 +31,6 @@ class LoginFragment : Fragment(), View.OnClickListener{
     private val binding get() =  _binding!!
     private val sharedPrefs by lazy { activity?.getSharedPreferences(R.string.app_name.toString(), Context.MODE_PRIVATE) }
     private val loginViewModel: LoginViewModel by viewModels()
-    private lateinit var signInEmail: String
-    private lateinit var signInPassword: String
     private lateinit var emailSignInObserver: Observer<Boolean>
     private lateinit var googleAuthObserver: Observer<Boolean>
     private lateinit var facebookAuthObserver: Observer<Boolean>
@@ -125,8 +123,8 @@ class LoginFragment : Fragment(), View.OnClickListener{
                 }
                 R.id.login_sign_in_btn -> {
                     loginViewModel.getEmailSignInStatus().observe(viewLifecycleOwner, emailSignInObserver)
-                    signInEmail = binding.loginEmailEt.text?.trim().toString()
-                    signInPassword = binding.loginPasswordEt.text?.trim().toString()
+                    val signInEmail = binding.loginEmailEt.text?.trim().toString()
+                    val signInPassword = binding.loginPasswordEt.text?.trim().toString()
 
                     if (!TextUtils.isEmpty(signInEmail) && !TextUtils.isEmpty(signInPassword)) {
                         loginViewModel.signInWithEmailAndPass(signInEmail, signInPassword)
