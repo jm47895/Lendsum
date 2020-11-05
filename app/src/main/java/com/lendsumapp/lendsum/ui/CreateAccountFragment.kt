@@ -17,12 +17,11 @@ import com.lendsumapp.lendsum.R
 import com.lendsumapp.lendsum.databinding.FragmentCreateAccountBinding
 import com.lendsumapp.lendsum.util.AndroidUtils
 import com.lendsumapp.lendsum.util.GlobalConstants.NAV_SIGN_UP_TYPE
-import com.lendsumapp.lendsum.util.GlobalConstants.PROFILE_NAME_KEY
+import com.lendsumapp.lendsum.util.GlobalConstants.FIRESTORE_PROFILE_NAME_KEY
 import com.lendsumapp.lendsum.util.GlobalConstants.RETURNING_USER
 import com.lendsumapp.lendsum.util.NavSignUpType
 import com.lendsumapp.lendsum.viewmodel.CreateAccountViewModel
 import dagger.hilt.android.AndroidEntryPoint
-import javax.inject.Inject
 
 
 @AndroidEntryPoint
@@ -43,7 +42,7 @@ class CreateAccountFragment : Fragment(), View.OnClickListener {
             if (isCreateEmailAccountSuccessful){
                 sharedPrefs?.edit()?.putInt(NAV_SIGN_UP_TYPE, NavSignUpType.EMAIL_LOGIN.ordinal)?.apply()
                 val displayName = binding?.createUserFirstNameEt?.text.toString().trim() + " " + binding?.createUserLastNameEt?.text.toString().trim()
-                createAccountViewModel.updateCreateAccountAuthProfile(PROFILE_NAME_KEY, displayName)
+                createAccountViewModel.updateCreateAccountAuthProfile(FIRESTORE_PROFILE_NAME_KEY, displayName)
                 Log.d(TAG, "Email create account success")
                 findNavController(this).navigate(R.id.action_createAccountFragment_to_numberVerificationFragment)
             }else{

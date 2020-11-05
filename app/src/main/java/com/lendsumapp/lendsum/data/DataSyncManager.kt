@@ -13,7 +13,10 @@ import com.lendsumapp.lendsum.data.model.Message
 import com.lendsumapp.lendsum.data.model.User
 import com.lendsumapp.lendsum.data.persistence.LendsumDatabase
 import com.lendsumapp.lendsum.util.DatabaseUtils
-import com.lendsumapp.lendsum.util.GlobalConstants.USER_COLLECTION_PATH
+import com.lendsumapp.lendsum.util.GlobalConstants.FIRESTORE_USER_COLLECTION_PATH
+import com.lendsumapp.lendsum.util.GlobalConstants.REALTIME_DB_CHAT_ROOM_PATH
+import com.lendsumapp.lendsum.util.GlobalConstants.REALTIME_DB_MESSAGES_PATH
+import com.lendsumapp.lendsum.util.GlobalConstants.REALTIME_DB_USER_PATH
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
@@ -32,39 +35,37 @@ class DataSyncManager @Inject constructor(
     }
 
     fun syncAllDataFromDatabases(uid: String){
-
-        getListOfChatIdsFromRealtimeDb(uid)
         syncAllUserDataFromFirestore(uid)
-
+        getListOfChatIdsFromRealtimeDb(uid)
     }
 
-    private fun getListOfChatIdsFromRealtimeDb(uid: String) {
-        val chatIdRef = realTimeDb.child("users").child(uid).ref
-        chatIdRef.addListenerForSingleValueEvent(chatIdsListener)
-    }
+    private fun getListOfChatIdsFromRealtimeDb(uid: String){
+        val chatIdRef = realTimeDb.child(REALTIME_DB_USER_PATH).child(uid).ref
+        val listOfChatIds = mutableListOf<String>()
 
-    private val chatIdsListener =  object: ValueEventListener {
+        chatIdRef.addListenerForSingleValueEvent(object: ValueEventListener {
 
-        private val listOfChatIds = mutableListOf<String>()
 
-        override fun onDataChange(snapshot: DataSnapshot) {
-            for (data in snapshot.children) {
-                listOfChatIds.add(data.value.toString())
+            override fun onDataChange(snapshot: DataSnapshot) {
+                for (data in snapshot.children) {
+                    listOfChatIds.add(data.value.toString())
+                }
+                Log.d(TAG, "chat id on changed hit")
+                syncAllMessagesFromRealtimeDb(listOfChatIds)
+                syncAllChatRoomDataFromRealtimeDb(listOfChatIds)
             }
-            Log.d(TAG, "chat id on changed hit")
-            syncAllMessagesFromRealtimeDb(listOfChatIds)
-            syncAllChatRoomDataFromRealtimeDb(listOfChatIds)
-        }
 
-        override fun onCancelled(error: DatabaseError) {
-            Log.d(TAG, "Failure to retrieve chatIds from Realtime Database: $error")
-        }
+            override fun onCancelled(error: DatabaseError) {
+                Log.d(TAG, "Failure to retrieve chatIds from Realtime Database: $error")
+            }
 
+        })
     }
+
 
     private fun syncAllUserDataFromFirestore(uid: String){
 
-        firestoreDb.collection(USER_COLLECTION_PATH)
+        firestoreDb.collection(FIRESTORE_USER_COLLECTION_PATH)
             .document(uid)
             .get().addOnSuccessListener { document ->
                 if(document != null){
@@ -90,25 +91,23 @@ class DataSyncManager @Inject constructor(
     private fun syncAllMessagesFromRealtimeDb(listOfChatIds: MutableList<String>) {
 
         for (chatIds in listOfChatIds){
-            val messagesRef = realTimeDb.child("messages").child(chatIds).ref
-            messagesRef.addListenerForSingleValueEvent(messageListener)
-        }
-    }
+            val messagesRef = realTimeDb.child(REALTIME_DB_MESSAGES_PATH).child(chatIds).ref
+            messagesRef.addListenerForSingleValueEvent(object : ValueEventListener {
 
-    private val messageListener = object : ValueEventListener {
-
-        override fun onDataChange(snapshot: DataSnapshot) {
-            for (data in snapshot.children){
-                val msg: Message = data.getValue(Message::class.java)!!
-                GlobalScope.launch(Dispatchers.IO) {
-                    insertAllExistingUserMessagesIntoLocaleCache(msg)
+                override fun onDataChange(snapshot: DataSnapshot) {
+                    for (data in snapshot.children){
+                        val msg: Message = data.getValue(Message::class.java)!!
+                        GlobalScope.launch(Dispatchers.IO) {
+                            insertAllExistingUserMessagesIntoLocaleCache(msg)
+                        }
+                    }
+                    Log.d(TAG, "Message on data change hit")
                 }
-            }
-            Log.d(TAG, "Message on data change hit")
-        }
 
-        override fun onCancelled(error: DatabaseError) {
-            Log.d(TAG, error.message)
+                override fun onCancelled(error: DatabaseError) {
+                    Log.d(TAG, error.message)
+                }
+            })
         }
     }
 
@@ -120,23 +119,21 @@ class DataSyncManager @Inject constructor(
     private fun syncAllChatRoomDataFromRealtimeDb(listOfChatIds: MutableList<String>){
         for (chatIds in listOfChatIds){
 
-            val chatRoomRef = realTimeDb.child("chat_rooms").child(chatIds).ref
-            chatRoomRef.addListenerForSingleValueEvent(chatRoomListener)
-        }
-    }
+            val chatRoomRef = realTimeDb.child(REALTIME_DB_CHAT_ROOM_PATH).child(chatIds).ref
+            chatRoomRef.addListenerForSingleValueEvent(object : ValueEventListener {
 
-    private val chatRoomListener = object : ValueEventListener {
+                override fun onDataChange(snapshot: DataSnapshot) {
+                    val chatRoom = snapshot.getValue(ChatRoom::class.java)!!
+                    GlobalScope.launch(Dispatchers.IO) {
+                        insertAllExistingChatRoomsIntoLocaleCache(chatRoom)
+                    }
+                    Log.d(TAG, "Chat room on Data changed hit")
+                }
 
-        override fun onDataChange(snapshot: DataSnapshot) {
-            val chatRoom = snapshot.getValue(ChatRoom::class.java)!!
-            GlobalScope.launch(Dispatchers.IO) {
-                insertAllExistingChatRoomsIntoLocaleCache(chatRoom)
-            }
-            Log.d(TAG, "Chat room on Data changed hit")
-        }
-
-        override fun onCancelled(error: DatabaseError) {
-            Log.d(TAG, error.message)
+                override fun onCancelled(error: DatabaseError) {
+                    Log.d(TAG, error.message)
+                }
+            })
         }
     }
 

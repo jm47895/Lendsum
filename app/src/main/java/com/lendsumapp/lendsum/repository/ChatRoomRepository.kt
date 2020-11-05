@@ -8,9 +8,9 @@ import com.lendsumapp.lendsum.data.model.ChatRoom
 import com.lendsumapp.lendsum.data.model.Message
 import com.lendsumapp.lendsum.data.model.User
 import com.lendsumapp.lendsum.data.persistence.LendsumDatabase
-import com.lendsumapp.lendsum.util.GlobalConstants.IS_PROFILE_PUBLIC_KEY
-import com.lendsumapp.lendsum.util.GlobalConstants.USERNAME_KEY
-import com.lendsumapp.lendsum.util.GlobalConstants.USER_COLLECTION_PATH
+import com.lendsumapp.lendsum.util.GlobalConstants.FIRESTORE_IS_PROFILE_PUBLIC_KEY
+import com.lendsumapp.lendsum.util.GlobalConstants.FIRESTORE_USERNAME_KEY
+import com.lendsumapp.lendsum.util.GlobalConstants.FIRESTORE_USER_COLLECTION_PATH
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
@@ -32,8 +32,8 @@ class ChatRoomRepository @Inject constructor(
     }
 
     fun findUserInFirestore(username: String){
-        firestoreDb.collection(USER_COLLECTION_PATH).whereEqualTo(IS_PROFILE_PUBLIC_KEY, true).orderBy(
-            USERNAME_KEY).startAt( "@$username").endAt("$username\uf8ff").limit(3).get()
+        firestoreDb.collection(FIRESTORE_USER_COLLECTION_PATH).whereEqualTo(FIRESTORE_IS_PROFILE_PUBLIC_KEY, true).orderBy(
+            FIRESTORE_USERNAME_KEY).startAt( "@$username").endAt("$username\uf8ff").limit(3).get()
             .addOnCompleteListener { task ->
                 if(task.isSuccessful){
                     userList.postValue(task.result!!.toObjects(User::class.java))

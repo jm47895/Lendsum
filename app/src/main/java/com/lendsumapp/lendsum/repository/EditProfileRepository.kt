@@ -8,7 +8,6 @@ import com.lendsumapp.lendsum.auth.EmailAndPassAuthComponent
 import com.lendsumapp.lendsum.data.model.User
 import com.lendsumapp.lendsum.data.persistence.LendsumDatabase
 import com.lendsumapp.lendsum.util.GlobalConstants
-import dagger.hilt.android.scopes.ActivityScoped
 import javax.inject.Inject
 
 class EditProfileRepository @Inject constructor(
@@ -47,7 +46,7 @@ class EditProfileRepository @Inject constructor(
     }
 
     fun updateUserValueInFirestore(key: String, stringValue: String?, booleanValue: Boolean?){
-        val userDoc = firestoreDb.collection(GlobalConstants.USER_COLLECTION_PATH)
+        val userDoc = firestoreDb.collection(GlobalConstants.FIRESTORE_USER_COLLECTION_PATH)
             .document(firebaseAuth.currentUser?.uid.toString())
 
         stringValue?.let {

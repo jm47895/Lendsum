@@ -2,21 +2,12 @@ package com.lendsumapp.lendsum.repository
 
 import android.content.Context
 import android.util.Log
-import androidx.core.content.ContentProviderCompat.requireContext
-import androidx.lifecycle.MutableLiveData
-import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.SetOptions
-import com.google.firebase.firestore.ktx.toObject
-import com.lendsumapp.lendsum.R
 import com.lendsumapp.lendsum.data.DataSyncManager
 import com.lendsumapp.lendsum.data.model.User
 import com.lendsumapp.lendsum.data.persistence.LendsumDatabase
-import com.lendsumapp.lendsum.util.DatabaseUtils
-import com.lendsumapp.lendsum.util.GlobalConstants.USER_COLLECTION_PATH
-import dagger.hilt.android.qualifiers.ActivityContext
-import dagger.hilt.android.qualifiers.ApplicationContext
-import dagger.hilt.android.scopes.ActivityScoped
+import com.lendsumapp.lendsum.util.GlobalConstants.FIRESTORE_USER_COLLECTION_PATH
 import javax.inject.Inject
 
 class NumberVerificationRepository @Inject constructor(
@@ -35,7 +26,7 @@ class NumberVerificationRepository @Inject constructor(
     //Firestore functions
     fun insertUserIntoFirestore(user: User){
 
-        firestoreDb.collection(USER_COLLECTION_PATH).document(user.userId).set(user, SetOptions.merge())
+        firestoreDb.collection(FIRESTORE_USER_COLLECTION_PATH).document(user.userId).set(user, SetOptions.merge())
             .addOnSuccessListener {
                 Log.w(TAG, "User added to firestore")
             }

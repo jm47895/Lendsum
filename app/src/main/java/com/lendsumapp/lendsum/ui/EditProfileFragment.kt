@@ -21,14 +21,13 @@ import com.lendsumapp.lendsum.data.model.User
 import com.lendsumapp.lendsum.databinding.FragmentEditProfileBinding
 import com.lendsumapp.lendsum.util.AndroidUtils
 import com.lendsumapp.lendsum.util.EditProfileInfoType
-import com.lendsumapp.lendsum.util.GlobalConstants.EMAIL_KEY
-import com.lendsumapp.lendsum.util.GlobalConstants.IS_PROFILE_PUBLIC_KEY
-import com.lendsumapp.lendsum.util.GlobalConstants.PROFILE_NAME_KEY
-import com.lendsumapp.lendsum.util.GlobalConstants.PROFILE_PIC_URI_KEY
-import com.lendsumapp.lendsum.util.GlobalConstants.USERNAME_KEY
+import com.lendsumapp.lendsum.util.GlobalConstants.FIRESTORE_EMAIL_KEY
+import com.lendsumapp.lendsum.util.GlobalConstants.FIRESTORE_IS_PROFILE_PUBLIC_KEY
+import com.lendsumapp.lendsum.util.GlobalConstants.FIRESTORE_PROFILE_NAME_KEY
+import com.lendsumapp.lendsum.util.GlobalConstants.FIRESTORE_PROFILE_PIC_URI_KEY
+import com.lendsumapp.lendsum.util.GlobalConstants.FIRESTORE_USERNAME_KEY
 import com.lendsumapp.lendsum.viewmodel.EditProfileViewModel
 import dagger.hilt.android.AndroidEntryPoint
-import javax.inject.Inject
 
 @AndroidEntryPoint
 class EditProfileFragment : Fragment(), View.OnClickListener, CompoundButton.OnCheckedChangeListener {
@@ -80,7 +79,7 @@ class EditProfileFragment : Fragment(), View.OnClickListener, CompoundButton.OnC
         updateAuthEmailStatusObserver = Observer { isAuthEmailUpdated->
             if(isAuthEmailUpdated){
                 editProfileViewModel.updateCachedUser(user)
-                editProfileViewModel.updateUserValueInFirestore(EMAIL_KEY, user.email, null)
+                editProfileViewModel.updateUserValueInFirestore(FIRESTORE_EMAIL_KEY, user.email, null)
             }else{
                 AndroidUtils.showSnackBar(requireActivity(), getString(R.string.sign_in_again_msg))
             }
@@ -153,8 +152,8 @@ class EditProfileFragment : Fragment(), View.OnClickListener, CompoundButton.OnC
             loadProfilePic(user.profilePicUri.toString(), binding?.editProfilePic!!)
 
             editProfileViewModel.updateCachedUser(user)
-            editProfileViewModel.updateUserValueInFirestore(PROFILE_PIC_URI_KEY, user.profilePicUri.toString(), null)
-            editProfileViewModel.updateFirebaseAuthProfile(PROFILE_PIC_URI_KEY, user.profilePicUri.toString())
+            editProfileViewModel.updateUserValueInFirestore(FIRESTORE_PROFILE_PIC_URI_KEY, user.profilePicUri.toString(), null)
+            editProfileViewModel.updateFirebaseAuthProfile(FIRESTORE_PROFILE_PIC_URI_KEY, user.profilePicUri.toString())
         }
     }
 
@@ -270,8 +269,8 @@ class EditProfileFragment : Fragment(), View.OnClickListener, CompoundButton.OnC
                         else -> {
                             user.name = textView.text.toString().trim()
                             editProfileViewModel.updateCachedUser(user)
-                            editProfileViewModel.updateUserValueInFirestore(PROFILE_NAME_KEY, user.name, null)
-                            editProfileViewModel.updateFirebaseAuthProfile(PROFILE_NAME_KEY, user.name)
+                            editProfileViewModel.updateUserValueInFirestore(FIRESTORE_PROFILE_NAME_KEY, user.name, null)
+                            editProfileViewModel.updateFirebaseAuthProfile(FIRESTORE_PROFILE_NAME_KEY, user.name)
                         }
                     }
                 }
@@ -289,7 +288,7 @@ class EditProfileFragment : Fragment(), View.OnClickListener, CompoundButton.OnC
                         else -> {
                             user.username = textView.text.toString().trim()
                             editProfileViewModel.updateCachedUser(user)
-                            editProfileViewModel.updateUserValueInFirestore(USERNAME_KEY, user.username, null)
+                            editProfileViewModel.updateUserValueInFirestore(FIRESTORE_USERNAME_KEY, user.username, null)
                         }
                     }
                 }
@@ -308,7 +307,7 @@ class EditProfileFragment : Fragment(), View.OnClickListener, CompoundButton.OnC
                 EditProfileInfoType.PROFILE_VISIBILITY.ordinal->{
                     user.isProfilePublic = true
                     editProfileViewModel.updateCachedUser(user)
-                    editProfileViewModel.updateUserValueInFirestore(IS_PROFILE_PUBLIC_KEY, null, true)
+                    editProfileViewModel.updateUserValueInFirestore(FIRESTORE_IS_PROFILE_PUBLIC_KEY, null, true)
                 }
             }
         }else{
@@ -316,7 +315,7 @@ class EditProfileFragment : Fragment(), View.OnClickListener, CompoundButton.OnC
                 EditProfileInfoType.PROFILE_VISIBILITY.ordinal->{
                     user.isProfilePublic = false
                     editProfileViewModel.updateCachedUser(user)
-                    editProfileViewModel.updateUserValueInFirestore(IS_PROFILE_PUBLIC_KEY, null, false)
+                    editProfileViewModel.updateUserValueInFirestore(FIRESTORE_IS_PROFILE_PUBLIC_KEY, null, false)
                 }
             }
         }
