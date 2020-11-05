@@ -12,7 +12,6 @@ import androidx.fragment.app.clearFragmentResultListener
 import androidx.fragment.app.setFragmentResultListener
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
-import androidx.lifecycle.viewModelScope
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.firebase.auth.FirebaseAuth
@@ -28,8 +27,6 @@ import com.lendsumapp.lendsum.util.GlobalConstants.CHAT_ROOM_BUNDLE_KEY
 import com.lendsumapp.lendsum.util.GlobalConstants.CHAT_ROOM_REQUEST_KEY
 import com.lendsumapp.lendsum.viewmodel.ChatRoomViewModel
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -179,8 +176,7 @@ class ChatRoomFragment : Fragment(), View.OnClickListener,
 
         val newMessage = Message(AndroidUtils.getTimestampInstant(), chatRoom.chatRoomId, firebaseAuth.currentUser?.uid.toString(), guestUser.profilePicUri, msg, null)
         currentListOfMessages.add(newMessage)
-        messageListAdapter.submitList(currentListOfMessages.toMutableList())
-        messageListAdapter.notifyDataSetChanged()
+        messageListAdapter.submitList(currentListOfMessages.toList())
         binding?.chatRoomList?.smoothScrollToPosition(currentListOfMessages.size - 1)
         binding?.chatRoomMsgEt?.text?.clear()
 
