@@ -25,7 +25,8 @@ import com.lendsumapp.lendsum.databinding.FragmentMessagesBinding
 import com.lendsumapp.lendsum.util.AndroidUtils
 import com.lendsumapp.lendsum.util.GlobalConstants.CHAT_ROOM_BUNDLE_KEY
 import com.lendsumapp.lendsum.util.GlobalConstants.CHAT_ROOM_REQUEST_KEY
-import com.lendsumapp.lendsum.viewmodel.ChatRoomViewModel
+import com.lendsumapp.lendsum.util.NetworkUtils
+import com.lendsumapp.lendsum.viewmodel.MessagesViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
@@ -36,7 +37,7 @@ class MessagesFragment : Fragment(), View.OnClickListener,
 
     private var _binding: FragmentMessagesBinding? = null
     private val binding get() = _binding!!
-    private val chatRoomViewModel: ChatRoomViewModel by viewModels()
+    private val messagesViewModel: MessagesViewModel by viewModels()
     private lateinit var userSearchListAdapter: UserSearchListAdapter
     private lateinit var messageListAdapter: MessageListAdapter
     private lateinit var remoteDbUserListObserver: Observer<List<User>>
@@ -50,7 +51,7 @@ class MessagesFragment : Fragment(), View.OnClickListener,
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        chatRoomViewModel.getCurrentCachedUser(firebaseAuth.currentUser?.uid.toString())
+        messagesViewModel.getCurrentCachedUser(firebaseAuth.currentUser?.uid.toString())
 
     }
 
@@ -66,7 +67,7 @@ class MessagesFragment : Fragment(), View.OnClickListener,
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        chatRoomViewModel.getUser().observe(viewLifecycleOwner, Observer { cachedUser->
+        messagesViewModel.getUser().observe(viewLifecycleOwner, Observer { cachedUser->
             hostUser = cachedUser
         })
 
@@ -78,15 +79,11 @@ class MessagesFragment : Fragment(), View.OnClickListener,
         setFragmentResultListener(CHAT_ROOM_REQUEST_KEY){ _, bundle->
 
             currentChatRoom = bundle.getParcelable(CHAT_ROOM_BUNDLE_KEY)
-            chatRoomViewModel.getCurrentCachedMessages(currentChatRoom?.chatRoomId.toString())
+
+            setCacheMessageObserver(currentChatRoom?.chatRoomId.toString())
 
             initRecyclerView(MESSAGE_RECYCLER_VIEW)
 
-            chatRoomViewModel.getCurrentCachedMessages(currentChatRoom!!.chatRoomId).observe(viewLifecycleOwner, Observer {
-                currentListOfMessages = it
-                messageListAdapter.submitList(it)
-                binding.chatRoomList.scrollToPosition(it.size - 1)
-            })
 
             val users = currentChatRoom?.participants!!
             handleMessageUi(users)
@@ -100,14 +97,11 @@ class MessagesFragment : Fragment(), View.OnClickListener,
             initRecyclerView(SEARCH_RECYCLER_VIEW)
         }
 
-
         remoteDbUserListObserver = Observer { userList->
 
             userSearchListAdapter.submitList(userList)
 
         }
-
-
     }
 
     override fun onDestroyView() {
@@ -115,7 +109,7 @@ class MessagesFragment : Fragment(), View.OnClickListener,
         binding.chatRoomList.adapter = null
         _binding = null
         clearFragmentResultListener(CHAT_ROOM_REQUEST_KEY)
-        chatRoomViewModel.getRemoteDbUserList().removeObserver(remoteDbUserListObserver)
+        messagesViewModel.getRemoteDbUserList().removeObserver(remoteDbUserListObserver)
     }
 
     private fun initRecyclerView(recyclerViewType: Int){
@@ -168,34 +162,46 @@ class MessagesFragment : Fragment(), View.OnClickListener,
         }
     }
 
+    private fun setCacheMessageObserver(chatId: String){
+        messagesViewModel.getCurrentCachedMessages(chatId).observe(viewLifecycleOwner, Observer {
+            currentListOfMessages = it
+            messageListAdapter.submitList(it)
+            binding.chatRoomList.scrollToPosition(it.size - 1)
+        })
+    }
+
     private fun addNewMessage(msg: String, chatRoom: ChatRoom) {
 
-        val newMessage = Message(AndroidUtils.getTimestampInstant(), chatRoom.chatRoomId, firebaseAuth.currentUser?.uid.toString(), guestUser.profilePicUri, msg, null)
-        binding.chatRoomMsgEt.text?.clear()
+        //TODO Eventually allow offline edits. Currently it will show in the UI but won't save to the database
+        if(NetworkUtils.isNetworkAvailable(requireContext())){
+            val newMessage = Message(AndroidUtils.getTimestampInstant(), chatRoom.chatRoomId, firebaseAuth.currentUser?.uid.toString(), guestUser.profilePicUri, msg, null)
+            binding.chatRoomMsgEt.text?.clear()
 
-        cacheNewMessage(newMessage)
-        sendMessageToRealtimeDB(chatRoom.chatRoomId, newMessage)
-        updateCachedChatRoom(chatRoom, msg)
-        updateRealTimeDbChatRoom(chatRoom)
-
+            cacheNewMessage(newMessage)
+            sendMessageToRealtimeDB(chatRoom.chatRoomId, newMessage)
+            updateCachedChatRoom(chatRoom, msg)
+            updateRealTimeDbChatRoom(chatRoom)
+        }else{
+            AndroidUtils.showSnackBar(requireActivity(), "You must be connected to the internet to do this.")
+        }
     }
 
     private fun updateRealTimeDbChatRoom(chatRoom: ChatRoom) {
-        chatRoomViewModel.updateChatRoomInRealTimeDb(chatRoom)
+        messagesViewModel.updateChatRoomInRealTimeDb(chatRoom)
     }
 
     private fun sendMessageToRealtimeDB(chatRoomId: String, msg: Message) {
-        chatRoomViewModel.addMessageToRealTimeDb(chatRoomId, msg)
+        messagesViewModel.addMessageToRealTimeDb(chatRoomId, msg)
     }
 
     private fun cacheNewMessage(newMessage: Message) {
-        chatRoomViewModel.cacheNewMessage(newMessage)
+        messagesViewModel.cacheNewMessage(newMessage)
     }
 
     private fun updateCachedChatRoom(chatRoom: ChatRoom, lastMsg: String) {
         chatRoom.lastMessage = lastMsg
         chatRoom.lastTimestamp = AndroidUtils.getTimestampInstant()
-        chatRoomViewModel.updateLocalCachedChatRoom(chatRoom)
+        messagesViewModel.updateLocalCachedChatRoom(chatRoom)
     }
 
     private fun createNewChatRoom(msg: String) {
@@ -207,11 +213,13 @@ class MessagesFragment : Fragment(), View.OnClickListener,
 
         val newChatRoom = ChatRoom(chatRoomId, chatRoomUserList, msg, AndroidUtils.getTimestampInstant())
 
-        chatRoomViewModel.addChatRoomObjectToRealTimeDb(chatRoomId, newChatRoom)
-        chatRoomViewModel.addChatRoomIdToRealTimeDb(idList, chatRoomId)
-        chatRoomViewModel.cacheNewChatRoom(newChatRoom)
+        messagesViewModel.addChatRoomObjectToRealTimeDb(chatRoomId, newChatRoom)
+        messagesViewModel.addChatRoomIdToRealTimeDb(idList, chatRoomId)
+        messagesViewModel.cacheNewChatRoom(newChatRoom)
 
         addNewMessage(msg, newChatRoom)
+
+        setCacheMessageObserver(chatRoomId)
 
         currentChatRoom = newChatRoom
     }
@@ -232,18 +240,13 @@ class MessagesFragment : Fragment(), View.OnClickListener,
 
     private fun handleMessageUi(users: List<User>){
 
-        organizeChatRoomWidgets()
-
-        setParticipants(users)
-
-    }
-
-    private fun organizeChatRoomWidgets(){
-
         AndroidUtils.hideKeyboard(requireActivity())
         binding.chatRoomList.visibility = View.INVISIBLE
         binding.chatRoomSearchView.visibility = View.GONE
         binding.chatRoomRecipientTv.visibility = View.VISIBLE
+
+        setParticipants(users)
+
     }
 
     private fun setParticipants(users: List<User>){
@@ -272,10 +275,10 @@ class MessagesFragment : Fragment(), View.OnClickListener,
     override fun onQueryTextChange(query: String): Boolean {
         if(query.isBlank() || query.isEmpty()){
             userSearchListAdapter.submitList(emptyList())
-            chatRoomViewModel.getRemoteDbUserList().removeObserver(remoteDbUserListObserver)
+            messagesViewModel.getRemoteDbUserList().removeObserver(remoteDbUserListObserver)
         }else{
-            chatRoomViewModel.getRemoteDbUserList().observe(viewLifecycleOwner, remoteDbUserListObserver)
-            chatRoomViewModel.findUserInRemoteDb(query)
+            messagesViewModel.getRemoteDbUserList().observe(viewLifecycleOwner, remoteDbUserListObserver)
+            messagesViewModel.findUserInRemoteDb(query)
         }
 
         Log.d(TAG, "Query text changed.")

@@ -15,7 +15,7 @@ import com.lendsumapp.lendsum.data.model.ChatRoom
 import com.lendsumapp.lendsum.databinding.FragmentChatRoomsBinding
 import com.lendsumapp.lendsum.util.GlobalConstants.CHAT_ROOM_BUNDLE_KEY
 import com.lendsumapp.lendsum.util.GlobalConstants.CHAT_ROOM_REQUEST_KEY
-import com.lendsumapp.lendsum.viewmodel.MessagesViewModel
+import com.lendsumapp.lendsum.viewmodel.ChatRoomsViewModel
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -23,13 +23,13 @@ class ChatRoomsFragment : Fragment(), View.OnClickListener, ChatRoomListAdapter.
 
     private var _binding:FragmentChatRoomsBinding? = null
     private val binding get() = _binding!!
-    private val messagesViewModel: MessagesViewModel by viewModels()
+    private val chatRoomsViewModel: ChatRoomsViewModel by viewModels()
     private lateinit var chatRoomListAdapter: ChatRoomListAdapter
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        messagesViewModel.getCachedChatRooms()
+        chatRoomsViewModel.getCachedChatRooms()
 
     }
 
@@ -56,7 +56,7 @@ class ChatRoomsFragment : Fragment(), View.OnClickListener, ChatRoomListAdapter.
 
         binding.messagesNewMessageBtn.setOnClickListener(this)
 
-        messagesViewModel.getChatRooms().observe(viewLifecycleOwner, Observer {
+        chatRoomsViewModel.getChatRooms().observe(viewLifecycleOwner, Observer {
             loadChatRooms(it)
         })
     }

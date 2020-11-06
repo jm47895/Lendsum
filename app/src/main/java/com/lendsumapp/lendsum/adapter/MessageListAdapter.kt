@@ -1,5 +1,6 @@
 package com.lendsumapp.lendsum.adapter
 
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -39,9 +40,15 @@ class MessageListAdapter(private val interaction: Interaction? = null) :
     }
 
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
+
+        var lastItemPosition = position
+        if(position > 0){
+            lastItemPosition = position - 1
+        }
+
         when (holder) {
             is MessageViewHolder -> {
-                holder.bind(differ.currentList[position])
+                holder.bind(differ.currentList[position], differ.currentList[lastItemPosition], position)
             }
         }
     }
@@ -61,9 +68,19 @@ class MessageListAdapter(private val interaction: Interaction? = null) :
         private val firebaseUser = FirebaseAuth.getInstance().currentUser
         private val binding = MessageListItemBinding.bind(itemView)
 
-        fun bind(item: Message){
+        fun bind(item: Message, previousItem: Message, position: Int){
 
-            val date = AndroidUtils.convertTimestampToFullDate(item.messageTimestamp)
+            val previousTimestamp = previousItem.messageTimestamp
+            val currentTimestamp = item.messageTimestamp
+
+            val oldDate = AndroidUtils.convertTimestampToFullDate(previousTimestamp)
+            val date = AndroidUtils.convertTimestampToFullDate(currentTimestamp)
+
+            if (oldDate == date && position != 0){
+                binding.messageTimestampTv.visibility = View.GONE
+            }else{
+                binding.messageTimestampTv.visibility = View.VISIBLE
+            }
 
             binding.messageTimestampTv.text = date
 
@@ -93,5 +110,9 @@ class MessageListAdapter(private val interaction: Interaction? = null) :
 
     interface Interaction {
         fun onMessageItemSelected(position: Int, item: Message)
+    }
+
+    companion object{
+        private val TAG = MessageListAdapter::class.java.simpleName
     }
 }
