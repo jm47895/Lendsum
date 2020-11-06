@@ -1,5 +1,6 @@
 package com.lendsumapp.lendsum.data.persistence
 
+import androidx.lifecycle.LiveData
 import androidx.room.*
 import com.lendsumapp.lendsum.data.model.Message
 
@@ -16,5 +17,5 @@ interface ChatMessageDao {
     suspend fun deleteChatMessage(message: Message)
 
     @Query("SELECT * FROM chat_messages WHERE chatRoomId = :chatRoomId ORDER BY timestamp ASC")
-    suspend fun getChatRoomMessages(chatRoomId: String): List<Message>
+    fun getChatRoomMessages(chatRoomId: String): LiveData<List<Message>>
 }

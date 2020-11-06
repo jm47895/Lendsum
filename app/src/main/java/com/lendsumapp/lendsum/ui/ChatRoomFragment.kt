@@ -35,14 +35,12 @@ class ChatRoomFragment : Fragment(), View.OnClickListener,
     SearchView.OnQueryTextListener{
 
     private var _binding: FragmentChatRoomBinding? = null
-    private val binding get() = _binding
+    private val binding get() = _binding!!
     private val chatRoomViewModel: ChatRoomViewModel by viewModels()
     private lateinit var userSearchListAdapter: UserSearchListAdapter
     private lateinit var messageListAdapter: MessageListAdapter
     private lateinit var remoteDbUserListObserver: Observer<List<User>>
-    private lateinit var cachedUserObserver: Observer<User>
-    private lateinit var cachedMessagesObserver: Observer<List<Message>>
-    private var currentListOfMessages = mutableListOf<Message>()
+    private var currentListOfMessages = listOf<Message>()
     private var guestUser = User()
     private var hostUser = User()
     private var isChatRoomEmpty = true
@@ -54,14 +52,6 @@ class ChatRoomFragment : Fragment(), View.OnClickListener,
 
         chatRoomViewModel.getCurrentCachedUser(firebaseAuth.currentUser?.uid.toString())
 
-        cachedUserObserver = Observer { cachedUser->
-            hostUser = cachedUser
-        }
-
-        cachedMessagesObserver = Observer { cachedListOfMessages ->
-            currentListOfMessages = cachedListOfMessages.toMutableList()
-            messageListAdapter.submitList(currentListOfMessages)
-        }
     }
 
 
@@ -70,17 +60,19 @@ class ChatRoomFragment : Fragment(), View.OnClickListener,
         savedInstanceState: Bundle?
     ): View? {
         _binding = FragmentChatRoomBinding.inflate(inflater, container, false)
-        return binding?.root
+        return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        chatRoomViewModel.getUser().observe(viewLifecycleOwner, cachedUserObserver)
+        chatRoomViewModel.getUser().observe(viewLifecycleOwner, Observer { cachedUser->
+            hostUser = cachedUser
+        })
 
-        binding?.chatRoomSendMsgBtn?.setOnClickListener(this)
-        binding?.chatRoomBackBtn?.setOnClickListener(this)
-        binding?.chatRoomSearchView?.setOnQueryTextListener(this)
+        binding.chatRoomSendMsgBtn.setOnClickListener(this)
+        binding.chatRoomBackBtn.setOnClickListener(this)
+        binding.chatRoomSearchView.setOnQueryTextListener(this)
 
         //This listener listens for click from the chat room list in the messages fragment and populates the data associated with the list
         setFragmentResultListener(CHAT_ROOM_REQUEST_KEY){ _, bundle->
@@ -90,12 +82,16 @@ class ChatRoomFragment : Fragment(), View.OnClickListener,
 
             initRecyclerView(MESSAGE_RECYCLER_VIEW)
 
-            chatRoomViewModel.getCurrentMessages().observe(viewLifecycleOwner, cachedMessagesObserver)
+            chatRoomViewModel.getCurrentCachedMessages(currentChatRoom!!.chatRoomId).observe(viewLifecycleOwner, Observer {
+                currentListOfMessages = it
+                messageListAdapter.submitList(it)
+                binding.chatRoomList.scrollToPosition(it.size - 1)
+            })
 
             val users = currentChatRoom?.participants!!
             handleMessageUi(users)
 
-            binding?.chatRoomList?.visibility = View.VISIBLE
+            binding.chatRoomList.visibility = View.VISIBLE
 
             isChatRoomEmpty = false
         }
@@ -116,7 +112,7 @@ class ChatRoomFragment : Fragment(), View.OnClickListener,
 
     override fun onDestroyView() {
         super.onDestroyView()
-        binding?.chatRoomList?.adapter = null
+        binding.chatRoomList.adapter = null
         _binding = null
         clearFragmentResultListener(CHAT_ROOM_REQUEST_KEY)
         chatRoomViewModel.getRemoteDbUserList().removeObserver(remoteDbUserListObserver)
@@ -128,18 +124,18 @@ class ChatRoomFragment : Fragment(), View.OnClickListener,
             SEARCH_RECYCLER_VIEW->{
 
                 userSearchListAdapter = UserSearchListAdapter(this@ChatRoomFragment)
-                binding?.chatRoomList?.layoutManager = LinearLayoutManager(context)
-                binding?.chatRoomList?.adapter = userSearchListAdapter
+                binding.chatRoomList.layoutManager = LinearLayoutManager(context)
+                binding.chatRoomList.adapter = userSearchListAdapter
 
             }
             MESSAGE_RECYCLER_VIEW->{
 
                 messageListAdapter = MessageListAdapter(this@ChatRoomFragment)
 
-                binding?.chatRoomList?.layoutManager = LinearLayoutManager(context).apply {
+                binding.chatRoomList.layoutManager = LinearLayoutManager(context).apply {
                     stackFromEnd = true
                 }
-                binding?.chatRoomList?.adapter = messageListAdapter
+                binding.chatRoomList.adapter = messageListAdapter
             }
         }
     }
@@ -151,9 +147,9 @@ class ChatRoomFragment : Fragment(), View.OnClickListener,
             }
             R.id.chat_room_send_msg_btn->{
 
-                if (binding?.chatRoomRecipientTv?.isVisible!!) {
+                if (binding.chatRoomRecipientTv.isVisible) {
 
-                    val msg = binding?.chatRoomMsgEt?.text.toString()
+                    val msg = binding.chatRoomMsgEt.text.toString()
 
                     if (currentListOfMessages.isEmpty()) {
 
@@ -165,7 +161,7 @@ class ChatRoomFragment : Fragment(), View.OnClickListener,
                 }else{
                     AndroidUtils.hideKeyboard(requireActivity())
                     AndroidUtils.showSnackBar(requireActivity(), getString(R.string.pick_user_first))
-                    binding?.chatRoomMsgEt?.text?.clear()
+                    binding.chatRoomMsgEt.text?.clear()
                 }
 
             }
@@ -175,10 +171,7 @@ class ChatRoomFragment : Fragment(), View.OnClickListener,
     private fun addNewMessage(msg: String, chatRoom: ChatRoom) {
 
         val newMessage = Message(AndroidUtils.getTimestampInstant(), chatRoom.chatRoomId, firebaseAuth.currentUser?.uid.toString(), guestUser.profilePicUri, msg, null)
-        currentListOfMessages.add(newMessage)
-        messageListAdapter.submitList(currentListOfMessages.toList())
-        binding?.chatRoomList?.smoothScrollToPosition(currentListOfMessages.size - 1)
-        binding?.chatRoomMsgEt?.text?.clear()
+        binding.chatRoomMsgEt.text?.clear()
 
         cacheNewMessage(newMessage)
         sendMessageToRealtimeDB(chatRoom.chatRoomId, newMessage)
@@ -232,7 +225,7 @@ class ChatRoomFragment : Fragment(), View.OnClickListener,
         initRecyclerView(MESSAGE_RECYCLER_VIEW)
         handleMessageUi(newParticipant)
 
-        binding?.chatRoomList?.visibility = View.VISIBLE
+        binding.chatRoomList.visibility = View.VISIBLE
 
         Log.d(TAG, "We are at position $position")
     }
@@ -248,9 +241,9 @@ class ChatRoomFragment : Fragment(), View.OnClickListener,
     private fun organizeChatRoomWidgets(){
 
         AndroidUtils.hideKeyboard(requireActivity())
-        binding?.chatRoomList?.visibility = View.INVISIBLE
-        binding?.chatRoomSearchView?.visibility = View.GONE
-        binding?.chatRoomRecipientTv?.visibility = View.VISIBLE
+        binding.chatRoomList.visibility = View.INVISIBLE
+        binding.chatRoomSearchView.visibility = View.GONE
+        binding.chatRoomRecipientTv.visibility = View.VISIBLE
     }
 
     private fun setParticipants(users: List<User>){
@@ -264,7 +257,7 @@ class ChatRoomFragment : Fragment(), View.OnClickListener,
             participants = users[0].name
         }
 
-        binding?.chatRoomRecipientTv?.text = participants
+        binding.chatRoomRecipientTv.text = participants
     }
 
     override fun onMessageItemSelected(position: Int, item: Message) {

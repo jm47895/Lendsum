@@ -1,6 +1,7 @@
 package com.lendsumapp.lendsum.repository
 
 import android.util.Log
+import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.google.firebase.database.DatabaseReference
 import com.google.firebase.firestore.FirebaseFirestore
@@ -27,7 +28,7 @@ class ChatRoomRepository @Inject constructor(
         return lendsumDatabase.getUserDao().getUser(userId)
     }
 
-    suspend fun getCurrentMessages(chatRoomId: String): List<Message>{
+    fun getCurrentMessages(chatRoomId: String): LiveData<List<Message>>{
         return lendsumDatabase.getChatMessageDao().getChatRoomMessages(chatRoomId)
     }
 

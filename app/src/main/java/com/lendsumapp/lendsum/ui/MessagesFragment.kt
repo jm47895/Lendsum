@@ -24,7 +24,6 @@ class MessagesFragment : Fragment(), View.OnClickListener, ChatRoomListAdapter.I
     private var _binding:FragmentMessagesBinding? = null
     private val binding get() = _binding!!
     private val messagesViewModel: MessagesViewModel by viewModels()
-    private lateinit var chatRoomsCacheObserver: Observer<List<ChatRoom>>
     private lateinit var chatRoomListAdapter: ChatRoomListAdapter
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -57,12 +56,9 @@ class MessagesFragment : Fragment(), View.OnClickListener, ChatRoomListAdapter.I
 
         binding.messagesNewMessageBtn.setOnClickListener(this)
 
-        chatRoomsCacheObserver = Observer { chatRooms->
-
-            loadChatRooms(chatRooms)
-
-        }
-        messagesViewModel.getChatRooms().observe(viewLifecycleOwner, chatRoomsCacheObserver)
+        messagesViewModel.getChatRooms().observe(viewLifecycleOwner, Observer {
+            loadChatRooms(it)
+        })
     }
 
     override fun onDestroyView() {
@@ -84,7 +80,6 @@ class MessagesFragment : Fragment(), View.OnClickListener, ChatRoomListAdapter.I
         if (chatRooms?.size == 0){
             binding.messagesNoConversationsTv.visibility = View.VISIBLE
         }else{
-            binding.messagesNoConversationsTv.visibility = View.INVISIBLE
             chatRooms?.let { chatRoomListAdapter.submitList(it) }
         }
 
