@@ -23,7 +23,6 @@ class ProfileFragment : Fragment(), View.OnClickListener {
     private var _binding: FragmentProfileBinding? = null
     private val binding get() = _binding!!
     private val profileViewModel: ProfileViewModel by viewModels()
-    private lateinit var userObserver: Observer<User>
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -46,8 +45,7 @@ class ProfileFragment : Fragment(), View.OnClickListener {
         binding.profileSettingsBtn.setOnClickListener(this)
         binding.profileProfileEditBtn.setOnClickListener(this)
 
-        userObserver = Observer { user ->
-
+        profileViewModel.getCachedUser().observe(viewLifecycleOwner, Observer { user->
             binding.profileName.text = user.name
             binding.profileUsername.text = user.username
             binding.profileKarmaScore.text = getString(R.string.karma_score, user.karmaScore)
@@ -62,8 +60,7 @@ class ProfileFragment : Fragment(), View.OnClickListener {
                 .load(user.profilePicUri)
                 .circleCrop()
                 .into(binding.profilePicImage)
-        }
-        profileViewModel.getUser().observe(viewLifecycleOwner, userObserver)
+        })
     }
 
     override fun onDestroyView() {

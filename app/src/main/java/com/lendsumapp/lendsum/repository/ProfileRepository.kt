@@ -8,20 +8,14 @@ import com.google.firebase.firestore.ktx.toObject
 import com.lendsumapp.lendsum.data.model.User
 import com.lendsumapp.lendsum.data.persistence.LendsumDatabase
 import dagger.hilt.android.scopes.ActivityScoped
+import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 
 class ProfileRepository @Inject constructor(
-    private val database: LendsumDatabase,
-    private var firebaseAuth: FirebaseAuth?
+    private val database: LendsumDatabase
 ){
 
-    private val remoteUser: MutableLiveData<User> = MutableLiveData()
-
-    fun getFirebaseDisplayName(): String{
-        return firebaseAuth?.currentUser?.displayName.toString()
-    }
-
-    suspend fun getCachedUser(userId: String): User {
+    fun getCachedUser(userId: String): Flow<User> {
         return database.getUserDao().getUser(userId)
     }
 

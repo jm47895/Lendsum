@@ -25,7 +25,7 @@ class MessagesRepository @Inject constructor(
 ){
     private val userList: MutableLiveData<List<User>> = MutableLiveData()
 
-    suspend fun getCurrentCachedUser(userId: String): User{
+    fun getCurrentCachedUser(userId: String): Flow<User> {
         return lendsumDatabase.getUserDao().getUser(userId)
     }
 

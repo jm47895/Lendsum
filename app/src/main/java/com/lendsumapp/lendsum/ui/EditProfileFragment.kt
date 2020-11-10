@@ -41,13 +41,6 @@ class EditProfileFragment : Fragment(), View.OnClickListener, CompoundButton.OnC
     private lateinit var updateAuthPassStatusObserver: Observer<Boolean>
     private var user: User = User()
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-
-        editProfileViewModel.getCachedUser()
-
-    }
-
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -67,14 +60,13 @@ class EditProfileFragment : Fragment(), View.OnClickListener, CompoundButton.OnC
         binding?.editProfileEmailToggle?.setOnCheckedChangeListener(this)
         binding?.editProfileVisibilityToggle?.setOnCheckedChangeListener(this)
 
-        userCacheObserver = Observer { cachedUser ->
+
+        editProfileViewModel.getCachedUser().observe(viewLifecycleOwner, Observer { cachedUser->
 
             user = cachedUser
 
             loadCachedUserProfile(user)
-
-        }
-        editProfileViewModel.getUser().observe(viewLifecycleOwner, userCacheObserver)
+        })
 
         updateAuthEmailStatusObserver = Observer { isAuthEmailUpdated->
             if(isAuthEmailUpdated){

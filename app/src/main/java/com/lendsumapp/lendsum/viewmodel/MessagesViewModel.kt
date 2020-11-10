@@ -2,6 +2,7 @@ package com.lendsumapp.lendsum.viewmodel
 
 import androidx.hilt.lifecycle.ViewModelInject
 import androidx.lifecycle.*
+import com.google.firebase.auth.FirebaseAuth
 import com.lendsumapp.lendsum.data.model.ChatRoom
 import com.lendsumapp.lendsum.data.model.Message
 import com.lendsumapp.lendsum.data.model.User
@@ -11,28 +12,18 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.launch
 
 class MessagesViewModel @ViewModelInject constructor(
-    private val messagesRepository: MessagesRepository
+    private val messagesRepository: MessagesRepository,
+    private val firebaseAuth: FirebaseAuth?
 ): ViewModel(){
 
-    private val currentUser: MutableLiveData<User> = MutableLiveData()
-    private val currentListOfMessages: MutableLiveData<LiveData<List<Message>>> = MutableLiveData()
+    fun getCurrentCachedUser(): LiveData<User>{
 
-    fun getCurrentCachedUser(userId: String){
-        viewModelScope.launch(Dispatchers.IO) {
-           currentUser.postValue(messagesRepository.getCurrentCachedUser(userId))
-        }
+        val uid = firebaseAuth?.currentUser?.uid.toString()
+        return messagesRepository.getCurrentCachedUser(uid).asLiveData()
     }
 
     fun getCurrentCachedMessages(chatRoomId: String): LiveData<List<Message>> {
        return messagesRepository.getCurrentMessages(chatRoomId).asLiveData()
-    }
-
-    fun getUser(): MutableLiveData<User>{
-        return currentUser
-    }
-
-    fun getCurrentMessages(): MutableLiveData<LiveData<List<Message>>> {
-        return currentListOfMessages
     }
 
     fun findUserInRemoteDb(name: String){

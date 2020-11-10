@@ -8,6 +8,7 @@ import com.lendsumapp.lendsum.auth.EmailAndPassAuthComponent
 import com.lendsumapp.lendsum.data.model.User
 import com.lendsumapp.lendsum.data.persistence.LendsumDatabase
 import com.lendsumapp.lendsum.util.GlobalConstants
+import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 
 class EditProfileRepository @Inject constructor(
@@ -17,7 +18,7 @@ class EditProfileRepository @Inject constructor(
     private val firebaseAuth: FirebaseAuth
 ){
 
-    suspend fun getCachedUser(userId:String): User{
+    fun getCachedUser(userId:String): Flow<User> {
         return lendsumDatabase.getUserDao().getUser(userId)
     }
 
@@ -25,7 +26,7 @@ class EditProfileRepository @Inject constructor(
         return lendsumDatabase.getUserDao().updateUser(user)
     }
 
-    suspend fun updateAuthEmail(email: String){
+    fun updateAuthEmail(email: String){
         emailAndPassAuthComponent.updateAuthEmail(email)
     }
 
@@ -33,7 +34,7 @@ class EditProfileRepository @Inject constructor(
         return emailAndPassAuthComponent.getUpdateAuthEmailStatus()
     }
 
-    suspend fun updateAuthPass(password: String){
+    fun updateAuthPass(password: String){
         emailAndPassAuthComponent.updateAuthPassword(password)
     }
 

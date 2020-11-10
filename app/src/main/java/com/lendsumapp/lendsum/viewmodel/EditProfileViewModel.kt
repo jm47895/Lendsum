@@ -1,9 +1,7 @@
 package com.lendsumapp.lendsum.viewmodel
 
 import androidx.hilt.lifecycle.ViewModelInject
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.*
 import com.google.firebase.auth.FirebaseAuth
 import com.lendsumapp.lendsum.data.model.User
 import com.lendsumapp.lendsum.repository.EditProfileRepository
@@ -15,19 +13,15 @@ class EditProfileViewModel @ViewModelInject constructor(
     private var firebaseAuth: FirebaseAuth?
 ) :ViewModel(){
 
-    private val user: MutableLiveData<User> = MutableLiveData()
     private val updateUserStatus: MutableLiveData<Int> = MutableLiveData()
 
     //Room cache sql functions
-    fun getCachedUser(){
-        viewModelScope.launch(Dispatchers.IO) {
-            val cachedUser = editProfileRepository.getCachedUser(firebaseAuth?.currentUser?.uid.toString())
-            user.postValue(cachedUser)
-        }
-    }
+    fun getCachedUser(): LiveData<User>{
 
-    fun getUser(): MutableLiveData<User> {
-        return user
+        val uid = firebaseAuth?.currentUser?.uid.toString()
+
+        return editProfileRepository.getCachedUser(uid).asLiveData()
+
     }
 
     fun updateCachedUser(userObject: User){

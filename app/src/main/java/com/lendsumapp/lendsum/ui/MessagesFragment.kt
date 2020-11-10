@@ -48,14 +48,6 @@ class MessagesFragment : Fragment(), View.OnClickListener,
     private var currentChatRoom: ChatRoom? = null
     @Inject lateinit var firebaseAuth: FirebaseAuth
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-
-        messagesViewModel.getCurrentCachedUser(firebaseAuth.currentUser?.uid.toString())
-
-    }
-
-
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -67,7 +59,7 @@ class MessagesFragment : Fragment(), View.OnClickListener,
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        messagesViewModel.getUser().observe(viewLifecycleOwner, Observer { cachedUser->
+        messagesViewModel.getCurrentCachedUser().observe(viewLifecycleOwner, Observer { cachedUser->
             hostUser = cachedUser
         })
 
