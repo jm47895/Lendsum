@@ -2,6 +2,7 @@ package com.lendsumapp.lendsum.data.persistence
 
 import androidx.room.*
 import com.lendsumapp.lendsum.data.model.ChatRoom
+import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface ChatRoomDao {
@@ -16,5 +17,5 @@ interface ChatRoomDao {
     suspend fun deleteChatRoom(chatRoom: ChatRoom)
 
     @Query("SELECT * FROM chat_rooms")
-    suspend fun getAllChatRooms(): List<ChatRoom>
+    fun getAllChatRooms(): Flow<List<ChatRoom>>
 }

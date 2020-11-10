@@ -1,9 +1,7 @@
 package com.lendsumapp.lendsum.viewmodel
 
 import androidx.hilt.lifecycle.ViewModelInject
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.*
 import com.lendsumapp.lendsum.data.model.ChatRoom
 import com.lendsumapp.lendsum.repository.ChatRoomsRepository
 import kotlinx.coroutines.Dispatchers
@@ -13,14 +11,8 @@ class ChatRoomsViewModel @ViewModelInject constructor(
     private val chatRoomsRepository: ChatRoomsRepository
 ): ViewModel(){
 
-    fun getCachedChatRooms(){
-        viewModelScope.launch(Dispatchers.IO) {
-            chatRoomsRepository.getCachedChatRooms()
-        }
-    }
-
-    fun getChatRooms(): MutableLiveData<List<ChatRoom>> {
-        return chatRoomsRepository.getChatRooms()
+    fun getCachedChatRooms(): LiveData<List<ChatRoom>>{
+        return chatRoomsRepository.getCachedChatRooms().asLiveData()
     }
 
     companion object{

@@ -26,13 +26,6 @@ class ChatRoomsFragment : Fragment(), View.OnClickListener, ChatRoomListAdapter.
     private val chatRoomsViewModel: ChatRoomsViewModel by viewModels()
     private lateinit var chatRoomListAdapter: ChatRoomListAdapter
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-
-        chatRoomsViewModel.getCachedChatRooms()
-
-    }
-
     private fun initRecyclerView() {
         binding.chatRoomList.apply {
             chatRoomListAdapter = ChatRoomListAdapter(this@ChatRoomsFragment)
@@ -56,7 +49,7 @@ class ChatRoomsFragment : Fragment(), View.OnClickListener, ChatRoomListAdapter.
 
         binding.messagesNewMessageBtn.setOnClickListener(this)
 
-        chatRoomsViewModel.getChatRooms().observe(viewLifecycleOwner, Observer {
+        chatRoomsViewModel.getCachedChatRooms().observe(viewLifecycleOwner, Observer {
             loadChatRooms(it)
         })
     }
