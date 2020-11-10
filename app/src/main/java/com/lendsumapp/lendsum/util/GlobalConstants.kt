@@ -12,7 +12,7 @@ object GlobalConstants {
     const val FIRESTORE_EMAIL_KEY = "email"
     const val FIRESTORE_USERNAME_KEY = "username"
     const val FIRESTORE_PROFILE_NAME_KEY = "name"
-    const val FIRESTORE_PROFILE_PIC_URI_KEY = "profilePicUrl"
+    const val FIRESTORE_PROFILE_PIC_URI_KEY = "profilePicUri"
     const val FIRESTORE_IS_PROFILE_PUBLIC_KEY = "isProfilePublic"
 
     /*Android specific constants*/

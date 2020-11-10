@@ -9,6 +9,7 @@ import androidx.recyclerview.widget.AsyncListDiffer
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
+import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.bumptech.glide.request.RequestOptions
 import com.google.firebase.auth.FirebaseAuth
 import com.lendsumapp.lendsum.R
@@ -89,13 +90,13 @@ class MessageListAdapter(private val interaction: Interaction? = null) :
                 binding.messageHostTv.visibility = View.VISIBLE
             }else{
                 Glide.with(itemView.context)
-                    .applyDefaultRequestOptions(
-                        RequestOptions()
-                            .placeholder(R.drawable.com_facebook_profile_picture_blank_portrait)
-                            .error(R.drawable.com_facebook_profile_picture_blank_portrait)
-                            .circleCrop()
-                    )
+                    .asBitmap()
                     .load(item.guestPic)
+                    .apply(
+                        RequestOptions()
+                            .diskCacheStrategy(DiskCacheStrategy.NONE)
+                            .placeholder(R.drawable.com_facebook_profile_picture_blank_portrait)
+                            .error(R.drawable.com_facebook_profile_picture_blank_portrait))
                     .circleCrop()
                     .into(binding.messageGuestPic)
 

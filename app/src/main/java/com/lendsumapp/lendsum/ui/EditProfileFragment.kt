@@ -15,6 +15,7 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import androidx.navigation.fragment.findNavController
 import com.bumptech.glide.Glide
+import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.bumptech.glide.request.RequestOptions
 import com.lendsumapp.lendsum.R
 import com.lendsumapp.lendsum.data.model.User
@@ -119,13 +120,13 @@ class EditProfileFragment : Fragment(), View.OnClickListener, CompoundButton.OnC
 
     private fun loadProfilePic(profilePicUri: String, imageView: ImageView) {
         Glide.with(this)
-            .applyDefaultRequestOptions(
-                RequestOptions()
-                    .placeholder(R.drawable.com_facebook_profile_picture_blank_portrait)
-                    .error(R.drawable.com_facebook_profile_picture_blank_portrait)
-                    .circleCrop()
-            )
+            .asBitmap()
             .load(profilePicUri)
+            .apply(
+                RequestOptions()
+                    .diskCacheStrategy(DiskCacheStrategy.NONE)
+                    .placeholder(R.drawable.com_facebook_profile_picture_blank_portrait)
+                    .error(R.drawable.com_facebook_profile_picture_blank_portrait))
             .circleCrop()
             .into(imageView)
     }

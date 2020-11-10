@@ -9,6 +9,7 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import androidx.navigation.findNavController
 import com.bumptech.glide.Glide
+import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.bumptech.glide.request.RequestOptions
 import com.lendsumapp.lendsum.R
 import com.lendsumapp.lendsum.data.model.User
@@ -51,16 +52,17 @@ class ProfileFragment : Fragment(), View.OnClickListener {
             binding.profileKarmaScore.text = getString(R.string.karma_score, user.karmaScore)
 
             Glide.with(this)
-                .applyDefaultRequestOptions(
-                    RequestOptions()
-                        .placeholder(R.drawable.com_facebook_profile_picture_blank_portrait)
-                        .error(R.drawable.com_facebook_profile_picture_blank_portrait)
-                        .circleCrop()
-                )
+                .asBitmap()
                 .load(user.profilePicUri)
+                .apply(RequestOptions()
+                    .diskCacheStrategy(DiskCacheStrategy.NONE)
+                    .error(R.drawable.com_facebook_profile_picture_blank_portrait)
+                    .placeholder(R.drawable.com_facebook_profile_picture_blank_portrait))
                 .circleCrop()
                 .into(binding.profilePicImage)
         })
+
+        binding.profilePicImage.visibility = View.VISIBLE
     }
 
     override fun onDestroyView() {
