@@ -14,6 +14,7 @@ import com.lendsumapp.lendsum.util.GlobalConstants.FIRESTORE_USERNAME_KEY
 import com.lendsumapp.lendsum.util.GlobalConstants.FIRESTORE_USER_COLLECTION_PATH
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -28,7 +29,7 @@ class MessagesRepository @Inject constructor(
         return lendsumDatabase.getUserDao().getUser(userId)
     }
 
-    fun getCurrentMessages(chatRoomId: String): LiveData<List<Message>>{
+    fun getCurrentMessages(chatRoomId: String): Flow<List<Message>> {
         return lendsumDatabase.getChatMessageDao().getChatRoomMessages(chatRoomId)
     }
 

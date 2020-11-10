@@ -164,6 +164,7 @@ class MessagesFragment : Fragment(), View.OnClickListener,
 
     private fun setCacheMessageObserver(chatId: String){
         messagesViewModel.getCurrentCachedMessages(chatId).observe(viewLifecycleOwner, Observer {
+            Log.d(TAG, it.toString())
             currentListOfMessages = it
             messageListAdapter.submitList(it)
             binding.chatRoomList.scrollToPosition(it.size - 1)

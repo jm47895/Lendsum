@@ -1,15 +1,13 @@
 package com.lendsumapp.lendsum.viewmodel
 
 import androidx.hilt.lifecycle.ViewModelInject
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.*
 import com.lendsumapp.lendsum.data.model.ChatRoom
 import com.lendsumapp.lendsum.data.model.Message
 import com.lendsumapp.lendsum.data.model.User
 import com.lendsumapp.lendsum.repository.MessagesRepository
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.launch
 
 class MessagesViewModel @ViewModelInject constructor(
@@ -25,8 +23,8 @@ class MessagesViewModel @ViewModelInject constructor(
         }
     }
 
-    fun getCurrentCachedMessages(chatRoomId: String): LiveData<List<Message>>{
-       return messagesRepository.getCurrentMessages(chatRoomId)
+    fun getCurrentCachedMessages(chatRoomId: String): LiveData<List<Message>> {
+       return messagesRepository.getCurrentMessages(chatRoomId).asLiveData()
     }
 
     fun getUser(): MutableLiveData<User>{

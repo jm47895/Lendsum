@@ -1,8 +1,8 @@
 package com.lendsumapp.lendsum.data.persistence
 
-import androidx.lifecycle.LiveData
 import androidx.room.*
 import com.lendsumapp.lendsum.data.model.Message
+import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface ChatMessageDao {
@@ -17,5 +17,5 @@ interface ChatMessageDao {
     suspend fun deleteChatMessage(message: Message)
 
     @Query("SELECT * FROM chat_messages WHERE chatRoomId = :chatRoomId ORDER BY timestamp ASC")
-    fun getChatRoomMessages(chatRoomId: String): LiveData<List<Message>>
+    fun getChatRoomMessages(chatRoomId: String): Flow<List<Message>>
 }
