@@ -1,10 +1,10 @@
 package com.lendsumapp.lendsum.repository
 
 import android.util.Log
-import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.google.firebase.database.DatabaseReference
 import com.google.firebase.firestore.FirebaseFirestore
+import com.lendsumapp.lendsum.data.DataSyncManager
 import com.lendsumapp.lendsum.data.model.ChatRoom
 import com.lendsumapp.lendsum.data.model.Message
 import com.lendsumapp.lendsum.data.model.User
@@ -21,7 +21,8 @@ import javax.inject.Inject
 class MessagesRepository @Inject constructor(
     private val firestoreDb: FirebaseFirestore,
     private val lendsumDatabase: LendsumDatabase,
-    private val realTimeDb: DatabaseReference
+    private val realTimeDb: DatabaseReference,
+    private val dataSyncManager: DataSyncManager
 ){
     private val userList: MutableLiveData<List<User>> = MutableLiveData()
 
@@ -114,6 +115,22 @@ class MessagesRepository @Inject constructor(
                 Log.d(TAG, "Chat room updated in real time db failed")
             }
         }
+    }
+
+    fun registerMessagesSyncListener(chatId: String) {
+        dataSyncManager.registerMessagesSyncListener(chatId)
+    }
+
+    fun getNumberOfRealtimeMessages(): MutableLiveData<MutableList<String>> {
+        return dataSyncManager.getNumberOfRealtimeMessages()
+    }
+
+    fun unregisterMessagesSyncListener(chatId: String){
+        dataSyncManager.unregisterMessagesSyncListener(chatId)
+    }
+
+    fun syncMessageData(chatId: String){
+        dataSyncManager.syncMessageData(chatId)
     }
 
     companion object{

@@ -27,8 +27,10 @@ class DataSyncManager @Inject constructor(
     private val realTimeDb: DatabaseReference
 ){
 
-    private val chatIdCount: MutableLiveData<MutableList<String>> = MutableLiveData()
-    val listOfRealtimeChatIds = mutableListOf<String>()
+    private val chatIdList: MutableLiveData<MutableList<String>> = MutableLiveData()
+    private val messagesList: MutableLiveData<MutableList<String>> = MutableLiveData()
+    private val listOfRealtimeChatIds = mutableListOf<String>()
+    private val listOfRealtimeMessages = mutableListOf<String>()
 
     //Full data sync on reinstall for existing user methods
     fun doesLendsumDbExist(context: Context, dbName: String): Boolean{
@@ -136,8 +138,7 @@ class DataSyncManager @Inject constructor(
         override fun onChildAdded(snapshot: DataSnapshot, previousChildName: String?) {
 
             listOfRealtimeChatIds.add(snapshot.value.toString())
-            chatIdCount.postValue(listOfRealtimeChatIds)
-            Log.d(TAG, "Chat room id realtime: ${snapshot.value.toString()}")
+            chatIdList.postValue(listOfRealtimeChatIds)
 
         }
 
@@ -152,7 +153,7 @@ class DataSyncManager @Inject constructor(
     }
 
     fun getNumberOfChatIdsFromRealtimeDb(): MutableLiveData<MutableList<String>> {
-        return chatIdCount
+        return chatIdList
     }
 
     fun syncChatRoomData(chatId: String){
@@ -192,6 +193,51 @@ class DataSyncManager @Inject constructor(
 
     private suspend fun insertAllExistingUserMessagesIntoLocaleCache(message: Message){
         lendsumDatabase.getChatMessageDao().insertChatMessage(message)
+    }
+
+    fun registerMessagesSyncListener(chatId: String) {
+        val messagesRef = realTimeDb.child(REALTIME_DB_MESSAGES_PATH).child(chatId).ref
+
+        messagesRef.addChildEventListener(messagesChildListener)
+    }
+
+    private val messagesChildListener = object :  ChildEventListener{
+        override fun onChildAdded(snapshot: DataSnapshot, previousChildName: String?) {
+            listOfRealtimeMessages.add(snapshot.value.toString())
+            messagesList.postValue(listOfRealtimeMessages)
+            Log.d(TAG, "Messages realtime: ${snapshot.value.toString()}")
+        }
+
+        override fun onChildChanged(snapshot: DataSnapshot, previousChildName: String?) {
+
+        }
+
+        override fun onChildRemoved(snapshot: DataSnapshot) {
+
+        }
+
+        override fun onChildMoved(snapshot: DataSnapshot, previousChildName: String?) {
+
+        }
+
+        override fun onCancelled(error: DatabaseError) {
+
+        }
+
+    }
+
+    fun unregisterMessagesSyncListener(chatId: String){
+        val messagesRef = realTimeDb.child(REALTIME_DB_MESSAGES_PATH).child(chatId).ref
+        messagesRef.removeEventListener(messagesChildListener)
+    }
+
+    fun getNumberOfRealtimeMessages(): MutableLiveData<MutableList<String>> {
+        return messagesList
+    }
+
+    fun syncMessageData(chatId: String){
+        val chatIds = mutableListOf(chatId)
+        syncAllMessagesFromRealtimeDb(chatIds)
     }
     //End messages data sync
 

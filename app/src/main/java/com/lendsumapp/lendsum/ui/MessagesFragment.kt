@@ -73,6 +73,7 @@ class MessagesFragment : Fragment(), View.OnClickListener,
             currentChatRoom = bundle.getParcelable(CHAT_ROOM_BUNDLE_KEY)
 
             setCacheMessageObserver(currentChatRoom?.chatRoomId.toString())
+            messagesViewModel.registerMessagesSyncListener(currentChatRoom?.chatRoomId.toString())
 
             initRecyclerView(MESSAGE_RECYCLER_VIEW)
 
@@ -102,6 +103,7 @@ class MessagesFragment : Fragment(), View.OnClickListener,
         _binding = null
         clearFragmentResultListener(CHAT_ROOM_REQUEST_KEY)
         messagesViewModel.getRemoteDbUserList().removeObserver(remoteDbUserListObserver)
+        messagesViewModel.unregisterMessagesSyncListener(currentChatRoom?.chatRoomId.toString())
     }
 
     private fun initRecyclerView(recyclerViewType: Int){
@@ -160,12 +162,19 @@ class MessagesFragment : Fragment(), View.OnClickListener,
             currentListOfMessages = it
             messageListAdapter.submitList(it)
             binding.chatRoomList.scrollToPosition(it.size - 1)
+
+            messagesViewModel.getNumberOfRealtimeMessages().observe(viewLifecycleOwner, Observer { listOfRealtimeMessages->
+
+                if(currentListOfMessages.size < listOfRealtimeMessages.size){
+                    messagesViewModel.syncMessageData(chatId)
+                }
+            })
         })
     }
 
     private fun addNewMessage(msg: String, chatRoom: ChatRoom) {
 
-        //TODO Eventually allow offline edits. Currently it will show in the UI but won't save to the database
+        //TODO Eventually allow offline edits. Currently it is coded to only show in the UI offline
         if(NetworkUtils.isNetworkAvailable(requireContext())){
             val newMessage = Message(AndroidUtils.getTimestampInstant(), chatRoom.chatRoomId, firebaseAuth.currentUser?.uid.toString(), guestUser.profilePicUri, msg, null)
             binding.chatRoomMsgEt.text?.clear()

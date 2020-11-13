@@ -8,7 +8,6 @@ import com.lendsumapp.lendsum.data.model.Message
 import com.lendsumapp.lendsum.data.model.User
 import com.lendsumapp.lendsum.repository.MessagesRepository
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.launch
 
 class MessagesViewModel @ViewModelInject constructor(
@@ -74,6 +73,24 @@ class MessagesViewModel @ViewModelInject constructor(
     fun updateChatRoomInRealTimeDb(chatRoom: ChatRoom){
         viewModelScope.launch(Dispatchers.IO){
             messagesRepository.updateChatRoomInRealTimeDb(chatRoom)
+        }
+    }
+
+    fun registerMessagesSyncListener(chatId: String) {
+        messagesRepository.registerMessagesSyncListener(chatId)
+    }
+
+    fun getNumberOfRealtimeMessages(): MutableLiveData<MutableList<String>> {
+        return messagesRepository.getNumberOfRealtimeMessages()
+    }
+
+    fun unregisterMessagesSyncListener(chatId: String){
+        messagesRepository.unregisterMessagesSyncListener(chatId)
+    }
+
+    fun syncMessageData(chatId: String){
+        viewModelScope.launch(Dispatchers.IO) {
+            messagesRepository.syncMessageData(chatId)
         }
     }
 
