@@ -85,11 +85,11 @@ class DataSyncManager @Inject constructor(
                 Log.d(TAG, exception.toString())
             }
     }
-    //End sync user data
 
     private suspend fun insertAllExistingUserDataIntoLocalCache(user: User){
         lendsumDatabase.getUserDao().insertUser(user)
     }
+    //End sync user data
 
     //Chat Rooms data sync
     private fun syncAllChatRoomDataFromRealtimeDb(listOfChatIds: MutableList<String>){
