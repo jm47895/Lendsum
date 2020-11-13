@@ -79,6 +79,7 @@ class MessageListAdapter(private val interaction: Interaction? = null) :
 
             if (oldDate == date && position != 0){
                 binding.messageTimestampTv.visibility = View.GONE
+                binding.messageGuestPic.visibility = View.GONE
             }else{
                 binding.messageTimestampTv.visibility = View.VISIBLE
             }

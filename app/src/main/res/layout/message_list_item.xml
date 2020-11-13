@@ -31,10 +31,10 @@
         android:id="@+id/message_guest_pic"
         android:layout_width="50dp"
         android:layout_height="50dp"
-        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintBottom_toBottomOf="@+id/message_guest_tv"
         app:layout_constraintEnd_toStartOf="@+id/horizontal_20_guide"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/message_guest_tv"
         app:layout_constraintVertical_bias="0"/>
 
     <TextView
