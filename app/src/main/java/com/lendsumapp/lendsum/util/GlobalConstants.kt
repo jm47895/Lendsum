@@ -13,7 +13,9 @@ object GlobalConstants {
     const val FIRESTORE_USERNAME_KEY = "username"
     const val FIRESTORE_PROFILE_NAME_KEY = "name"
     const val FIRESTORE_PROFILE_PIC_URI_KEY = "profilePicUri"
-    const val FIRESTORE_IS_PROFILE_PUBLIC_KEY = "isProfilePublic"
+    /*LEAVE THIS CONSTANT ALONE. For some reason, Firestore is renaming this key when
+    * an object is sent to the db to the key below*/
+    const val FIRESTORE_IS_PROFILE_PUBLIC_KEY = "profilePublic"
 
     /*Android specific constants*/
     //Pattern is for One upper case, one lower case, one symbol, and between 6 and 20 characters

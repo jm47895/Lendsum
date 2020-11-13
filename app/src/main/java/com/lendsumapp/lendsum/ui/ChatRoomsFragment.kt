@@ -1,6 +1,7 @@
 package com.lendsumapp.lendsum.ui
 
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -26,12 +27,9 @@ class ChatRoomsFragment : Fragment(), View.OnClickListener, ChatRoomListAdapter.
     private val chatRoomsViewModel: ChatRoomsViewModel by viewModels()
     private lateinit var chatRoomListAdapter: ChatRoomListAdapter
 
-    private fun initRecyclerView() {
-        binding.chatRoomList.apply {
-            chatRoomListAdapter = ChatRoomListAdapter(this@ChatRoomsFragment)
-            layoutManager = LinearLayoutManager(context)
-            adapter = chatRoomListAdapter
-        }
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        chatRoomsViewModel.registerChatRoomSyncListener()
     }
 
     override fun onCreateView(
@@ -49,13 +47,22 @@ class ChatRoomsFragment : Fragment(), View.OnClickListener, ChatRoomListAdapter.
 
         binding.messagesNewMessageBtn.setOnClickListener(this)
 
-        chatRoomsViewModel.getCachedChatRooms().observe(viewLifecycleOwner, Observer {
-            loadChatRooms(it)
+        chatRoomsViewModel.getCachedChatRooms().observe(viewLifecycleOwner, Observer { currentCachedChatRooms->
+            loadChatRooms(currentCachedChatRooms)
+            chatRoomsViewModel.getNumberOfChatIdsFromRealtimeDb().observe(viewLifecycleOwner, Observer {
+                if(currentCachedChatRooms.size < it.size){
+                    if (currentCachedChatRooms.isEmpty()){
+                        binding.messagesNoConversationsTv.visibility = View.INVISIBLE    
+                    }
+                    chatRoomsViewModel.syncChatRoomData(it[it.size-1])
+                }
+            })
         })
     }
 
     override fun onDestroyView() {
         super.onDestroyView()
+        chatRoomsViewModel.unregisterChatRoomSyncListener()
         binding.chatRoomList.adapter = null
         _binding = null
     }
@@ -65,6 +72,14 @@ class ChatRoomsFragment : Fragment(), View.OnClickListener, ChatRoomListAdapter.
             R.id.messages_new_message_btn->{
                 findNavController().navigate(R.id.action_messagesFragment_to_chatRoomFragment)
             }
+        }
+    }
+
+    private fun initRecyclerView() {
+        binding.chatRoomList.apply {
+            chatRoomListAdapter = ChatRoomListAdapter(this@ChatRoomsFragment)
+            layoutManager = LinearLayoutManager(context)
+            adapter = chatRoomListAdapter
         }
     }
 
@@ -85,6 +100,6 @@ class ChatRoomsFragment : Fragment(), View.OnClickListener, ChatRoomListAdapter.
     }
 
     companion object{
-        //private val TAG = MessagesFragment::class.simpleName
+        private val TAG = ChatRoomsFragment::class.simpleName
     }
 }
