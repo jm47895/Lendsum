@@ -207,23 +207,27 @@ class MessagesFragment : Fragment(), View.OnClickListener,
     }
 
     private fun createNewChatRoom(msg: String) {
-        val guestId = guestUser.userId
-        val hostId = hostUser.userId
-        val idList = listOf(guestId, hostId).sorted()
-        val chatRoomId = idList[0].substring(0, 5) + idList[1].substring(0, 5)
-        val chatRoomUserList = listOf(guestUser)
+        if(NetworkUtils.isNetworkAvailable(requireContext())){
+            val guestId = guestUser.userId
+            val hostId = hostUser.userId
+            val idList = listOf(guestId, hostId).sorted()
+            val chatRoomId = idList[0].substring(0, 5) + idList[1].substring(0, 5)
+            val chatRoomUserList = listOf(guestUser, hostUser)
 
-        val newChatRoom = ChatRoom(chatRoomId, chatRoomUserList, msg, AndroidUtils.getTimestampInstant())
+            val newChatRoom = ChatRoom(chatRoomId, chatRoomUserList, msg, AndroidUtils.getTimestampInstant())
 
-        messagesViewModel.addChatRoomObjectToRealTimeDb(chatRoomId, newChatRoom)
-        messagesViewModel.addChatRoomIdToRealTimeDb(idList, chatRoomId)
-        messagesViewModel.cacheNewChatRoom(newChatRoom)
+            messagesViewModel.addChatRoomObjectToRealTimeDb(chatRoomId, newChatRoom)
+            messagesViewModel.addChatRoomIdToRealTimeDb(idList, chatRoomId)
+            messagesViewModel.cacheNewChatRoom(newChatRoom)
 
-        addNewMessage(msg, newChatRoom)
+            addNewMessage(msg, newChatRoom)
 
-        setCacheMessageObserver(chatRoomId)
+            setCacheMessageObserver(chatRoomId)
 
-        currentChatRoom = newChatRoom
+            currentChatRoom = newChatRoom
+        }else{
+            AndroidUtils.showSnackBar(requireActivity(), "You must be connected to the internet to do this.")
+        }
     }
 
     override fun onUserItemSelected(position: Int, item: User) {
@@ -242,27 +246,19 @@ class MessagesFragment : Fragment(), View.OnClickListener,
 
     private fun handleMessageUi(users: List<User>){
 
+        val currentUid = firebaseAuth.currentUser?.uid.toString()
+
         AndroidUtils.hideKeyboard(requireActivity())
         binding.chatRoomList.visibility = View.INVISIBLE
         binding.chatRoomSearchView.visibility = View.GONE
         binding.chatRoomRecipientTv.visibility = View.VISIBLE
 
-        setParticipants(users)
-
-    }
-
-    private fun setParticipants(users: List<User>){
-        var participants = ""
-
-        if(users.size > 1){
-            for(user in users){
-                participants += user.name + "/"
+        for (user in users){
+            if(user.userId != currentUid){
+                binding.chatRoomRecipientTv.text = user.name
             }
-        }else{
-            participants = users[0].name
         }
 
-        binding.chatRoomRecipientTv.text = participants
     }
 
     override fun onMessageItemSelected(position: Int, item: Message) {
