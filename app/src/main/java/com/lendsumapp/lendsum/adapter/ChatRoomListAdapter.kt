@@ -8,11 +8,14 @@ import androidx.recyclerview.widget.AsyncListDiffer
 import androidx.recyclerview.widget.DiffUtil
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.RequestOptions
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.ktx.Firebase
 import com.lendsumapp.lendsum.R
 import com.lendsumapp.lendsum.data.model.ChatRoom
 import com.lendsumapp.lendsum.data.model.User
 import com.lendsumapp.lendsum.databinding.ChatRoomListItemBinding
 import com.lendsumapp.lendsum.util.AndroidUtils
+import javax.inject.Inject
 
 class ChatRoomListAdapter(private val interaction: Interaction? = null) :
     RecyclerView.Adapter<RecyclerView.ViewHolder>() {
@@ -55,6 +58,7 @@ class ChatRoomListAdapter(private val interaction: Interaction? = null) :
     class ChatRoomViewHolder constructor(itemView: View, private val interaction: Interaction?) : RecyclerView.ViewHolder(itemView) {
 
         val binding = ChatRoomListItemBinding.bind(itemView)
+        val firebaseAuth = FirebaseAuth.getInstance()
 
         fun bind(item: ChatRoom){
             itemView.setOnClickListener {
@@ -62,10 +66,10 @@ class ChatRoomListAdapter(private val interaction: Interaction? = null) :
             }
 
             lateinit var guestUser: User
+            val currentUid = firebaseAuth.currentUser?.uid.toString()
 
-            val participants = item.participants
-            participants.let {
-                for (user in participants){
+            for(user in item.participants){
+                if(user.userId != currentUid){
                     guestUser = user
                 }
             }
