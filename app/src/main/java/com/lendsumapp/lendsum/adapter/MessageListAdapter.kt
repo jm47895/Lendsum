@@ -82,6 +82,7 @@ class MessageListAdapter(private val interaction: Interaction? = null) :
                 binding.messageGuestPic.visibility = View.GONE
             }else{
                 binding.messageTimestampTv.visibility = View.VISIBLE
+                binding.messageGuestPic.visibility = View.VISIBLE
             }
 
             binding.messageTimestampTv.text = date
@@ -89,7 +90,13 @@ class MessageListAdapter(private val interaction: Interaction? = null) :
             if(item.messageSender == firebaseUser?.uid){
                 binding.messageHostTv.text = item.message
                 binding.messageHostTv.visibility = View.VISIBLE
+                binding.messageGuestTv.visibility = View.INVISIBLE
             }else{
+
+                binding.messageGuestTv.text = item.message
+                binding.messageGuestTv.visibility = View.VISIBLE
+                binding.messageHostTv.visibility = View.INVISIBLE
+
                 Glide.with(itemView.context)
                     .asBitmap()
                     .load(item.guestPic)
@@ -101,8 +108,6 @@ class MessageListAdapter(private val interaction: Interaction? = null) :
                     .circleCrop()
                     .into(binding.messageGuestPic)
 
-                binding.messageGuestTv.text = item.message
-                binding.messageGuestTv.visibility = View.VISIBLE
             }
 
         }

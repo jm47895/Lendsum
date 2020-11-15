@@ -50,11 +50,11 @@ class ChatRoomsFragment : Fragment(), View.OnClickListener, ChatRoomListAdapter.
         chatRoomsViewModel.getCachedChatRooms().observe(viewLifecycleOwner, Observer { currentCachedChatRooms->
             loadChatRooms(currentCachedChatRooms)
             chatRoomsViewModel.getNumberOfChatIdsFromRealtimeDb().observe(viewLifecycleOwner, Observer {
-                if(currentCachedChatRooms.size < it.size){
+                if(currentCachedChatRooms.size < it.size || currentCachedChatRooms.size == it.size){
                     if (currentCachedChatRooms.isEmpty()){
                         binding.messagesNoConversationsTv.visibility = View.INVISIBLE    
                     }
-                    chatRoomsViewModel.syncChatRoomData(it[it.size-1])
+                    chatRoomsViewModel.syncChatRoomData(it)
                 }
             })
         })

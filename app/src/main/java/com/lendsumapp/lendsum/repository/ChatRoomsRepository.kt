@@ -29,8 +29,8 @@ class ChatRoomsRepository @Inject constructor(
         return dataSyncManager.getNumberOfChatIdsFromRealtimeDb()
     }
 
-    fun syncChatRoomData(chatId: String){
-        dataSyncManager.syncChatRoomData(chatId)
+    fun syncChatRoomData(chatIdList: MutableList<String>){
+        dataSyncManager.syncChatRoomData(chatIdList)
     }
 
     companion object{

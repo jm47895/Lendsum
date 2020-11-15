@@ -32,9 +32,9 @@ class ChatRoomsViewModel @ViewModelInject constructor(
         return chatRoomsRepository.getNumberOfChatIdsFromRealtimeDb()
     }
 
-    fun syncChatRoomData(chatId: String){
+    fun syncChatRoomData(chatIdList: MutableList<String>){
         viewModelScope.launch(Dispatchers.IO){
-            chatRoomsRepository.syncChatRoomData(chatId)
+            chatRoomsRepository.syncChatRoomData(chatIdList)
         }
     }
 

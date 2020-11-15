@@ -156,9 +156,8 @@ class DataSyncManager @Inject constructor(
         return chatIdList
     }
 
-    fun syncChatRoomData(chatId: String){
-        val chatIds = mutableListOf(chatId)
-        syncAllChatRoomDataFromRealtimeDb(chatIds)
+    fun syncChatRoomData(chatIdList: MutableList<String>){
+        syncAllChatRoomDataFromRealtimeDb(chatIdList)
     }
 
     fun unregisterChatRoomSyncListener(userId: String){
