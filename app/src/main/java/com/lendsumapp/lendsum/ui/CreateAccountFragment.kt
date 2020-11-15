@@ -28,21 +28,47 @@ import dagger.hilt.android.AndroidEntryPoint
 class CreateAccountFragment : Fragment(), View.OnClickListener {
 
     private var _binding: FragmentCreateAccountBinding? = null
-    private val binding get() =  _binding
+    private val binding get() =  _binding!!
     private val sharedPrefs by lazy { activity?.getSharedPreferences(R.string.app_name.toString(), Context.MODE_PRIVATE) }
     private val createAccountViewModel: CreateAccountViewModel by viewModels()
     private lateinit var emailCreateAccountObserver: Observer<Boolean>
     private lateinit var linkWithEmailObserver: Observer<Boolean>
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
+    override fun onCreateView(
+        inflater: LayoutInflater, container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? {
+        _binding = FragmentCreateAccountBinding.inflate(inflater, container, false)
+        return binding.root
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+
+        requireActivity().onBackPressedDispatcher.addCallback(this){
+            sharedPrefs?.getBoolean(RETURNING_USER, false)?.let { logoutOrDeleteUserHandler(it) }
+            clearEditTextFocus()
+            findNavController(this@CreateAccountFragment).navigate(R.id.action_createAccountFragment_to_loginFragment)
+        }
+
+        val user = createAccountViewModel.getFirebaseUser()
+
+        if(user != null){
+            binding.createUserFirstNameEt.setText(user.displayName?.let { getFirstName(it) })
+            binding.createUserLastNameEt.setText(user.displayName?.let { getLastName(it) })
+            binding.createUserEmailEt.setText(user.email)
+        }
+
+        binding.createAccountBackBtn.setOnClickListener(this)
+        binding.createAccountNextBtn.setOnClickListener(this)
 
         emailCreateAccountObserver = Observer { isCreateEmailAccountSuccessful ->
 
             if (isCreateEmailAccountSuccessful){
                 sharedPrefs?.edit()?.putInt(NAV_SIGN_UP_TYPE, NavSignUpType.EMAIL_LOGIN.ordinal)?.apply()
-                val displayName = binding?.createUserFirstNameEt?.text.toString().trim() + " " + binding?.createUserLastNameEt?.text.toString().trim()
+                val displayName = binding.createUserFirstNameEt.text.toString().trim() + " " + binding.createUserLastNameEt.text.toString().trim()
                 createAccountViewModel.updateCreateAccountAuthProfile(FIRESTORE_PROFILE_NAME_KEY, displayName)
+                clearEditTextFocus()
                 Log.d(TAG, "Email create account success")
                 findNavController(this).navigate(R.id.action_createAccountFragment_to_numberVerificationFragment)
             }else{
@@ -54,6 +80,7 @@ class CreateAccountFragment : Fragment(), View.OnClickListener {
         linkWithEmailObserver = Observer { isLinkWithEmailSuccessful->
             if(isLinkWithEmailSuccessful){
                 Log.d(TAG, "Link email with other credential provider success")
+                clearEditTextFocus()
                 findNavController(this).navigate(R.id.action_createAccountFragment_to_numberVerificationFragment)
             }else{
                 Log.d(TAG, "Link email with other credential provider failed")
@@ -62,35 +89,6 @@ class CreateAccountFragment : Fragment(), View.OnClickListener {
             }
         }
 
-        requireActivity().onBackPressedDispatcher.addCallback(this){
-            sharedPrefs?.getBoolean(RETURNING_USER, false)?.let { logoutOrDeleteUserHandler(it) }
-            findNavController(this@CreateAccountFragment).navigate(R.id.action_createAccountFragment_to_loginFragment)
-        }
-
-    }
-
-    override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View? {
-        _binding = FragmentCreateAccountBinding.inflate(inflater, container, false)
-        return binding?.root
-    }
-
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-
-        val user = createAccountViewModel.getFirebaseUser()
-
-        if(user != null){
-            binding?.createUserFirstNameEt?.setText(user.displayName?.let { getFirstName(it) })
-            binding?.createUserLastNameEt?.setText(user.displayName?.let { getLastName(it) })
-            binding?.createUserEmailEt?.setText(user.email)
-        }
-
-        binding?.createAccountBackBtn?.setOnClickListener(this)
-        binding?.createAccountNextBtn?.setOnClickListener(this)
-
     }
 
     override fun onDestroyView() {
@@ -98,26 +96,34 @@ class CreateAccountFragment : Fragment(), View.OnClickListener {
         _binding = null
     }
 
-    private fun signUpUser(firstName: String, lastName: String, email: String, password: String) {
+    private fun signUpUser(email: String, password: String) {
         createAccountViewModel.createUserAccount(email, password)
+    }
+
+    private fun clearEditTextFocus(){
+        binding.createUserFirstNameEt.clearFocus()
+        binding.createUserLastNameEt.clearFocus()
+        binding.createUserEmailEt.clearFocus()
+        binding.createUserPasswordEt.clearFocus()
+        binding.createUserMatchPasswordEt.clearFocus()
     }
 
     private fun isValidAccountForm(firstName: String, lastName: String, email: String, password: String, matchPassword: String): Boolean {
 
         if (TextUtils.isEmpty(firstName) && TextUtils.isEmpty(lastName)) {
-            binding?.createUserFirstNameEt?.error = getString(R.string.first_name_error_msg)
-            binding?.createUserLastNameEt?.error = getString(R.string.last_name_err_msg)
+            binding.createUserFirstNameEt.error = getString(R.string.first_name_error_msg)
+            binding.createUserLastNameEt.error = getString(R.string.last_name_err_msg)
             return false
         } else if (!AndroidUtils.isValidEmail(email)) {
-            binding?.createUserEmailEt?.error = getString(R.string.invalid_email_err_msg)
+            binding.createUserEmailEt.error = getString(R.string.invalid_email_err_msg)
             return false
         } else if (TextUtils.isEmpty(password) || !AndroidUtils.isValidPassword(password)
         ) {
-            binding?.createUserPasswordEt?.error = getString(R.string.password_param_err_msg)
+            binding.createUserPasswordEt.error = getString(R.string.password_param_err_msg)
             return false
         }else if(password != matchPassword){
-            binding?.createUserMatchPasswordEt?.error = getString(R.string.pass_dont_match_err_msg)
-            binding?.createUserPasswordEt?.error = getString(R.string.pass_dont_match_err_msg)
+            binding.createUserMatchPasswordEt.error = getString(R.string.pass_dont_match_err_msg)
+            binding.createUserPasswordEt.error = getString(R.string.pass_dont_match_err_msg)
             return false
         }
         return true
@@ -128,23 +134,23 @@ class CreateAccountFragment : Fragment(), View.OnClickListener {
             R.id.create_account_back_btn->{
 
                 sharedPrefs?.getBoolean(RETURNING_USER, false)?.let { logoutOrDeleteUserHandler(it) }
-
+                clearEditTextFocus()
                 view.findNavController().navigate(R.id.action_createAccountFragment_to_loginFragment)
             }
             R.id.create_account_next_btn->{
 
                 AndroidUtils.hideKeyboard(requireActivity())
 
-                val firstName = binding?.createUserFirstNameEt?.text.toString().trim()
-                val lastName = binding?.createUserLastNameEt?.text.toString().trim()
-                val email = binding?.createUserEmailEt?.text.toString().trim()
-                val password = binding?.createUserPasswordEt?.text.toString().trim()
-                val matchPassword = binding?.createUserMatchPasswordEt?.text.toString().trim()
+                val firstName = binding.createUserFirstNameEt.text.toString().trim()
+                val lastName = binding.createUserLastNameEt.text.toString().trim()
+                val email = binding.createUserEmailEt.text.toString().trim()
+                val password = binding.createUserPasswordEt.text.toString().trim()
+                val matchPassword = binding.createUserMatchPasswordEt.text.toString().trim()
 
                 if(isValidAccountForm(firstName, lastName, email, password, matchPassword)){
                     createAccountViewModel.getEmailCreateAccountStatus().observe(viewLifecycleOwner, emailCreateAccountObserver)
                     createAccountViewModel.getLinkWithCredentialStatus().observe(viewLifecycleOwner, linkWithEmailObserver)
-                    signUpUser(firstName, lastName, email, password)
+                    signUpUser(email, password)
                 }
             }
         }

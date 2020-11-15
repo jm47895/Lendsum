@@ -34,9 +34,8 @@ import dagger.hilt.android.AndroidEntryPoint
 class EditProfileFragment : Fragment(), View.OnClickListener, CompoundButton.OnCheckedChangeListener {
 
     private var _binding: FragmentEditProfileBinding? = null
-    private val binding get() = _binding
+    private val binding get() = _binding!!
     private val editProfileViewModel: EditProfileViewModel by viewModels()
-    private lateinit var userCacheObserver: Observer<User>
     private lateinit var updateUserStatusObserver: Observer<Int>
     private lateinit var updateAuthEmailStatusObserver: Observer<Boolean>
     private lateinit var updateAuthPassStatusObserver: Observer<Boolean>
@@ -47,19 +46,19 @@ class EditProfileFragment : Fragment(), View.OnClickListener, CompoundButton.OnC
         savedInstanceState: Bundle?
     ): View? {
         _binding = FragmentEditProfileBinding.inflate(inflater, container, false)
-        return binding?.root
+        return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        binding?.editProfilePic?.setOnClickListener(this)
-        binding?.editProfileUpdatePassBtn?.setOnClickListener(this)
-        binding?.editProfileBackBtn?.setOnClickListener(this)
-        binding?.editProfileNameToggle?.setOnCheckedChangeListener(this)
-        binding?.editProfileUsernameToggle?.setOnCheckedChangeListener(this)
-        binding?.editProfileEmailToggle?.setOnCheckedChangeListener(this)
-        binding?.editProfileVisibilityToggle?.setOnCheckedChangeListener(this)
+        binding.editProfilePic.setOnClickListener(this)
+        binding.editProfileUpdatePassBtn.setOnClickListener(this)
+        binding.editProfileBackBtn.setOnClickListener(this)
+        binding.editProfileNameToggle.setOnCheckedChangeListener(this)
+        binding.editProfileUsernameToggle.setOnCheckedChangeListener(this)
+        binding.editProfileEmailToggle.setOnCheckedChangeListener(this)
+        binding.editProfileVisibilityToggle.setOnCheckedChangeListener(this)
 
 
         editProfileViewModel.getCachedUser().observe(viewLifecycleOwner, Observer { cachedUser->
@@ -80,8 +79,8 @@ class EditProfileFragment : Fragment(), View.OnClickListener, CompoundButton.OnC
 
         updateAuthPassStatusObserver = Observer {   isAuthPassUpdated->
             if(isAuthPassUpdated){
-                binding?.editProfilePasswordEt?.setText("")
-                binding?.editProfileMatchPasswordEt?.setText("")
+                binding.editProfilePasswordEt.setText("")
+                binding.editProfileMatchPasswordEt.setText("")
                 AndroidUtils.showSnackBar(requireActivity(), getString(R.string.password_has_updated))
             }else{
                 AndroidUtils.showSnackBar(requireActivity(), getString(R.string.sign_in_again_msg))
@@ -104,17 +103,17 @@ class EditProfileFragment : Fragment(), View.OnClickListener, CompoundButton.OnC
 
         user?.let {
             if(!user.isProfilePublic){
-                binding?.editProfileVisibilityToggle?.setOnCheckedChangeListener(null)
-                binding?.editProfileVisibilityToggle?.isChecked = true
-                handleUpdateInfoUI(binding?.editProfileVisibilityToggle?.isChecked!!, null, null, binding?.editProfileVisibilityToggle!!)
-                binding?.editProfileVisibilityToggle?.setOnCheckedChangeListener(this)
+                binding.editProfileVisibilityToggle.setOnCheckedChangeListener(null)
+                binding.editProfileVisibilityToggle.isChecked = true
+                handleUpdateInfoUI(binding.editProfileVisibilityToggle.isChecked, null, null, binding.editProfileVisibilityToggle)
+                binding.editProfileVisibilityToggle.setOnCheckedChangeListener(this)
             }
 
-            binding?.editProfileNameTv?.text = it.name
-            binding?.editProfileUsernameTv?.text = it.username
-            binding?.editProfileEmailTv?.text = it.email
+            binding.editProfileNameTv.text = it.name
+            binding.editProfileUsernameTv.text = it.username
+            binding.editProfileEmailTv.text = it.email
 
-            loadProfilePic(it.profilePicUri!!, binding?.editProfilePic!!)
+            loadProfilePic(it.profilePicUri!!, binding.editProfilePic)
         }
     }
 
@@ -142,7 +141,7 @@ class EditProfileFragment : Fragment(), View.OnClickListener, CompoundButton.OnC
 
             user.profilePicUri = data?.data.toString()
 
-            loadProfilePic(user.profilePicUri.toString(), binding?.editProfilePic!!)
+            loadProfilePic(user.profilePicUri.toString(), binding.editProfilePic)
 
             editProfileViewModel.updateCachedUser(user)
             editProfileViewModel.updateUserValueInFirestore(FIRESTORE_PROFILE_PIC_URI_KEY, user.profilePicUri.toString(), null)
@@ -154,26 +153,26 @@ class EditProfileFragment : Fragment(), View.OnClickListener, CompoundButton.OnC
         when(button?.id){
             R.id.edit_profile_name_toggle->{
 
-                handleUpdateInfoUI(isChecked, binding?.editProfileNameTv!!, binding?.editProfileNameEt!!, binding?.editProfileNameToggle!!)
-                handleUpdateInfoData(isChecked, binding?.editProfileNameTv!!, EditProfileInfoType.PROFILE_NAME.ordinal)
+                handleUpdateInfoUI(isChecked, binding.editProfileNameTv, binding.editProfileNameEt, binding.editProfileNameToggle)
+                handleUpdateInfoData(isChecked, binding.editProfileNameTv, EditProfileInfoType.PROFILE_NAME.ordinal)
 
             }
             R.id.edit_profile_username_toggle->{
 
-                handleUpdateInfoUI(isChecked, binding?.editProfileUsernameTv!!, binding?.editProfileUsernameEt!!, binding?.editProfileUsernameToggle!!)
-                handleUpdateInfoData(isChecked, binding?.editProfileUsernameTv!!, EditProfileInfoType.PROFILE_USERNAME.ordinal)
+                handleUpdateInfoUI(isChecked, binding.editProfileUsernameTv, binding.editProfileUsernameEt, binding.editProfileUsernameToggle)
+                handleUpdateInfoData(isChecked, binding.editProfileUsernameTv, EditProfileInfoType.PROFILE_USERNAME.ordinal)
 
             }
             R.id.edit_profile_email_toggle->{
 
-                handleUpdateInfoUI(isChecked, binding?.editProfileEmailTv!!, binding?.editProfileEmailEt!!, binding?.editProfileEmailToggle!!)
-                handleUpdateInfoData(isChecked, binding?.editProfileEmailTv!!, EditProfileInfoType.PROFILE_EMAIL.ordinal)
+                handleUpdateInfoUI(isChecked, binding.editProfileEmailTv, binding.editProfileEmailEt, binding.editProfileEmailToggle)
+                handleUpdateInfoData(isChecked, binding.editProfileEmailTv, EditProfileInfoType.PROFILE_EMAIL.ordinal)
 
             }
             R.id.edit_profile_visibility_toggle->{
 
-                handleUpdateInfoUI(isChecked, null, null, binding?.editProfileVisibilityToggle!!)
-                handleUpdateInfoData(isChecked, binding?.editProfileVisibilityTv!!, EditProfileInfoType.PROFILE_VISIBILITY.ordinal)
+                handleUpdateInfoUI(isChecked, null, null, binding.editProfileVisibilityToggle)
+                handleUpdateInfoData(isChecked, binding.editProfileVisibilityTv, EditProfileInfoType.PROFILE_VISIBILITY.ordinal)
             }
         }
     }
@@ -187,8 +186,8 @@ class EditProfileFragment : Fragment(), View.OnClickListener, CompoundButton.OnC
 
                 AndroidUtils.hideKeyboard(requireActivity())
 
-                val password = binding?.editProfilePasswordEt?.text.toString().trim()
-                val passwordMatch = binding?.editProfileMatchPasswordEt?.text.toString().trim()
+                val password = binding.editProfilePasswordEt.text.toString().trim()
+                val passwordMatch = binding.editProfileMatchPasswordEt.text.toString().trim()
 
                 if(isPasswordValidated(password, passwordMatch)){
                     editProfileViewModel.getUpdateAuthPassStatus().observe(viewLifecycleOwner, updateAuthPassStatusObserver)
@@ -196,25 +195,33 @@ class EditProfileFragment : Fragment(), View.OnClickListener, CompoundButton.OnC
                 }
             }
             R.id.edit_profile_back_btn->{
+                clearEditTextFocus()
                 findNavController().navigate(R.id.action_editProfileFragment_to_profileFragment)
             }
         }
     }
 
+    private fun clearEditTextFocus(){
+        binding.editProfileEmailEt.clearFocus()
+        binding.editProfileNameEt.clearFocus()
+        binding.editProfilePasswordEt.clearFocus()
+        binding.editProfileMatchPasswordEt.clearFocus()
+    }
+
     private fun isPasswordValidated(password:String, passwordMatch: String):Boolean{
         when {
             TextUtils.isEmpty(password) || TextUtils.isEmpty(passwordMatch) -> {
-                binding?.editProfilePasswordEt?.error = getString(R.string.blank_pass_no_update)
-                binding?.editProfileMatchPasswordEt?.error = getString(R.string.blank_pass_no_update)
+                binding.editProfilePasswordEt.error = getString(R.string.blank_pass_no_update)
+                binding.editProfileMatchPasswordEt.error = getString(R.string.blank_pass_no_update)
                 return false
             }
             !AndroidUtils.isValidPassword(password) -> {
-                binding?.editProfilePasswordEt?.error = getString(R.string.password_param_err_msg)
+                binding.editProfilePasswordEt.error = getString(R.string.password_param_err_msg)
                 return false
             }
             password != passwordMatch -> {
-                binding?.editProfilePasswordEt?.error = getString(R.string.pass_dont_match_err_msg)
-                binding?.editProfileMatchPasswordEt?.error = getString(R.string.pass_dont_match_err_msg)
+                binding.editProfilePasswordEt.error = getString(R.string.pass_dont_match_err_msg)
+                binding.editProfileMatchPasswordEt.error = getString(R.string.pass_dont_match_err_msg)
                 return false
             }
             else -> {

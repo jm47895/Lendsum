@@ -23,19 +23,6 @@ class ForgotPasswordFragment : Fragment(), View.OnClickListener {
     private val forgotPasswordViewModel: ForgotPasswordViewModel by viewModels()
     private lateinit var resetEmailStatusObserver: Observer<Boolean>
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-
-        resetEmailStatusObserver = Observer { isEmailSent ->
-            if(isEmailSent){
-                activity?.let { AndroidUtils.showSnackBar(it, getString(R.string.reset_email_sent)) }
-                findNavController().navigate(R.id.action_forgotPasswordFragment_to_loginFragment)
-            }else{
-                activity?.let { AndroidUtils.showSnackBar(it, getString(R.string.no_account_with_email)) }
-            }
-        }
-    }
-
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -49,11 +36,25 @@ class ForgotPasswordFragment : Fragment(), View.OnClickListener {
 
         binding.forgotSendResetPassBtn.setOnClickListener(this)
 
+        resetEmailStatusObserver = Observer { isEmailSent ->
+            if(isEmailSent){
+                activity?.let { AndroidUtils.showSnackBar(it, getString(R.string.reset_email_sent)) }
+                clearEditTextFocus()
+                findNavController().navigate(R.id.action_forgotPasswordFragment_to_loginFragment)
+            }else{
+                activity?.let { AndroidUtils.showSnackBar(it, getString(R.string.no_account_with_email)) }
+            }
+        }
+
     }
 
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
+    }
+
+    private fun clearEditTextFocus(){
+        binding.forgotEmailEt.clearFocus()
     }
 
     override fun onClick(view: View?) {

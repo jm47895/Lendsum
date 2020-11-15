@@ -35,14 +35,41 @@ class LoginFragment : Fragment(), View.OnClickListener{
     private lateinit var googleAuthObserver: Observer<Boolean>
     private lateinit var facebookAuthObserver: Observer<Boolean>
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
+    override fun onCreateView(
+        inflater: LayoutInflater, container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? {
+        _binding = FragmentLoginBinding.inflate(inflater, container, false)
+        return binding.root
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
 
         val firebaseUser = loginViewModel.getFirebaseUser()
 
         if(firebaseUser != null
             && sharedPrefs?.getBoolean(RETURNING_USER, false) == true){
             findNavController().navigate(R.id.action_loginFragment_to_marketplaceFragment)
+        }
+
+        binding.loginSignUpEmailBtn.setOnClickListener(this)
+        binding.loginSignInBtn.setOnClickListener(this)
+        binding.loginForgotPasswordTv.setOnClickListener(this)
+        binding.loginSignInWithFacebook.setOnClickListener(this)
+        binding.loginSignInWithGoogle.setOnClickListener(this)
+
+        emailSignInObserver = Observer { isLoginSuccessful ->
+            if (isLoginSuccessful){
+                clearEditTextsFocusToPreventNavigationLeaks()
+                Log.d(TAG, "Email login success")
+                sharedPrefs?.edit()?.putBoolean(RETURNING_USER, true)?.apply()
+                findNavController().navigate(R.id.action_loginFragment_to_numberVerificationFragment)
+            }else{
+                Log.d(TAG, "Email login failed")
+                binding.loginEmailEt.error = getString(R.string.email_or_pass_wrong)
+                binding.loginPasswordEt.error = getString(R.string.email_or_pass_wrong)
+            }
         }
 
         googleAuthObserver = Observer{ isGoogleLoginSuccessful ->
@@ -66,34 +93,12 @@ class LoginFragment : Fragment(), View.OnClickListener{
         }
     }
 
-    override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View? {
-        _binding = FragmentLoginBinding.inflate(inflater, container, false)
-        return binding.root
-    }
-
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-
-        binding.loginSignUpEmailBtn.setOnClickListener(this)
-        binding.loginSignInBtn.setOnClickListener(this)
-        binding.loginForgotPasswordTv.setOnClickListener(this)
-        binding.loginSignInWithFacebook.setOnClickListener(this)
-        binding.loginSignInWithGoogle.setOnClickListener(this)
-
-        emailSignInObserver = Observer { isLoginSuccessful ->
-            if (isLoginSuccessful){
-                Log.d(TAG, "Email login success")
-                sharedPrefs?.edit()?.putBoolean(RETURNING_USER, true)?.apply()
-                findNavController().navigate(R.id.action_loginFragment_to_numberVerificationFragment)
-            }else{
-                Log.d(TAG, "Email login failed")
-                binding.loginEmailEt.error = getString(R.string.email_or_pass_wrong)
-                binding.loginPasswordEt.error = getString(R.string.email_or_pass_wrong)
-            }
-        }
+    private fun clearEditTextsFocusToPreventNavigationLeaks() {
+        /*The fact that I have to do this is sad. You would data binding would take care of
+        * this, but alas it doesn't. This is happening due to the garbage collector not being
+        * to collect the edit text after navigation*/
+        binding.loginEmailEt.clearFocus()
+        binding.loginPasswordEt.clearFocus()
     }
 
     override fun onDestroyView() {
@@ -128,8 +133,7 @@ class LoginFragment : Fragment(), View.OnClickListener{
 
                     if (!TextUtils.isEmpty(signInEmail) && !TextUtils.isEmpty(signInPassword)) {
                         loginViewModel.signInWithEmailAndPass(signInEmail, signInPassword)
-                        sharedPrefs?.edit()
-                            ?.putInt(NAV_SIGN_UP_TYPE, NavSignUpType.EMAIL_LOGIN.ordinal)?.apply()
+                        sharedPrefs?.edit()?.putInt(NAV_SIGN_UP_TYPE, NavSignUpType.EMAIL_LOGIN.ordinal)?.apply()
                     } else {
                         binding.loginEmailEt.error = getString(R.string.email_or_pass_wrong)
                         binding.loginPasswordEt.error = getString(R.string.email_or_pass_wrong)

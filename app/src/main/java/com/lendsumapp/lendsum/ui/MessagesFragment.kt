@@ -106,6 +106,10 @@ class MessagesFragment : Fragment(), View.OnClickListener,
         messagesViewModel.unregisterMessagesSyncListener(currentChatRoom?.chatRoomId.toString())
     }
 
+    fun clearEditTextFocus(){
+        binding.chatRoomMsgEt
+    }
+
     private fun initRecyclerView(recyclerViewType: Int){
 
         when(recyclerViewType){
@@ -131,6 +135,7 @@ class MessagesFragment : Fragment(), View.OnClickListener,
     override fun onClick(view: View?) {
         when(view?.id){
             R.id.chat_room_back_btn->{
+                clearEditTextFocus()
                 findNavController().navigate(R.id.action_chatRoomFragment_to_messagesFragment)
             }
             R.id.chat_room_send_msg_btn->{

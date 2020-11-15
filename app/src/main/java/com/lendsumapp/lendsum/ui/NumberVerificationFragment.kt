@@ -67,8 +67,10 @@ class NumberVerificationFragment : Fragment(), View.OnClickListener, CountryCode
                 if(sharedPrefs?.getBoolean(RETURNING_USER, false) == false){
                     numberVerificationViewModel.insertNewUserIntoSqlCache()
                     numberVerificationViewModel.insertNewUserIntoFirestoreDb()
+                    clearEditTextFocus()
                     findNavController().navigate(R.id.action_numberVerificationFragment_to_termsConditionsFragment)
                 }else{
+                    clearEditTextFocus()
                     findNavController().navigate(R.id.action_numberVerificationFragment_to_marketplaceFragment)
                 }
 
@@ -102,6 +104,11 @@ class NumberVerificationFragment : Fragment(), View.OnClickListener, CountryCode
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
+    }
+
+    private fun clearEditTextFocus(){
+        binding.numberVerificationPhoneEt.clearFocus()
+        binding.numberVerificationCodeEt.clearFocus()
     }
 
     override fun onClick(view: View?) {
@@ -146,6 +153,7 @@ class NumberVerificationFragment : Fragment(), View.OnClickListener, CountryCode
                             numberVerificationViewModel.getPhoneNumberLinkStatus().observe(viewLifecycleOwner, linkPhoneNumberStatusObserver)
                             numberVerificationViewModel.linkPhoneNumWithLoginCredential(credential!!)
                         }else{
+                            clearEditTextFocus()
                             findNavController().navigate(R.id.action_numberVerificationFragment_to_marketplaceFragment)
                         }
 
@@ -158,8 +166,10 @@ class NumberVerificationFragment : Fragment(), View.OnClickListener, CountryCode
                 }
                 R.id.number_verification_back_btn -> {
                     if (sharedPrefs?.getBoolean(RETURNING_USER, false) == false) {
+                        clearEditTextFocus()
                         view.findNavController().navigate(R.id.action_numberVerificationFragment_to_createAccountFragment)
                     } else {
+                        clearEditTextFocus()
                         view.findNavController().navigate(R.id.action_numberVerificationFragment_to_loginFragment)
                     }
                 }
