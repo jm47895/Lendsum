@@ -7,6 +7,7 @@ import androidx.core.view.get
 import androidx.navigation.NavController
 import androidx.navigation.NavDestination
 import androidx.navigation.Navigation
+import androidx.navigation.fragment.NavHostFragment
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.lendsumapp.lendsum.R
 import com.lendsumapp.lendsum.databinding.ActivityHomeBinding
@@ -18,7 +19,8 @@ class HomeActivity: AppCompatActivity(),
     BottomNavigationView.OnNavigationItemSelectedListener, NavController.OnDestinationChangedListener{
 
     private lateinit var binding: ActivityHomeBinding
-    private lateinit var navController: NavController
+    private val navHostFragment by lazy { supportFragmentManager.findFragmentById(R.id.nav_host_fragment) as NavHostFragment }
+    private val navController get() = navHostFragment.navController
 
     override fun onCreate(savedInstanceState: Bundle?){
         super.onCreate(savedInstanceState)
@@ -33,7 +35,6 @@ class HomeActivity: AppCompatActivity(),
     private fun setupBottomNavigation() {
         AndroidUtils.hideView(binding.bottomNavigation)
         binding.bottomNavigation.menu.setGroupCheckable(R.id.home_group, false, true)
-        navController = Navigation.findNavController(this, R.id.nav_host_fragment)
         binding.bottomNavigation.setOnNavigationItemSelectedListener(this)
         navController.addOnDestinationChangedListener(this)
 
