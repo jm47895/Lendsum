@@ -1,5 +1,6 @@
 package com.lendsumapp.lendsum.viewmodel
 
+import android.net.Uri
 import androidx.hilt.lifecycle.ViewModelInject
 import androidx.lifecycle.*
 import com.google.firebase.auth.FirebaseAuth
@@ -72,6 +73,14 @@ class EditProfileViewModel @ViewModelInject constructor(
         }
     }
     //End of firestore functions
+
+    //Firebase storage functions
+    fun uploadProfilePhotoToFirebaseStorage(fileName: String, uri: Uri){
+        viewModelScope.launch(Dispatchers.IO){
+            editProfileRepository.uploadProfilePhotoToFirebaseStorage(fileName, uri)
+        }
+    }
+    //End firebase storage functions
 
 
     companion object {

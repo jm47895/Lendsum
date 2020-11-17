@@ -1,22 +1,24 @@
 package com.lendsumapp.lendsum.ui
 
-import android.app.Activity
-import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
 import android.text.TextUtils
 import android.util.Log
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.webkit.MimeTypeMap
 import android.widget.*
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.ContextCompat
+import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import androidx.navigation.fragment.findNavController
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.bumptech.glide.request.RequestOptions
+import com.google.firebase.auth.FirebaseAuth
 import com.lendsumapp.lendsum.R
 import com.lendsumapp.lendsum.data.model.User
 import com.lendsumapp.lendsum.databinding.FragmentEditProfileBinding
@@ -30,6 +32,7 @@ import com.lendsumapp.lendsum.util.GlobalConstants.FIRESTORE_USERNAME_KEY
 import com.lendsumapp.lendsum.viewmodel.EditProfileViewModel
 import dagger.hilt.android.AndroidEntryPoint
 
+
 @AndroidEntryPoint
 class EditProfileFragment : Fragment(), View.OnClickListener, CompoundButton.OnCheckedChangeListener {
 
@@ -40,6 +43,9 @@ class EditProfileFragment : Fragment(), View.OnClickListener, CompoundButton.OnC
     private lateinit var updateAuthEmailStatusObserver: Observer<Boolean>
     private lateinit var updateAuthPassStatusObserver: Observer<Boolean>
     private var user: User = User()
+    private val registerOnActivityResult = registerForActivityResult(ActivityResultContracts.GetContent()) {
+        updateProfilePic(it)
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -61,14 +67,14 @@ class EditProfileFragment : Fragment(), View.OnClickListener, CompoundButton.OnC
         binding.editProfileVisibilityToggle.setOnCheckedChangeListener(this)
 
 
-        editProfileViewModel.getCachedUser().observe(viewLifecycleOwner, Observer { cachedUser->
+        editProfileViewModel.getCachedUser().observe(viewLifecycleOwner, Observer { cachedUser ->
 
             user = cachedUser
 
             loadCachedUserProfile(user)
         })
 
-        updateAuthEmailStatusObserver = Observer { isAuthEmailUpdated->
+        updateAuthEmailStatusObserver = Observer { isAuthEmailUpdated ->
             if(isAuthEmailUpdated){
                 editProfileViewModel.updateCachedUser(user)
                 editProfileViewModel.updateUserValueInFirestore(FIRESTORE_EMAIL_KEY, user.email, null)
@@ -77,7 +83,7 @@ class EditProfileFragment : Fragment(), View.OnClickListener, CompoundButton.OnC
             }
         }
 
-        updateAuthPassStatusObserver = Observer {   isAuthPassUpdated->
+        updateAuthPassStatusObserver = Observer { isAuthPassUpdated ->
             if(isAuthPassUpdated){
                 binding.editProfilePasswordEt.setText("")
                 binding.editProfileMatchPasswordEt.setText("")
@@ -119,11 +125,10 @@ class EditProfileFragment : Fragment(), View.OnClickListener, CompoundButton.OnC
 
     private fun loadProfilePic(profilePicUri: String, imageView: ImageView) {
         Glide.with(this)
-            .asBitmap()
             .load(profilePicUri)
             .apply(
                 RequestOptions()
-                    .diskCacheStrategy(DiskCacheStrategy.NONE)
+                    .diskCacheStrategy(DiskCacheStrategy.ALL)
                     .placeholder(R.drawable.com_facebook_profile_picture_blank_portrait)
                     .error(R.drawable.com_facebook_profile_picture_blank_portrait))
             .circleCrop()
@@ -135,41 +140,27 @@ class EditProfileFragment : Fragment(), View.OnClickListener, CompoundButton.OnC
         _binding = null
     }
 
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        super.onActivityResult(requestCode, resultCode, data)
-        if(resultCode == Activity.RESULT_OK && requestCode == GALLERY_REQUEST_CODE){
-
-            user.profilePicUri = data?.data.toString()
-
-            loadProfilePic(user.profilePicUri.toString(), binding.editProfilePic)
-
-            editProfileViewModel.updateCachedUser(user)
-            editProfileViewModel.updateUserValueInFirestore(FIRESTORE_PROFILE_PIC_URI_KEY, user.profilePicUri.toString(), null)
-            editProfileViewModel.updateFirebaseAuthProfile(FIRESTORE_PROFILE_PIC_URI_KEY, user.profilePicUri.toString())
-        }
-    }
-
     override fun onCheckedChanged(button: CompoundButton?, isChecked: Boolean) {
         when(button?.id){
-            R.id.edit_profile_name_toggle->{
+            R.id.edit_profile_name_toggle -> {
 
                 handleUpdateInfoUI(isChecked, binding.editProfileNameTv, binding.editProfileNameEt, binding.editProfileNameToggle)
                 handleUpdateInfoData(isChecked, binding.editProfileNameTv, EditProfileInfoType.PROFILE_NAME.ordinal)
 
             }
-            R.id.edit_profile_username_toggle->{
+            R.id.edit_profile_username_toggle -> {
 
                 handleUpdateInfoUI(isChecked, binding.editProfileUsernameTv, binding.editProfileUsernameEt, binding.editProfileUsernameToggle)
                 handleUpdateInfoData(isChecked, binding.editProfileUsernameTv, EditProfileInfoType.PROFILE_USERNAME.ordinal)
 
             }
-            R.id.edit_profile_email_toggle->{
+            R.id.edit_profile_email_toggle -> {
 
                 handleUpdateInfoUI(isChecked, binding.editProfileEmailTv, binding.editProfileEmailEt, binding.editProfileEmailToggle)
                 handleUpdateInfoData(isChecked, binding.editProfileEmailTv, EditProfileInfoType.PROFILE_EMAIL.ordinal)
 
             }
-            R.id.edit_profile_visibility_toggle->{
+            R.id.edit_profile_visibility_toggle -> {
 
                 handleUpdateInfoUI(isChecked, null, null, binding.editProfileVisibilityToggle)
                 handleUpdateInfoData(isChecked, binding.editProfileVisibilityTv, EditProfileInfoType.PROFILE_VISIBILITY.ordinal)
@@ -179,10 +170,10 @@ class EditProfileFragment : Fragment(), View.OnClickListener, CompoundButton.OnC
 
     override fun onClick(view: View?) {
         when(view?.id){
-            R.id.edit_profile_pic->{
+            R.id.edit_profile_pic -> {
                 openGalleryForImage()
             }
-            R.id.edit_profile_update_pass_btn->{
+            R.id.edit_profile_update_pass_btn -> {
 
                 AndroidUtils.hideKeyboard(requireActivity())
 
@@ -194,7 +185,7 @@ class EditProfileFragment : Fragment(), View.OnClickListener, CompoundButton.OnC
                     editProfileViewModel.updateAuthPass(password)
                 }
             }
-            R.id.edit_profile_back_btn->{
+            R.id.edit_profile_back_btn -> {
                 clearEditTextFocus()
                 findNavController().navigate(R.id.action_editProfileFragment_to_profileFragment)
             }
@@ -208,7 +199,7 @@ class EditProfileFragment : Fragment(), View.OnClickListener, CompoundButton.OnC
         binding.editProfileMatchPasswordEt.clearFocus()
     }
 
-    private fun isPasswordValidated(password:String, passwordMatch: String):Boolean{
+    private fun isPasswordValidated(password: String, passwordMatch: String):Boolean{
         when {
             TextUtils.isEmpty(password) || TextUtils.isEmpty(passwordMatch) -> {
                 binding.editProfilePasswordEt.error = getString(R.string.blank_pass_no_update)
@@ -231,10 +222,32 @@ class EditProfileFragment : Fragment(), View.OnClickListener, CompoundButton.OnC
     }
 
     private fun openGalleryForImage() {
-        Log.d(TAG, "Open gallery")
-        val intent = Intent(Intent.ACTION_PICK)
-        intent.type = "image/*"
-        startActivityForResult(intent, GALLERY_REQUEST_CODE)
+        registerOnActivityResult.launch("image/*")
+    }
+
+    private fun getFileExtension(uri: Uri): String{
+        val contentResolver = context?.contentResolver
+        val mime = MimeTypeMap.getSingleton()
+        return mime.getExtensionFromMimeType(contentResolver?.getType(uri))!!
+    }
+
+    private fun updateProfilePic(it: Uri) {
+
+        loadProfilePic(it.toString(), binding.editProfilePic)
+
+        val uid = FirebaseAuth.getInstance().currentUser?.uid.toString()
+        val fileName = uid + "."+ getFileExtension(it)
+
+        user.profilePicUri = it.toString()
+
+        saveProfilePicUriToDbs(fileName, user)
+    }
+
+    private fun saveProfilePicUriToDbs(fileName: String, user: User) {
+        editProfileViewModel.updateCachedUser(user)
+        editProfileViewModel.updateUserValueInFirestore(FIRESTORE_PROFILE_PIC_URI_KEY, user.profilePicUri.toString(), null)
+        editProfileViewModel.updateFirebaseAuthProfile(FIRESTORE_PROFILE_PIC_URI_KEY, user.profilePicUri.toString())
+        editProfileViewModel.uploadProfilePhotoToFirebaseStorage(fileName, Uri.parse(user.profilePicUri))
     }
 
     private fun handleUpdateInfoUI(isChecked: Boolean, textView: TextView?, editText: EditText?, toggleButton: ToggleButton) {
@@ -258,7 +271,7 @@ class EditProfileFragment : Fragment(), View.OnClickListener, CompoundButton.OnC
     private fun handleUpdateInfoData(isChecked: Boolean, textView: TextView, infoType: Int){
         if(!isChecked){
             when(infoType){
-                EditProfileInfoType.PROFILE_NAME.ordinal->{
+                EditProfileInfoType.PROFILE_NAME.ordinal -> {
                     when {
                         TextUtils.isEmpty(textView.text) -> {
                             AndroidUtils.showSnackBar(requireActivity(), getString(R.string.empty_profile_name))
@@ -274,7 +287,7 @@ class EditProfileFragment : Fragment(), View.OnClickListener, CompoundButton.OnC
                         }
                     }
                 }
-                EditProfileInfoType.PROFILE_USERNAME.ordinal->{
+                EditProfileInfoType.PROFILE_USERNAME.ordinal -> {
                     when {
                         TextUtils.isEmpty(textView.text) -> {
                             AndroidUtils.showSnackBar(requireActivity(), getString(R.string.empty_username))
@@ -292,7 +305,7 @@ class EditProfileFragment : Fragment(), View.OnClickListener, CompoundButton.OnC
                         }
                     }
                 }
-                EditProfileInfoType.PROFILE_EMAIL.ordinal->{
+                EditProfileInfoType.PROFILE_EMAIL.ordinal -> {
                     when {
                         AndroidUtils.isValidEmail(textView.text.toString().trim()) && !TextUtils.isEmpty(textView.text) -> {
                             user.email = textView.text.toString().trim()
@@ -304,7 +317,7 @@ class EditProfileFragment : Fragment(), View.OnClickListener, CompoundButton.OnC
                         }
                     }
                 }
-                EditProfileInfoType.PROFILE_VISIBILITY.ordinal->{
+                EditProfileInfoType.PROFILE_VISIBILITY.ordinal -> {
                     user.isProfilePublic = true
                     editProfileViewModel.updateCachedUser(user)
                     editProfileViewModel.updateUserValueInFirestore(FIRESTORE_IS_PROFILE_PUBLIC_KEY, null, true)
@@ -312,7 +325,7 @@ class EditProfileFragment : Fragment(), View.OnClickListener, CompoundButton.OnC
             }
         }else{
             when(infoType){
-                EditProfileInfoType.PROFILE_VISIBILITY.ordinal->{
+                EditProfileInfoType.PROFILE_VISIBILITY.ordinal -> {
                     user.isProfilePublic = false
                     editProfileViewModel.updateCachedUser(user)
                     editProfileViewModel.updateUserValueInFirestore(FIRESTORE_IS_PROFILE_PUBLIC_KEY, null, false)
@@ -326,7 +339,6 @@ class EditProfileFragment : Fragment(), View.OnClickListener, CompoundButton.OnC
 
     companion object {
         private val TAG = EditProfileFragment::class.simpleName
-        private const val GALLERY_REQUEST_CODE = 5340
     }
 
 }

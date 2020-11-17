@@ -1,21 +1,28 @@
 package com.lendsumapp.lendsum.repository
 
+import android.net.Uri
+import android.provider.MediaStore
 import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.storage.FirebaseStorage
+import com.google.firebase.storage.StorageReference
 import com.lendsumapp.lendsum.auth.EmailAndPassAuthComponent
 import com.lendsumapp.lendsum.data.model.User
 import com.lendsumapp.lendsum.data.persistence.LendsumDatabase
 import com.lendsumapp.lendsum.util.GlobalConstants
 import kotlinx.coroutines.flow.Flow
+import java.io.File
+import java.io.FileInputStream
 import javax.inject.Inject
 
 class EditProfileRepository @Inject constructor(
     private val lendsumDatabase: LendsumDatabase,
     private val emailAndPassAuthComponent: EmailAndPassAuthComponent,
     private val firestoreDb: FirebaseFirestore,
-    private val firebaseAuth: FirebaseAuth
+    private val firebaseAuth: FirebaseAuth,
+    private val firebaseStorageReference: StorageReference
 ){
 
     fun getCachedUser(userId:String): Flow<User> {
@@ -70,6 +77,20 @@ class EditProfileRepository @Inject constructor(
             }
         }
 
+    }
+
+    fun uploadProfilePhotoToFirebaseStorage(fileName: String, uri: Uri){
+
+        val profileImageRef = firebaseStorageReference.child("profile_pics").child(fileName)
+
+        val uploadTask = profileImageRef.putFile(uri)
+        uploadTask.addOnCompleteListener{ task->
+            if(task.isSuccessful){
+                Log.d(TAG, "Profile pic uploaded to database")
+            }else{
+                Log.d(TAG, "Profile pic failed to upload ${task.exception}")
+            }
+        }
     }
 
     companion object {

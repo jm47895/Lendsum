@@ -102,7 +102,7 @@ class MessageListAdapter(private val interaction: Interaction? = null) :
                     .load(item.guestPic)
                     .apply(
                         RequestOptions()
-                            .diskCacheStrategy(DiskCacheStrategy.NONE)
+                            .diskCacheStrategy(DiskCacheStrategy.ALL)
                             .placeholder(R.drawable.com_facebook_profile_picture_blank_portrait)
                             .error(R.drawable.com_facebook_profile_picture_blank_portrait))
                     .circleCrop()
