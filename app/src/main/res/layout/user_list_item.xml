@@ -29,13 +29,13 @@
         android:text="@string/user_list_item_name_holder"
         android:layout_margin="0dp"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toStartOf="@+id/user_list_item_msg_btn"
+        app:layout_constraintEnd_toStartOf="@+id/user_list_item_msg_tv"
         app:layout_constraintHorizontal_chainStyle="spread_inside"
         app:layout_constraintStart_toStartOf="@+id/horizontal_20_guide"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <Button
-        android:id="@+id/user_list_item_msg_btn"
+    <TextView
+        android:id="@+id/user_list_item_msg_tv"
         style="@style/ButtonTheme"
         android:text="@string/message"
         app:layout_constraintBottom_toBottomOf="parent"
