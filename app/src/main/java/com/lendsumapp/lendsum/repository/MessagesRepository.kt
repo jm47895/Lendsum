@@ -12,6 +12,7 @@ import com.lendsumapp.lendsum.data.persistence.LendsumDatabase
 import com.lendsumapp.lendsum.util.GlobalConstants.FIRESTORE_IS_PROFILE_PUBLIC_KEY
 import com.lendsumapp.lendsum.util.GlobalConstants.FIRESTORE_USERNAME_KEY
 import com.lendsumapp.lendsum.util.GlobalConstants.FIRESTORE_USER_COLLECTION_PATH
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.flow.Flow
@@ -117,20 +118,8 @@ class MessagesRepository @Inject constructor(
         }
     }
 
-    fun registerMessagesSyncListener(chatId: String) {
-        dataSyncManager.registerMessagesSyncListener(chatId)
-    }
-
-    fun getNumberOfRealtimeMessages(): MutableLiveData<MutableList<String>> {
-        return dataSyncManager.getNumberOfRealtimeMessages()
-    }
-
-    fun unregisterMessagesSyncListener(chatId: String){
-        dataSyncManager.unregisterMessagesSyncListener(chatId)
-    }
-
-    fun syncMessageData(chatId: String){
-        dataSyncManager.syncMessageData(chatId)
+    fun syncMessagesData(chatId: String, viewModelScope: CoroutineScope){
+        dataSyncManager.syncMessagesData(chatId, viewModelScope)
     }
 
     companion object{

@@ -1,10 +1,9 @@
 package com.lendsumapp.lendsum.adapter
 
-import android.util.Log
+import android.graphics.Color
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.recyclerview.widget.AsyncListDiffer
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
@@ -12,11 +11,13 @@ import com.bumptech.glide.Glide
 import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.bumptech.glide.request.RequestOptions
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.ktx.Firebase
+import com.google.firebase.storage.ktx.storage
 import com.lendsumapp.lendsum.R
 import com.lendsumapp.lendsum.data.model.Message
 import com.lendsumapp.lendsum.databinding.MessageListItemBinding
 import com.lendsumapp.lendsum.util.AndroidUtils
-import java.util.*
+import com.lendsumapp.lendsum.util.GlideApp
 
 
 class MessageListAdapter(private val interaction: Interaction? = null) :
@@ -78,28 +79,33 @@ class MessageListAdapter(private val interaction: Interaction? = null) :
             val date = AndroidUtils.convertTimestampToFullDate(currentTimestamp)
 
             if (oldDate == date && position != 0){
-                binding.messageTimestampTv.visibility = View.GONE
-                binding.messageGuestPic.visibility = View.GONE
+                AndroidUtils.goneView(binding.messageTimestampTv)
+                AndroidUtils.goneView(binding.messageGuestPic)
             }else{
-                binding.messageTimestampTv.visibility = View.VISIBLE
-                binding.messageGuestPic.visibility = View.VISIBLE
+                AndroidUtils.showView(binding.messageTimestampTv)
+                AndroidUtils.showView(binding.messageTimestampTv)
             }
 
             binding.messageTimestampTv.text = date
 
             if(item.messageSender == firebaseUser?.uid){
                 binding.messageHostTv.text = item.message
-                binding.messageHostTv.visibility = View.VISIBLE
-                binding.messageGuestTv.visibility = View.INVISIBLE
+                AndroidUtils.showView(binding.messageHostTv)
+                AndroidUtils.hideView(binding.messageGuestTv)
             }else{
 
-                binding.messageGuestTv.text = item.message
-                binding.messageGuestTv.visibility = View.VISIBLE
-                binding.messageHostTv.visibility = View.INVISIBLE
+                val storageRef = Firebase.storage.reference
+                val profilePicRef = storageRef
+                    .child("profile_pics")
 
-                Glide.with(itemView.context)
+                binding.messageGuestTv.text = item.message
+                binding.messageGuestTv.setTextColor(Color.parseColor("#FFFFFF"))
+                AndroidUtils.showView(binding.messageGuestTv)
+                AndroidUtils.hideView(binding.messageHostTv)
+
+                GlideApp.with(itemView.context)
                     .asBitmap()
-                    .load(item.guestPic)
+                    .load(profilePicRef)
                     .apply(
                         RequestOptions()
                             .diskCacheStrategy(DiskCacheStrategy.ALL)

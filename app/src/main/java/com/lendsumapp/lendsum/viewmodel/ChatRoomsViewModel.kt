@@ -5,7 +5,6 @@ import androidx.lifecycle.*
 import com.google.firebase.auth.FirebaseAuth
 import com.lendsumapp.lendsum.data.model.ChatRoom
 import com.lendsumapp.lendsum.repository.ChatRoomsRepository
-import com.lendsumapp.lendsum.util.GlobalConstants
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
@@ -20,21 +19,20 @@ class ChatRoomsViewModel @ViewModelInject constructor(
         return chatRoomsRepository.getCachedChatRooms().asLiveData()
     }
 
-    fun registerChatRoomSyncListener(){
-        chatRoomsRepository.registerChatRoomSyncListener(uid)
+    fun registerRealtimeChatIdListener(){
+        viewModelScope.launch(Dispatchers.IO) {
+            val uid = firebaseAuth.currentUser?.uid.toString()
+            chatRoomsRepository.registerRealtimeChatIdListener(uid)
+        }
     }
 
-    fun unregisterChatRoomSyncListener(){
-        chatRoomsRepository.unregisterChatRoomSyncListener(uid)
+    fun getRealtimeChatIds(): MutableLiveData<MutableList<String>> {
+        return chatRoomsRepository.getRealtimeChatIds()
     }
 
-    fun getNumberOfChatIdsFromRealtimeDb(): MutableLiveData<MutableList<String>> {
-        return chatRoomsRepository.getNumberOfChatIdsFromRealtimeDb()
-    }
-
-    fun syncChatRoomData(chatIdList: MutableList<String>){
-        viewModelScope.launch(Dispatchers.IO){
-            chatRoomsRepository.syncChatRoomData(chatIdList)
+    fun syncChatRoomList(listOfChatIds: List<String>){
+        viewModelScope.launch(Dispatchers.IO) {
+            chatRoomsRepository.syncChatRoomList(listOfChatIds, viewModelScope)
         }
     }
 

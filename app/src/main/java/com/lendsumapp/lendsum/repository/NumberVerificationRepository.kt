@@ -8,6 +8,7 @@ import com.lendsumapp.lendsum.data.DataSyncManager
 import com.lendsumapp.lendsum.data.model.User
 import com.lendsumapp.lendsum.data.persistence.LendsumDatabase
 import com.lendsumapp.lendsum.util.GlobalConstants.FIRESTORE_USER_COLLECTION_PATH
+import kotlinx.coroutines.CoroutineScope
 import javax.inject.Inject
 
 class NumberVerificationRepository @Inject constructor(
@@ -42,8 +43,8 @@ class NumberVerificationRepository @Inject constructor(
         return dataSyncManager.doesLendsumDbExist(context, dbName)
     }
 
-    fun syncAllDataFromDatabases(uid: String){
-        dataSyncManager.syncAllDataFromDatabases(uid)
+    fun syncUserData(uid: String, scope: CoroutineScope){
+        dataSyncManager.syncUserData(uid, scope)
     }
     //End Sync data functions
 

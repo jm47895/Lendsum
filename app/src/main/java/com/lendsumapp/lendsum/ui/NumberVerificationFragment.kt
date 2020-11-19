@@ -47,8 +47,8 @@ class NumberVerificationFragment : Fragment(), View.OnClickListener, CountryCode
         numberVerificationViewModel.doesLendsumDbCacheExist(requireContext(), getString(R.string.database_name))
         localCacheStatusObserver = Observer { doesSignInCacheExist->
             if(!doesSignInCacheExist && sharedPrefs?.getBoolean(RETURNING_USER, false) == true){
-                Log.d(TAG, "Database cache does not exist for returning user, syncing data from remote dbs")
-                numberVerificationViewModel.syncAllDataFromDatabases(firebaseAuth.currentUser?.uid.toString())
+                Log.d(TAG, "Database cache does not exist for returning user, syncing user data from remote dbs")
+                numberVerificationViewModel.syncUserData(firebaseAuth.currentUser?.uid.toString())
             }else{
                 Log.d(TAG, "Local cache exists")
             }

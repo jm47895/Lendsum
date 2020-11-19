@@ -76,21 +76,9 @@ class MessagesViewModel @ViewModelInject constructor(
         }
     }
 
-    fun registerMessagesSyncListener(chatId: String) {
-        messagesRepository.registerMessagesSyncListener(chatId)
-    }
-
-    fun getNumberOfRealtimeMessages(): MutableLiveData<MutableList<String>> {
-        return messagesRepository.getNumberOfRealtimeMessages()
-    }
-
-    fun unregisterMessagesSyncListener(chatId: String){
-        messagesRepository.unregisterMessagesSyncListener(chatId)
-    }
-
-    fun syncMessageData(chatId: String){
+    fun syncMessagesData(chatId: String){
         viewModelScope.launch(Dispatchers.IO) {
-            messagesRepository.syncMessageData(chatId)
+            messagesRepository.syncMessagesData(chatId, viewModelScope)
         }
     }
 

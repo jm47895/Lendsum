@@ -14,6 +14,7 @@ import com.lendsumapp.lendsum.R
 import com.lendsumapp.lendsum.adapter.ChatRoomListAdapter
 import com.lendsumapp.lendsum.data.model.ChatRoom
 import com.lendsumapp.lendsum.databinding.FragmentChatRoomsBinding
+import com.lendsumapp.lendsum.util.AndroidUtils
 import com.lendsumapp.lendsum.util.GlobalConstants.CHAT_ROOM_BUNDLE_KEY
 import com.lendsumapp.lendsum.util.GlobalConstants.CHAT_ROOM_REQUEST_KEY
 import com.lendsumapp.lendsum.viewmodel.ChatRoomsViewModel
@@ -29,7 +30,9 @@ class ChatRoomsFragment : Fragment(), View.OnClickListener, ChatRoomListAdapter.
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        chatRoomsViewModel.registerChatRoomSyncListener()
+
+        chatRoomsViewModel.registerRealtimeChatIdListener()
+
     }
 
     override fun onCreateView(
@@ -49,12 +52,17 @@ class ChatRoomsFragment : Fragment(), View.OnClickListener, ChatRoomListAdapter.
 
         chatRoomsViewModel.getCachedChatRooms().observe(viewLifecycleOwner, Observer { currentCachedChatRooms->
             loadChatRooms(currentCachedChatRooms)
-            chatRoomsViewModel.getNumberOfChatIdsFromRealtimeDb().observe(viewLifecycleOwner, Observer {
-                if(currentCachedChatRooms.size < it.size || currentCachedChatRooms.size == it.size){
-                    if (currentCachedChatRooms.isEmpty()){
-                        binding.messagesNoConversationsTv.visibility = View.INVISIBLE    
+            chatRoomsViewModel.getRealtimeChatIds().observe(viewLifecycleOwner, Observer { remoteChatIdList->
+                Log.d(TAG, "Chatid List: $remoteChatIdList")
+                Log.d(TAG, "Cached size: ${currentCachedChatRooms.size} / Realtime size: ${remoteChatIdList.size}")
+
+                if(currentCachedChatRooms.size < remoteChatIdList.size){
+                    if(currentCachedChatRooms.isEmpty()){
+                        AndroidUtils.hideView(binding.messagesNoConversationsTv)
                     }
-                    chatRoomsViewModel.syncChatRoomData(it)
+                    val difference = remoteChatIdList.size - currentCachedChatRooms.size
+                    val subList = remoteChatIdList.subList(remoteChatIdList.size - difference,remoteChatIdList.size)
+                    chatRoomsViewModel.syncChatRoomList(subList.toList())
                 }
             })
         })
@@ -62,7 +70,6 @@ class ChatRoomsFragment : Fragment(), View.OnClickListener, ChatRoomListAdapter.
 
     override fun onDestroyView() {
         super.onDestroyView()
-        chatRoomsViewModel.unregisterChatRoomSyncListener()
         binding.chatRoomList.adapter = null
         _binding = null
     }

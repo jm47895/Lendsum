@@ -153,12 +153,12 @@ class LoginFragment : Fragment(), View.OnClickListener{
                     )
                 }
                 R.id.login_sign_in_with_facebook -> {
-                    loginViewModel.getFacebookAuthState().observe(viewLifecycleOwner, facebookAuthObserver)
+                    /*loginViewModel.getFacebookAuthState().observe(viewLifecycleOwner, facebookAuthObserver)
                     LoginManager.getInstance().logInWithReadPermissions(
                         this,
                         listOf("user_photos", "email", "user_birthday", "public_profile")
                     )
-                    loginViewModel.sendFacebookIntent()
+                    loginViewModel.sendFacebookIntent()*/
                 }
             }
 

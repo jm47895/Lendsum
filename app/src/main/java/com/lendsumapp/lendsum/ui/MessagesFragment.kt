@@ -73,7 +73,6 @@ class MessagesFragment : Fragment(), View.OnClickListener,
             currentChatRoom = bundle.getParcelable(CHAT_ROOM_BUNDLE_KEY)
 
             setCacheMessageObserver(currentChatRoom?.chatRoomId.toString())
-            messagesViewModel.registerMessagesSyncListener(currentChatRoom?.chatRoomId.toString())
 
             initRecyclerView(MESSAGE_RECYCLER_VIEW)
 
@@ -81,7 +80,7 @@ class MessagesFragment : Fragment(), View.OnClickListener,
             val users = currentChatRoom?.participants!!
             handleMessageUi(users)
 
-            binding.chatRoomList.visibility = View.VISIBLE
+            binding.chatMessageList.visibility = View.VISIBLE
 
             isChatRoomEmpty = false
         }
@@ -99,14 +98,13 @@ class MessagesFragment : Fragment(), View.OnClickListener,
 
     override fun onDestroyView() {
         super.onDestroyView()
-        binding.chatRoomList.adapter = null
+        binding.chatMessageList.adapter = null
         _binding = null
         clearFragmentResultListener(CHAT_ROOM_REQUEST_KEY)
         messagesViewModel.getRemoteDbUserList().removeObserver(remoteDbUserListObserver)
-        messagesViewModel.unregisterMessagesSyncListener(currentChatRoom?.chatRoomId.toString())
     }
 
-    fun clearEditTextFocus(){
+    private fun clearEditTextFocus(){
         binding.chatRoomMsgEt
     }
 
@@ -116,18 +114,18 @@ class MessagesFragment : Fragment(), View.OnClickListener,
             SEARCH_RECYCLER_VIEW->{
 
                 userSearchListAdapter = UserSearchListAdapter(this@MessagesFragment)
-                binding.chatRoomList.layoutManager = LinearLayoutManager(context)
-                binding.chatRoomList.adapter = userSearchListAdapter
+                binding.chatMessageList.layoutManager = LinearLayoutManager(context)
+                binding.chatMessageList.adapter = userSearchListAdapter
 
             }
             MESSAGE_RECYCLER_VIEW->{
 
                 messageListAdapter = MessageListAdapter(this@MessagesFragment)
 
-                binding.chatRoomList.layoutManager = LinearLayoutManager(context).apply {
+                binding.chatMessageList.layoutManager = LinearLayoutManager(context).apply {
                     stackFromEnd = true
                 }
-                binding.chatRoomList.adapter = messageListAdapter
+                binding.chatMessageList.adapter = messageListAdapter
             }
         }
     }
@@ -163,18 +161,13 @@ class MessagesFragment : Fragment(), View.OnClickListener,
 
     private fun setCacheMessageObserver(chatId: String){
         messagesViewModel.getCurrentCachedMessages(chatId).observe(viewLifecycleOwner, Observer {
-            Log.d(TAG, it.toString())
+            Log.d(TAG, "cache Message Observer hit")
             currentListOfMessages = it
             messageListAdapter.submitList(it)
-            binding.chatRoomList.scrollToPosition(it.size - 1)
-
-            messagesViewModel.getNumberOfRealtimeMessages().observe(viewLifecycleOwner, Observer { listOfRealtimeMessages->
-
-                if(currentListOfMessages.size < listOfRealtimeMessages.size){
-                    messagesViewModel.syncMessageData(chatId)
-                }
-            })
+            binding.chatMessageList.smoothScrollToPosition(it.size - 1)
         })
+
+        messagesViewModel.syncMessagesData(chatId)
     }
 
     private fun addNewMessage(msg: String, chatRoom: ChatRoom) {
@@ -244,7 +237,7 @@ class MessagesFragment : Fragment(), View.OnClickListener,
         initRecyclerView(MESSAGE_RECYCLER_VIEW)
         handleMessageUi(newParticipant)
 
-        binding.chatRoomList.visibility = View.VISIBLE
+        binding.chatMessageList.visibility = View.VISIBLE
 
         Log.d(TAG, "We are at position $position")
     }
@@ -254,7 +247,7 @@ class MessagesFragment : Fragment(), View.OnClickListener,
         val currentUid = firebaseAuth.currentUser?.uid.toString()
 
         AndroidUtils.hideKeyboard(requireActivity())
-        binding.chatRoomList.visibility = View.INVISIBLE
+        binding.chatMessageList.visibility = View.INVISIBLE
         binding.chatRoomSearchView.visibility = View.GONE
         binding.chatRoomRecipientTv.visibility = View.VISIBLE
 

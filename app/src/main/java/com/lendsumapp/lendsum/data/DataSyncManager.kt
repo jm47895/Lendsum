@@ -10,13 +10,14 @@ import com.lendsumapp.lendsum.data.model.ChatRoom
 import com.lendsumapp.lendsum.data.model.Message
 import com.lendsumapp.lendsum.data.model.User
 import com.lendsumapp.lendsum.data.persistence.LendsumDatabase
+import com.lendsumapp.lendsum.util.AndroidUtils
 import com.lendsumapp.lendsum.util.DatabaseUtils
 import com.lendsumapp.lendsum.util.GlobalConstants.FIRESTORE_USER_COLLECTION_PATH
 import com.lendsumapp.lendsum.util.GlobalConstants.REALTIME_DB_CHAT_ROOM_PATH
 import com.lendsumapp.lendsum.util.GlobalConstants.REALTIME_DB_MESSAGES_PATH
 import com.lendsumapp.lendsum.util.GlobalConstants.REALTIME_DB_USER_PATH
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -27,55 +28,49 @@ class DataSyncManager @Inject constructor(
     private val realTimeDb: DatabaseReference
 ){
 
-    private val chatIdList: MutableLiveData<MutableList<String>> = MutableLiveData()
-    private val messagesList: MutableLiveData<MutableList<String>> = MutableLiveData()
-    private val listOfRealtimeChatIds = mutableListOf<String>()
-    private val listOfRealtimeMessages = mutableListOf<String>()
+    val realtimeChatIdList = MutableLiveData<MutableList<String>>()
+    val chatIdsList = mutableListOf<String>()
 
-    //Full data sync on reinstall for existing user methods
     fun doesLendsumDbExist(context: Context, dbName: String): Boolean{
         return DatabaseUtils.doesCacheDatabaseExist(context, dbName)
     }
 
-    fun syncAllDataFromDatabases(uid: String){
-        syncAllUserDataFromFirestore(uid)
-        syncChatsAndMessages(uid)
-    }
+    fun registerRealtimeChatIdListener(uid: String){
 
-    private fun syncChatsAndMessages(uid: String){
-        val chatIdRef = realTimeDb.child(REALTIME_DB_USER_PATH).child(uid).ref
-        val listOfChatIds = mutableListOf<String>()
+        val chatIdRef = realTimeDb.child(REALTIME_DB_USER_PATH).child(uid)
 
-        chatIdRef.addListenerForSingleValueEvent(object: ValueEventListener {
-
-
+        chatIdRef.addValueEventListener(object : ValueEventListener{
             override fun onDataChange(snapshot: DataSnapshot) {
-                for (data in snapshot.children) {
-                    listOfChatIds.add(data.value.toString())
+                for(data in snapshot.children){
+                    chatIdsList.add(data.value.toString())
+                    realtimeChatIdList.postValue(chatIdsList)
                 }
-                Log.d(TAG, "chat id on changed hit")
-                syncAllMessagesFromRealtimeDb(listOfChatIds)
-                syncAllChatRoomDataFromRealtimeDb(listOfChatIds)
             }
 
             override fun onCancelled(error: DatabaseError) {
-                Log.d(TAG, "Failure to retrieve chatIds from Realtime Database: $error")
+                Log.d(TAG, "Error retrieving chatIds ${error.message}")
             }
-
         })
     }
-    //End of full data sync on reinstall for existing user methods
+
+    fun getRealtimeChatIds(): MutableLiveData<MutableList<String>> {
+        return realtimeChatIdList
+    }
 
     //Sync user data
-    private fun syncAllUserDataFromFirestore(uid: String){
+    fun syncUserData(uid: String, scope: CoroutineScope){
+        syncAllUserDataFromFirestore(uid, scope)
+    }
+
+    private fun syncAllUserDataFromFirestore(uid: String, viewModelScope: CoroutineScope){
 
         firestoreDb.collection(FIRESTORE_USER_COLLECTION_PATH)
             .document(uid)
             .get().addOnSuccessListener { document ->
                 if(document != null){
                     Log.d(TAG, "Retrieved Existing User Firestore Document")
-                    GlobalScope.launch(Dispatchers.IO) {
-                        insertAllExistingUserDataIntoLocalCache(document.toObject<User>()!!)
+                    viewModelScope.launch(Dispatchers.IO) {
+                        syncUserDataInLocalCache(document.toObject<User>()!!)
                     }
                 }else{
                     /*This will only be hit if we lose all of our remote user data, which in this case
@@ -88,157 +83,76 @@ class DataSyncManager @Inject constructor(
             }
     }
 
-    private suspend fun insertAllExistingUserDataIntoLocalCache(user: User){
+    private suspend fun syncUserDataInLocalCache(user: User){
         lendsumDatabase.getUserDao().insertUser(user)
     }
     //End sync user data
 
-    //Chat Rooms data sync
-    private fun syncAllChatRoomDataFromRealtimeDb(listOfChatIds: MutableList<String>){
-        for (chatIds in listOfChatIds){
+    //Sync chat data
+    fun syncChatRoomList(listOfChatIds: List<String>, viewModelScope: CoroutineScope){
+        for (chatId in listOfChatIds){
+            val chatRoomRef = realTimeDb.child(REALTIME_DB_CHAT_ROOM_PATH).child(chatId).ref
 
-            val chatRoomRef = realTimeDb.child(REALTIME_DB_CHAT_ROOM_PATH).child(chatIds).ref
-            chatRoomRef.addListenerForSingleValueEvent(object : ValueEventListener {
-
+            chatRoomRef.addListenerForSingleValueEvent(object : ValueEventListener{
                 override fun onDataChange(snapshot: DataSnapshot) {
+                    Log.d(TAG, "ChatRoom" + snapshot.value.toString())
                     val chatRoom = snapshot.getValue(ChatRoom::class.java)!!
-                    GlobalScope.launch(Dispatchers.IO) {
-                        insertAllExistingChatRoomsIntoLocaleCache(chatRoom)
+                    viewModelScope.launch {
+                        syncChatRoomDataInLocalCache(chatRoom)
                     }
-                    Log.d(TAG, "Chat room on Data changed hit")
                 }
 
                 override fun onCancelled(error: DatabaseError) {
-                    Log.d(TAG, error.message)
+                    Log.d(TAG, "Chatrooms failed to sync ${error.message}")
                 }
             })
         }
     }
 
-    private suspend fun insertAllExistingChatRoomsIntoLocaleCache(chatRoom: ChatRoom){
+    suspend fun syncChatRoomDataInLocalCache(chatRoom: ChatRoom){
         lendsumDatabase.getChatRoomDao().insertChatRoom(chatRoom)
     }
+    //End sync chat data
 
-    fun registerChatRoomSyncListener(userId: String) {
-        val chatIdRef = realTimeDb.child(REALTIME_DB_USER_PATH).child(userId).ref
+    //Sync message data
+    fun syncMessagesData(chatId: String, viewModelScope: CoroutineScope){
 
-        chatIdRef.addChildEventListener(chatIdChildListener)
-    }
+        val messagesRef = realTimeDb.child(REALTIME_DB_MESSAGES_PATH).child(chatId).ref
 
-    private val chatIdChildListener = object: ChildEventListener{
+        messagesRef.addChildEventListener(object : ChildEventListener{
+            override fun onChildAdded(snapshot: DataSnapshot, previousChildName: String?) {
 
-        override fun onChildMoved(snapshot: DataSnapshot, previousChildName: String?) {
+                Log.d(TAG, "Message added: " + snapshot.value.toString())
 
-        }
-
-        override fun onChildChanged(snapshot: DataSnapshot, previousChildName: String?) {
-
-        }
-
-        override fun onChildAdded(snapshot: DataSnapshot, previousChildName: String?) {
-
-            listOfRealtimeChatIds.add(snapshot.value.toString())
-            chatIdList.postValue(listOfRealtimeChatIds)
-
-        }
-
-        override fun onChildRemoved(snapshot: DataSnapshot) {
-
-        }
-
-        override fun onCancelled(error: DatabaseError) {
-
-        }
-
-    }
-
-    fun getNumberOfChatIdsFromRealtimeDb(): MutableLiveData<MutableList<String>> {
-        return chatIdList
-    }
-
-    fun syncChatRoomData(chatIdList: MutableList<String>){
-        syncAllChatRoomDataFromRealtimeDb(chatIdList)
-    }
-
-    fun unregisterChatRoomSyncListener(userId: String){
-        val chatIdRef = realTimeDb.child(REALTIME_DB_USER_PATH).child(userId).ref
-        chatIdRef.removeEventListener(chatIdChildListener)
-    }
-    //End chat room data sync
-
-    //Messages data sync
-    private fun syncAllMessagesFromRealtimeDb(listOfChatIds: MutableList<String>) {
-
-        for (chatIds in listOfChatIds){
-            val messagesRef = realTimeDb.child(REALTIME_DB_MESSAGES_PATH).child(chatIds).ref
-            messagesRef.addListenerForSingleValueEvent(object : ValueEventListener {
-
-                override fun onDataChange(snapshot: DataSnapshot) {
-                    for (data in snapshot.children){
-                        val msg: Message = data.getValue(Message::class.java)!!
-                        GlobalScope.launch(Dispatchers.IO) {
-                            insertAllExistingUserMessagesIntoLocaleCache(msg)
-                        }
-                    }
-                    Log.d(TAG, "Message on data change hit")
+                val message = snapshot.getValue(Message::class.java)!!
+                viewModelScope.launch(Dispatchers.IO){
+                    syncMessagesDataInLocalCache(message)
                 }
 
-                override fun onCancelled(error: DatabaseError) {
-                    Log.d(TAG, error.message)
-                }
-            })
-        }
+            }
+
+            override fun onChildChanged(snapshot: DataSnapshot, previousChildName: String?) {
+
+            }
+
+            override fun onChildRemoved(snapshot: DataSnapshot) {
+
+            }
+
+            override fun onChildMoved(snapshot: DataSnapshot, previousChildName: String?) {
+
+            }
+
+            override fun onCancelled(error: DatabaseError) {
+
+            }
+        })
     }
 
-    private suspend fun insertAllExistingUserMessagesIntoLocaleCache(message: Message){
+    suspend fun syncMessagesDataInLocalCache(message: Message){
         lendsumDatabase.getChatMessageDao().insertChatMessage(message)
     }
-
-    fun registerMessagesSyncListener(chatId: String) {
-        val messagesRef = realTimeDb.child(REALTIME_DB_MESSAGES_PATH).child(chatId).ref
-
-        messagesRef.addChildEventListener(messagesChildListener)
-    }
-
-    private val messagesChildListener = object :  ChildEventListener{
-        override fun onChildAdded(snapshot: DataSnapshot, previousChildName: String?) {
-            listOfRealtimeMessages.add(snapshot.value.toString())
-            messagesList.postValue(listOfRealtimeMessages)
-            Log.d(TAG, "Messages realtime: ${snapshot.value.toString()}")
-        }
-
-        override fun onChildChanged(snapshot: DataSnapshot, previousChildName: String?) {
-
-        }
-
-        override fun onChildRemoved(snapshot: DataSnapshot) {
-
-        }
-
-        override fun onChildMoved(snapshot: DataSnapshot, previousChildName: String?) {
-
-        }
-
-        override fun onCancelled(error: DatabaseError) {
-
-        }
-
-    }
-
-    fun unregisterMessagesSyncListener(chatId: String){
-        val messagesRef = realTimeDb.child(REALTIME_DB_MESSAGES_PATH).child(chatId).ref
-        messagesRef.removeEventListener(messagesChildListener)
-    }
-
-    fun getNumberOfRealtimeMessages(): MutableLiveData<MutableList<String>> {
-        return messagesList
-    }
-
-    fun syncMessageData(chatId: String){
-        val chatIds = mutableListOf(chatId)
-        syncAllMessagesFromRealtimeDb(chatIds)
-    }
-    //End messages data sync
+    //End sync message data
 
     companion object{
         private val TAG = DataSyncManager::class.java.simpleName

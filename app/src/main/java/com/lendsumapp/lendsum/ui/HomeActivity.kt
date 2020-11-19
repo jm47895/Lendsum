@@ -6,7 +6,6 @@ import android.view.MenuItem
 import androidx.core.view.get
 import androidx.navigation.NavController
 import androidx.navigation.NavDestination
-import androidx.navigation.Navigation
 import androidx.navigation.fragment.NavHostFragment
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.lendsumapp.lendsum.R
@@ -97,9 +96,9 @@ class HomeActivity: AppCompatActivity(),
                 binding.bottomNavigation.menu[4].isChecked = true
                 AndroidUtils.showView(binding.bottomNavigation)
             }
-            R.id.loginFragment-> AndroidUtils.shrinkView(binding.bottomNavigation)
-            R.id.editProfileFragment-> AndroidUtils.shrinkView(binding.bottomNavigation)
-            R.id.chatRoomFragment -> AndroidUtils.shrinkView(binding.bottomNavigation)
+            R.id.loginFragment-> AndroidUtils.goneView(binding.bottomNavigation)
+            R.id.editProfileFragment-> AndroidUtils.goneView(binding.bottomNavigation)
+            R.id.chatRoomFragment -> AndroidUtils.goneView(binding.bottomNavigation)
         }
     }
 }

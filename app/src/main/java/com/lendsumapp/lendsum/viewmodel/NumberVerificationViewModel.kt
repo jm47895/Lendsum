@@ -2,10 +2,8 @@ package com.lendsumapp.lendsum.viewmodel
 
 import android.app.Activity
 import android.content.Context
-import android.util.Log
 import androidx.hilt.lifecycle.ViewModelInject
 import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.firebase.auth.FirebaseAuth
@@ -88,9 +86,9 @@ class NumberVerificationViewModel @ViewModelInject constructor(
         }
     }
 
-    fun syncAllDataFromDatabases(uid: String){
+    fun syncUserData(uid: String){
         viewModelScope.launch(Dispatchers.IO) {
-            numberVerificationRepository.syncAllDataFromDatabases(uid)
+            numberVerificationRepository.syncUserData(uid, viewModelScope)
         }
     }
     //End sync data functions

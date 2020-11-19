@@ -4,7 +4,7 @@ import androidx.lifecycle.MutableLiveData
 import com.lendsumapp.lendsum.data.DataSyncManager
 import com.lendsumapp.lendsum.data.model.ChatRoom
 import com.lendsumapp.lendsum.data.persistence.LendsumDatabase
-import com.lendsumapp.lendsum.util.GlobalConstants
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 
@@ -17,20 +17,16 @@ class ChatRoomsRepository @Inject constructor(
         return cacheDatabase.getChatRoomDao().getAllChatRooms()
     }
 
-    fun registerChatRoomSyncListener(userId: String){
-        dataSyncManager.registerChatRoomSyncListener(userId)
+    fun registerRealtimeChatIdListener(uid: String){
+        return dataSyncManager.registerRealtimeChatIdListener(uid)
     }
 
-    fun unregisterChatRoomSyncListener(userId: String){
-        dataSyncManager.unregisterChatRoomSyncListener(userId)
+    fun getRealtimeChatIds(): MutableLiveData<MutableList<String>> {
+        return dataSyncManager.getRealtimeChatIds()
     }
 
-    fun getNumberOfChatIdsFromRealtimeDb(): MutableLiveData<MutableList<String>> {
-        return dataSyncManager.getNumberOfChatIdsFromRealtimeDb()
-    }
-
-    fun syncChatRoomData(chatIdList: MutableList<String>){
-        dataSyncManager.syncChatRoomData(chatIdList)
+    fun syncChatRoomList(listOfChatIds: List<String>, scope: CoroutineScope){
+        dataSyncManager.syncChatRoomList(listOfChatIds, scope)
     }
 
     companion object{

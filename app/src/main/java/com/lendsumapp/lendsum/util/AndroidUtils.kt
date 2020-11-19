@@ -59,7 +59,7 @@ class AndroidUtils{
             view.visibility = View.VISIBLE
         }
 
-        fun shrinkView(view: View) {
+        fun goneView(view: View) {
             view.visibility = View.GONE
         }
 
