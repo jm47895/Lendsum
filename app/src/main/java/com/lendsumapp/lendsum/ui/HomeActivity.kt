@@ -50,7 +50,7 @@ class HomeActivity: AppCompatActivity(),
             }
             R.id.messages -> {
                 item.isChecked = true
-                navController.navigate(R.id.messagesFragment)
+                navController.navigate(R.id.chatRoomsFragment)
             }
             R.id.marketplace -> {
                 item.isChecked = true
@@ -98,7 +98,7 @@ class HomeActivity: AppCompatActivity(),
             }
             R.id.loginFragment-> AndroidUtils.goneView(binding.bottomNavigation)
             R.id.editProfileFragment-> AndroidUtils.goneView(binding.bottomNavigation)
-            R.id.chatRoomFragment -> AndroidUtils.goneView(binding.bottomNavigation)
+            R.id.chatRoomsFragment -> AndroidUtils.goneView(binding.bottomNavigation)
         }
     }
 }

@@ -77,7 +77,7 @@ class ChatRoomsFragment : Fragment(), View.OnClickListener, ChatRoomListAdapter.
     override fun onClick(view: View?) {
         when(view?.id){
             R.id.messages_new_message_btn->{
-                findNavController().navigate(R.id.action_messagesFragment_to_chatRoomFragment)
+                findNavController().navigate(R.id.action_chatRoomsFragment_to_messagesFragment)
             }
         }
     }
@@ -103,7 +103,7 @@ class ChatRoomsFragment : Fragment(), View.OnClickListener, ChatRoomListAdapter.
 
     override fun onItemSelected(position: Int, item: ChatRoom) {
         setFragmentResult(CHAT_ROOM_REQUEST_KEY, bundleOf(CHAT_ROOM_BUNDLE_KEY to item))
-        findNavController().navigate(R.id.action_messagesFragment_to_chatRoomFragment)
+        findNavController().navigate(R.id.action_chatRoomsFragment_to_messagesFragment)
     }
 
     companion object{

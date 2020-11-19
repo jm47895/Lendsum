@@ -5,7 +5,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <com.google.android.material.appbar.AppBarLayout
-        android:id="@+id/messages_app_bar"
+        android:id="@+id/chat_rooms_app_bar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:layout_constraintTop_toTopOf="parent"
@@ -54,7 +54,7 @@
         android:layout_margin="12dp"
         android:src="@drawable/ic_new_chat_32"
         android:background="@null"
-        app:layout_constraintTop_toBottomOf="@id/messages_app_bar"
+        app:layout_constraintTop_toBottomOf="@id/chat_rooms_app_bar"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"

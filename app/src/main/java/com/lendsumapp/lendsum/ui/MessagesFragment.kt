@@ -63,9 +63,9 @@ class MessagesFragment : Fragment(), View.OnClickListener,
             hostUser = cachedUser
         })
 
-        binding.chatRoomSendMsgBtn.setOnClickListener(this)
-        binding.chatRoomBackBtn.setOnClickListener(this)
-        binding.chatRoomSearchView.setOnQueryTextListener(this)
+        binding.messagesSendMsgBtn.setOnClickListener(this)
+        binding.messagesBackBtn.setOnClickListener(this)
+        binding.messagesUserSearchView.setOnQueryTextListener(this)
 
         //This listener listens for click from the chat room list in the messages fragment and populates the data associated with the list
         setFragmentResultListener(CHAT_ROOM_REQUEST_KEY){ _, bundle->
@@ -105,7 +105,7 @@ class MessagesFragment : Fragment(), View.OnClickListener,
     }
 
     private fun clearEditTextFocus(){
-        binding.chatRoomMsgEt
+        binding.messagesSendMsgEt
     }
 
     private fun initRecyclerView(recyclerViewType: Int){
@@ -132,15 +132,15 @@ class MessagesFragment : Fragment(), View.OnClickListener,
 
     override fun onClick(view: View?) {
         when(view?.id){
-            R.id.chat_room_back_btn->{
+            R.id.messages_back_btn->{
                 clearEditTextFocus()
-                findNavController().navigate(R.id.action_chatRoomFragment_to_messagesFragment)
+                findNavController().navigate(R.id.action_messagesFragment_to_chatRoomsFragment)
             }
-            R.id.chat_room_send_msg_btn->{
+            R.id.messages_send_msg_btn->{
 
-                if (binding.chatRoomRecipientTv.isVisible) {
+                if (binding.messagesRecipientTv.isVisible) {
 
-                    val msg = binding.chatRoomMsgEt.text.toString()
+                    val msg = binding.messagesSendMsgEt.text.toString()
 
                     if (currentListOfMessages.isEmpty()) {
 
@@ -152,7 +152,7 @@ class MessagesFragment : Fragment(), View.OnClickListener,
                 }else{
                     AndroidUtils.hideKeyboard(requireActivity())
                     AndroidUtils.showSnackBar(requireActivity(), getString(R.string.pick_user_first))
-                    binding.chatRoomMsgEt.text?.clear()
+                    binding.messagesSendMsgEt.text?.clear()
                 }
 
             }
@@ -164,7 +164,9 @@ class MessagesFragment : Fragment(), View.OnClickListener,
             Log.d(TAG, "cache Message Observer hit")
             currentListOfMessages = it
             messageListAdapter.submitList(it)
-            binding.chatMessageList.smoothScrollToPosition(it.size - 1)
+            if(it.size > 1) {
+                binding.chatMessageList.smoothScrollToPosition(it.size - 1)
+            }
         })
 
         messagesViewModel.syncMessagesData(chatId)
@@ -175,7 +177,7 @@ class MessagesFragment : Fragment(), View.OnClickListener,
         //TODO Eventually allow offline edits. Currently it is coded to only show in the UI offline
         if(NetworkUtils.isNetworkAvailable(requireContext())){
             val newMessage = Message(AndroidUtils.getTimestampInstant(), chatRoom.chatRoomId, firebaseAuth.currentUser?.uid.toString(), guestUser.profilePicUri, msg, null)
-            binding.chatRoomMsgEt.text?.clear()
+            binding.messagesSendMsgEt.text?.clear()
 
             cacheNewMessage(newMessage)
             sendMessageToRealtimeDB(chatRoom.chatRoomId, newMessage)
@@ -247,13 +249,13 @@ class MessagesFragment : Fragment(), View.OnClickListener,
         val currentUid = firebaseAuth.currentUser?.uid.toString()
 
         AndroidUtils.hideKeyboard(requireActivity())
-        binding.chatMessageList.visibility = View.INVISIBLE
-        binding.chatRoomSearchView.visibility = View.GONE
-        binding.chatRoomRecipientTv.visibility = View.VISIBLE
+        AndroidUtils.hideView(binding.chatMessageList)
+        AndroidUtils.goneView(binding.messagesUserSearchView)
+        AndroidUtils.showView(binding.messagesRecipientTv)
 
         for (user in users){
             if(user.userId != currentUid){
-                binding.chatRoomRecipientTv.text = user.name
+                binding.messagesRecipientTv.text = user.name
             }
         }
 
