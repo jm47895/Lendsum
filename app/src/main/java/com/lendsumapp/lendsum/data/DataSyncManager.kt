@@ -93,18 +93,19 @@ class DataSyncManager @Inject constructor(
         for (chatId in listOfChatIds){
             val chatRoomRef = realTimeDb.child(REALTIME_DB_CHAT_ROOM_PATH).child(chatId).ref
 
-            chatRoomRef.addListenerForSingleValueEvent(object : ValueEventListener{
+            chatRoomRef.addValueEventListener(object : ValueEventListener{
                 override fun onDataChange(snapshot: DataSnapshot) {
-                    Log.d(TAG, "ChatRoom" + snapshot.value.toString())
-                    val chatRoom = snapshot.getValue(ChatRoom::class.java)!!
+                    val chatRoom = snapshot.getValue(ChatRoom::class.java)
                     viewModelScope.launch {
-                        syncChatRoomDataInLocalCache(chatRoom)
+                        chatRoom?.let { syncChatRoomDataInLocalCache(it) }
                     }
                 }
 
                 override fun onCancelled(error: DatabaseError) {
-                    Log.d(TAG, "Chatrooms failed to sync ${error.message}")
+                    TODO("Not yet implemented")
                 }
+
+
             })
         }
     }
@@ -124,9 +125,9 @@ class DataSyncManager @Inject constructor(
 
                 Log.d(TAG, "Message added: " + snapshot.value.toString())
 
-                val message = snapshot.getValue(Message::class.java)!!
+                val message = snapshot.getValue(Message::class.java)
                 viewModelScope.launch(Dispatchers.IO){
-                    syncMessagesDataInLocalCache(message)
+                    message?.let { syncMessagesDataInLocalCache(it) }
                 }
 
             }

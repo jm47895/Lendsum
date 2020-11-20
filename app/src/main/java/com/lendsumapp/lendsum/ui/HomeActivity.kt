@@ -80,7 +80,7 @@ class HomeActivity: AppCompatActivity(),
                 binding.bottomNavigation.menu[0].isChecked = true
                 AndroidUtils.showView(binding.bottomNavigation)
             }
-            R.id.messagesFragment -> {
+            R.id.chatRoomsFragment -> {
                 binding.bottomNavigation.menu[1].isChecked = true
                 AndroidUtils.showView(binding.bottomNavigation)
             }
@@ -98,7 +98,7 @@ class HomeActivity: AppCompatActivity(),
             }
             R.id.loginFragment-> AndroidUtils.goneView(binding.bottomNavigation)
             R.id.editProfileFragment-> AndroidUtils.goneView(binding.bottomNavigation)
-            R.id.chatRoomsFragment -> AndroidUtils.goneView(binding.bottomNavigation)
+            R.id.messagesFragment -> AndroidUtils.goneView(binding.bottomNavigation)
         }
     }
 }

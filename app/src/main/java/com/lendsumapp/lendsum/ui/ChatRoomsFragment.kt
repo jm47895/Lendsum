@@ -52,20 +52,12 @@ class ChatRoomsFragment : Fragment(), View.OnClickListener, ChatRoomListAdapter.
 
         chatRoomsViewModel.getCachedChatRooms().observe(viewLifecycleOwner, Observer { currentCachedChatRooms->
             loadChatRooms(currentCachedChatRooms)
-            chatRoomsViewModel.getRealtimeChatIds().observe(viewLifecycleOwner, Observer { remoteChatIdList->
-                Log.d(TAG, "Chatid List: $remoteChatIdList")
-                Log.d(TAG, "Cached size: ${currentCachedChatRooms.size} / Realtime size: ${remoteChatIdList.size}")
-
-                if(currentCachedChatRooms.size < remoteChatIdList.size){
-                    if(currentCachedChatRooms.isEmpty()){
-                        AndroidUtils.hideView(binding.messagesNoConversationsTv)
-                    }
-                    val difference = remoteChatIdList.size - currentCachedChatRooms.size
-                    val subList = remoteChatIdList.subList(remoteChatIdList.size - difference,remoteChatIdList.size)
-                    chatRoomsViewModel.syncChatRoomList(subList.toList())
-                }
-            })
         })
+
+        chatRoomsViewModel.getRealtimeChatIds().observe(viewLifecycleOwner, Observer { remoteChatIdList->
+            chatRoomsViewModel.syncChatRoomList(remoteChatIdList)
+        })
+
     }
 
     override fun onDestroyView() {

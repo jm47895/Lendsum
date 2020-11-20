@@ -16,6 +16,6 @@ interface ChatRoomDao {
     @Delete
     suspend fun deleteChatRoom(chatRoom: ChatRoom)
 
-    @Query("SELECT * FROM chat_rooms")
+    @Query("SELECT * FROM chat_rooms ORDER BY lastTimestamp DESC")
     fun getAllChatRooms(): Flow<List<ChatRoom>>
 }
