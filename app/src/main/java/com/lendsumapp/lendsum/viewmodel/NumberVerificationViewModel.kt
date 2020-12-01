@@ -22,7 +22,6 @@ class NumberVerificationViewModel @ViewModelInject constructor(
 
     private val cacheDbStatus: MutableLiveData<Boolean> = MutableLiveData()
 
-
     fun getCacheStatus(): MutableLiveData<Boolean> {
         return cacheDbStatus
     }

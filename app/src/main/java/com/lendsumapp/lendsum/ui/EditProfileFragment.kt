@@ -7,7 +7,6 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.webkit.MimeTypeMap
 import android.widget.*
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.ContextCompat
@@ -18,7 +17,6 @@ import androidx.navigation.fragment.findNavController
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.bumptech.glide.request.RequestOptions
-import com.google.firebase.auth.FirebaseAuth
 import com.lendsumapp.lendsum.R
 import com.lendsumapp.lendsum.data.model.User
 import com.lendsumapp.lendsum.databinding.FragmentEditProfileBinding
@@ -50,7 +48,7 @@ class EditProfileFragment : Fragment(), View.OnClickListener, CompoundButton.OnC
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
         _binding = FragmentEditProfileBinding.inflate(inflater, container, false)
         return binding.root
     }
@@ -76,7 +74,7 @@ class EditProfileFragment : Fragment(), View.OnClickListener, CompoundButton.OnC
 
         updateAuthEmailStatusObserver = Observer { isAuthEmailUpdated ->
             if(isAuthEmailUpdated){
-                editProfileViewModel.updateCachedUser(user)
+                editProfileViewModel.updateLocalCachedUser(user)
                 editProfileViewModel.updateUserValueInFirestore(FIRESTORE_EMAIL_KEY, user.email, null)
             }else{
                 AndroidUtils.showSnackBar(requireActivity(), getString(R.string.sign_in_again_msg))
@@ -225,29 +223,17 @@ class EditProfileFragment : Fragment(), View.OnClickListener, CompoundButton.OnC
         registerOnActivityResult.launch("image/*")
     }
 
-    private fun getFileExtension(uri: Uri): String{
-        val contentResolver = context?.contentResolver
-        val mime = MimeTypeMap.getSingleton()
-        return mime.getExtensionFromMimeType(contentResolver?.getType(uri))!!
-    }
-
     private fun updateProfilePic(it: Uri) {
-
         loadProfilePic(it.toString(), binding.editProfilePic)
 
-        val uid = FirebaseAuth.getInstance().currentUser?.uid.toString()
-        val fileName = uid + "."+ getFileExtension(it)
+        uploadProfilePicToFirebaseStorage(it)
 
         user.profilePicUri = it.toString()
-
-        saveProfilePicUriToDbs(fileName, user)
+        editProfileViewModel.updateLocalCachedUser(user)
     }
 
-    private fun saveProfilePicUriToDbs(fileName: String, user: User) {
-        editProfileViewModel.updateCachedUser(user)
-        editProfileViewModel.updateUserValueInFirestore(FIRESTORE_PROFILE_PIC_URI_KEY, user.profilePicUri.toString(), null)
-        editProfileViewModel.updateFirebaseAuthProfile(FIRESTORE_PROFILE_PIC_URI_KEY, user.profilePicUri.toString())
-        editProfileViewModel.uploadProfilePhotoToFirebaseStorage(fileName, Uri.parse(user.profilePicUri))
+    private fun uploadProfilePicToFirebaseStorage(uri: Uri) {
+        editProfileViewModel.uploadProfilePhotoToFirebaseStorage(uri)
     }
 
     private fun handleUpdateInfoUI(isChecked: Boolean, textView: TextView?, editText: EditText?, toggleButton: ToggleButton) {
@@ -281,7 +267,7 @@ class EditProfileFragment : Fragment(), View.OnClickListener, CompoundButton.OnC
                         }
                         else -> {
                             user.name = textView.text.toString().trim()
-                            editProfileViewModel.updateCachedUser(user)
+                            editProfileViewModel.updateLocalCachedUser(user)
                             editProfileViewModel.updateUserValueInFirestore(FIRESTORE_PROFILE_NAME_KEY, user.name, null)
                             editProfileViewModel.updateFirebaseAuthProfile(FIRESTORE_PROFILE_NAME_KEY, user.name)
                         }
@@ -300,7 +286,7 @@ class EditProfileFragment : Fragment(), View.OnClickListener, CompoundButton.OnC
                         }
                         else -> {
                             user.username = textView.text.toString().trim()
-                            editProfileViewModel.updateCachedUser(user)
+                            editProfileViewModel.updateLocalCachedUser(user)
                             editProfileViewModel.updateUserValueInFirestore(FIRESTORE_USERNAME_KEY, user.username, null)
                         }
                     }
@@ -319,7 +305,7 @@ class EditProfileFragment : Fragment(), View.OnClickListener, CompoundButton.OnC
                 }
                 EditProfileInfoType.PROFILE_VISIBILITY.ordinal -> {
                     user.isProfilePublic = true
-                    editProfileViewModel.updateCachedUser(user)
+                    editProfileViewModel.updateLocalCachedUser(user)
                     editProfileViewModel.updateUserValueInFirestore(FIRESTORE_IS_PROFILE_PUBLIC_KEY, null, true)
                 }
             }
@@ -327,7 +313,7 @@ class EditProfileFragment : Fragment(), View.OnClickListener, CompoundButton.OnC
             when(infoType){
                 EditProfileInfoType.PROFILE_VISIBILITY.ordinal -> {
                     user.isProfilePublic = false
-                    editProfileViewModel.updateCachedUser(user)
+                    editProfileViewModel.updateLocalCachedUser(user)
                     editProfileViewModel.updateUserValueInFirestore(FIRESTORE_IS_PROFILE_PUBLIC_KEY, null, false)
                 }
             }

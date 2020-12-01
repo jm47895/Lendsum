@@ -1,20 +1,24 @@
 package com.lendsumapp.lendsum.viewmodel
 
+import android.app.Application
 import android.net.Uri
 import androidx.hilt.lifecycle.ViewModelInject
 import androidx.lifecycle.*
 import com.google.firebase.auth.FirebaseAuth
 import com.lendsumapp.lendsum.data.model.User
 import com.lendsumapp.lendsum.repository.EditProfileRepository
+import com.lendsumapp.lendsum.util.DatabaseUtils
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
 class EditProfileViewModel @ViewModelInject constructor(
     private val editProfileRepository: EditProfileRepository,
-    private var firebaseAuth: FirebaseAuth?
-) :ViewModel(){
+    private var firebaseAuth: FirebaseAuth?,
+    application: Application
+) :AndroidViewModel(application){
 
     private val updateUserStatus: MutableLiveData<Int> = MutableLiveData()
+    private val context = getApplication<Application>().applicationContext
 
     //Room cache sql functions
     fun getCachedUser(): LiveData<User>{
@@ -25,9 +29,9 @@ class EditProfileViewModel @ViewModelInject constructor(
 
     }
 
-    fun updateCachedUser(userObject: User){
+    fun updateLocalCachedUser(userObject: User){
         viewModelScope.launch(Dispatchers.IO) {
-            val userStatus = editProfileRepository.updateCachedUser(userObject)
+            val userStatus = editProfileRepository.updateLocalCachedUser(userObject)
 
             updateUserStatus.postValue(userStatus)
         }
@@ -75,7 +79,11 @@ class EditProfileViewModel @ViewModelInject constructor(
     //End of firestore functions
 
     //Firebase storage functions
-    fun uploadProfilePhotoToFirebaseStorage(fileName: String, uri: Uri){
+    fun uploadProfilePhotoToFirebaseStorage(uri: Uri) {
+
+        val user = firebaseAuth?.currentUser
+        val fileName = user?.uid + DatabaseUtils.getFileExtension(context, uri)
+
         viewModelScope.launch(Dispatchers.IO){
             editProfileRepository.uploadProfilePhotoToFirebaseStorage(fileName, uri)
         }

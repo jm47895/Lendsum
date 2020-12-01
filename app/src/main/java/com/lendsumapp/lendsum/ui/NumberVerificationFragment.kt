@@ -85,7 +85,7 @@ class NumberVerificationFragment : Fragment(), View.OnClickListener, CountryCode
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
         _binding = FragmentNumberVerificationBinding.inflate(inflater, container, false)
         return binding.root
     }
