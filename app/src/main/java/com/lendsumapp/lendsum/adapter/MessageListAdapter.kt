@@ -17,7 +17,6 @@ import com.lendsumapp.lendsum.R
 import com.lendsumapp.lendsum.data.model.Message
 import com.lendsumapp.lendsum.databinding.MessageListItemBinding
 import com.lendsumapp.lendsum.util.AndroidUtils
-import com.lendsumapp.lendsum.util.GlideApp
 
 
 class MessageListAdapter(private val interaction: Interaction? = null) :
@@ -74,6 +73,7 @@ class MessageListAdapter(private val interaction: Interaction? = null) :
 
             val previousTimestamp = previousItem.messageTimestamp
             val currentTimestamp = item.messageTimestamp
+            var isPhotoNeeded = true
 
             val oldDate = AndroidUtils.convertTimestampToFullDate(previousTimestamp)
             val date = AndroidUtils.convertTimestampToFullDate(currentTimestamp)
@@ -81,6 +81,7 @@ class MessageListAdapter(private val interaction: Interaction? = null) :
             if (oldDate == date && position != 0){
                 AndroidUtils.goneView(binding.messageTimestampTv)
                 AndroidUtils.goneView(binding.messageGuestPic)
+                isPhotoNeeded = false
             }else{
                 AndroidUtils.showView(binding.messageTimestampTv)
                 AndroidUtils.showView(binding.messageTimestampTv)
@@ -94,26 +95,24 @@ class MessageListAdapter(private val interaction: Interaction? = null) :
                 AndroidUtils.hideView(binding.messageGuestTv)
             }else{
 
-                val storageRef = Firebase.storage.reference
-                val profilePicRef = storageRef
-                    .child("profile_pics")
-
                 binding.messageGuestTv.text = item.message
                 binding.messageGuestTv.setTextColor(Color.parseColor("#FFFFFF"))
                 AndroidUtils.showView(binding.messageGuestTv)
                 AndroidUtils.hideView(binding.messageHostTv)
 
-                GlideApp.with(itemView.context)
-                    .asBitmap()
-                    .load(profilePicRef)
-                    .apply(
-                        RequestOptions()
-                            .diskCacheStrategy(DiskCacheStrategy.ALL)
-                            .placeholder(R.drawable.com_facebook_profile_picture_blank_portrait)
-                            .error(R.drawable.com_facebook_profile_picture_blank_portrait))
-                    .circleCrop()
-                    .into(binding.messageGuestPic)
-
+                
+                if(isPhotoNeeded) {
+                    Glide.with(itemView)
+                        .applyDefaultRequestOptions(
+                            RequestOptions()
+                                .placeholder(R.drawable.com_facebook_profile_picture_blank_portrait)
+                                .error(R.drawable.com_facebook_profile_picture_blank_portrait)
+                                .circleCrop()
+                        )
+                        .load(item.senderPicUri)
+                        .circleCrop()
+                        .into(binding.messageGuestPic)
+                }
             }
 
         }

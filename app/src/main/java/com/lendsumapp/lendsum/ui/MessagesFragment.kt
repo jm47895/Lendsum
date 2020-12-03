@@ -51,7 +51,7 @@ class MessagesFragment : Fragment(), View.OnClickListener,
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
         _binding = FragmentMessagesBinding.inflate(inflater, container, false)
         return binding.root
     }
@@ -176,7 +176,7 @@ class MessagesFragment : Fragment(), View.OnClickListener,
 
         //TODO Eventually allow offline edits. Currently it is coded to only show in the UI offline
         if(NetworkUtils.isNetworkAvailable(requireContext())){
-            val newMessage = Message(AndroidUtils.getTimestampInstant(), chatRoom.chatRoomId, firebaseAuth.currentUser?.uid.toString(), guestUser.profilePicUri, msg, null)
+            val newMessage = Message(AndroidUtils.getTimestampInstant(), chatRoom.chatRoomId, firebaseAuth.currentUser?.uid.toString(), hostUser.profilePicUri, msg, null)
             binding.messagesSendMsgEt.text?.clear()
 
             cacheNewMessage(newMessage)
