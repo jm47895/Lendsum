@@ -7,6 +7,7 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.AsyncListDiffer
 import androidx.recyclerview.widget.DiffUtil
 import com.bumptech.glide.Glide
+import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.bumptech.glide.request.RequestOptions
 import com.lendsumapp.lendsum.R
 import com.lendsumapp.lendsum.data.model.User
@@ -59,9 +60,10 @@ class UserSearchListAdapter(private val interaction: Interaction? = null) :
                 interaction?.onUserItemSelected(adapterPosition, item)
             }
 
-            Glide.with(itemView.context)
+            Glide.with(itemView)
                 .applyDefaultRequestOptions(
                     RequestOptions()
+                        .diskCacheStrategy(DiskCacheStrategy.AUTOMATIC)
                         .placeholder(R.drawable.com_facebook_profile_picture_blank_portrait)
                         .error(R.drawable.com_facebook_profile_picture_blank_portrait)
                         .circleCrop()

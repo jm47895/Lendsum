@@ -7,6 +7,7 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.AsyncListDiffer
 import androidx.recyclerview.widget.DiffUtil
 import com.bumptech.glide.Glide
+import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.bumptech.glide.request.RequestOptions
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.ktx.Firebase
@@ -77,6 +78,7 @@ class ChatRoomListAdapter(private val interaction: Interaction? = null) :
             Glide.with(itemView)
                 .applyDefaultRequestOptions(
                     RequestOptions()
+                        .diskCacheStrategy(DiskCacheStrategy.AUTOMATIC)
                         .placeholder(R.drawable.com_facebook_profile_picture_blank_portrait)
                         .error(R.drawable.com_facebook_profile_picture_blank_portrait)
                         .circleCrop()

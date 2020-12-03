@@ -105,6 +105,7 @@ class MessageListAdapter(private val interaction: Interaction? = null) :
                     Glide.with(itemView)
                         .applyDefaultRequestOptions(
                             RequestOptions()
+                                .diskCacheStrategy(DiskCacheStrategy.AUTOMATIC)
                                 .placeholder(R.drawable.com_facebook_profile_picture_blank_portrait)
                                 .error(R.drawable.com_facebook_profile_picture_blank_portrait)
                                 .circleCrop()

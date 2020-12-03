@@ -55,7 +55,7 @@ class ProfileFragment : Fragment(), View.OnClickListener {
                 .asBitmap()
                 .load(user.profilePicUri)
                 .apply(RequestOptions()
-                    .diskCacheStrategy(DiskCacheStrategy.ALL)
+                    .diskCacheStrategy(DiskCacheStrategy.AUTOMATIC)
                     .error(R.drawable.com_facebook_profile_picture_blank_portrait)
                     .placeholder(R.drawable.com_facebook_profile_picture_blank_portrait))
                 .circleCrop()
