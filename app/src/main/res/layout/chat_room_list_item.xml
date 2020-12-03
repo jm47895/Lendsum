@@ -27,10 +27,9 @@
         android:id="@+id/chat_room_list_item_name_tv"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="4dp"
         android:text="@string/user_list_item_name_holder"
         android:textColor="@color/colorSecondaryLight"
-        app:layout_constraintBottom_toTopOf="@+id/chat_room_list_item_last_msg_tv"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0"
         app:layout_constraintStart_toStartOf="@+id/horizontal_20_guide"
@@ -40,13 +39,16 @@
 
     <TextView
         android:id="@+id/chat_room_list_item_last_msg_tv"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_width="wrap_content"
-        android:textColor="@color/colorSecondaryLight"
+        android:layout_marginEnd="12dp"
+        android:ellipsize="end"
+        android:lineSpacingExtra="3dp"
+        android:maxLines="2"
         android:text="@string/last_msg_placeholder"
-        app:layout_constraintBottom_toBottomOf="parent"
+        android:textColor="@color/colorSecondaryLight"
+        app:layout_constraintBottom_toBottomOf="@+id/chat_room_list_item_prof_pic"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0"
         app:layout_constraintStart_toStartOf="@+id/horizontal_20_guide"
         app:layout_constraintTop_toBottomOf="@+id/chat_room_list_item_name_tv" />
 
