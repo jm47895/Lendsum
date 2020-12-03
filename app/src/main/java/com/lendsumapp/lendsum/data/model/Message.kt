@@ -4,6 +4,8 @@ import android.net.Uri
 import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
+import com.google.firebase.database.Exclude
+
 import java.util.*
 
 @Entity(tableName = "chat_messages")
@@ -14,7 +16,7 @@ data class  Message(
     @ColumnInfo(name = "senderPicUri") var senderPicUri: String?,
     @ColumnInfo(name = "message") var message: String,
     @ColumnInfo(name = "listOfImageUris") var listOfImageUris: List<String>?,
-    @ColumnInfo(name = "sentToRemoteDb") var sentToRemoteDb: Boolean = false
+    @get:Exclude @ColumnInfo(name = "sentToRemoteDb") var sentToRemoteDb: Boolean = false
 ){
     constructor(): this(0, "", "", null, "", null)
 }

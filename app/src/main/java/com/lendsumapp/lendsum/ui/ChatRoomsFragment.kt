@@ -85,8 +85,9 @@ class ChatRoomsFragment : Fragment(), View.OnClickListener, ChatRoomListAdapter.
     private fun loadChatRooms(chatRooms: List<ChatRoom>?) {
 
         if (chatRooms?.size == 0){
-            binding.messagesNoConversationsTv.visibility = View.VISIBLE
+            AndroidUtils.showView(binding.messagesNoConversationsTv)
         }else{
+            AndroidUtils.hideView(binding.messagesNoConversationsTv)
             chatRooms?.let { chatRoomListAdapter.submitList(it) }
         }
 
