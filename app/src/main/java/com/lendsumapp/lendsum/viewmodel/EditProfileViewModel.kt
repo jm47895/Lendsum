@@ -82,7 +82,7 @@ class EditProfileViewModel @ViewModelInject constructor(
     fun uploadProfilePhotoToFirebaseStorage(uri: Uri) {
 
         val user = firebaseAuth?.currentUser
-        val fileName = user?.uid + DatabaseUtils.getFileExtension(context, uri)
+        val fileName = user?.uid + "." + DatabaseUtils.getFileExtension(context, uri)
 
         viewModelScope.launch(Dispatchers.IO){
             editProfileRepository.uploadProfilePhotoToFirebaseStorage(fileName, uri)

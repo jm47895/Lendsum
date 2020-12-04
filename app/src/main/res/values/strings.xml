@@ -97,5 +97,7 @@
     <string name="last_msg_placeholder">This is the last message</string>
     <string name="short_date_placeholder">Oct 20</string>
     <string name="pick_user_first">You must pick a user first</string>
+    <string name="take_image">Take Photo</string>
+    <string name="gallery">Gallery</string>
 
 </resources>

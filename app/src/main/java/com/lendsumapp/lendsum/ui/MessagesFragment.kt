@@ -1,10 +1,12 @@
 package com.lendsumapp.lendsum.ui
 
+import android.net.Uri
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.widget.SearchView
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
@@ -41,12 +43,22 @@ class MessagesFragment : Fragment(), View.OnClickListener,
     private lateinit var userSearchListAdapter: UserSearchListAdapter
     private lateinit var messageListAdapter: MessageListAdapter
     private lateinit var remoteDbUserListObserver: Observer<List<User>>
+    private lateinit var listOfImageUriObserver: Observer<MutableList<String>>
     private var currentListOfMessages = listOf<Message>()
     private var guestUser = User()
     private var hostUser = User()
     private var isChatRoomEmpty = true
     private var currentChatRoom: ChatRoom? = null
+    private var currentListOfImgUris: MutableList<String>? = null
     @Inject lateinit var firebaseAuth: FirebaseAuth
+
+    private val registerGalleryActivityResult = registerForActivityResult(ActivityResultContracts.GetContent()) {
+        it?.let { messagesViewModel.addImageUriToList(it.toString()) }
+    }
+
+    private val registerTakePictureActivityResult = registerForActivityResult(ActivityResultContracts.TakePicture()){
+
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -63,6 +75,9 @@ class MessagesFragment : Fragment(), View.OnClickListener,
             hostUser = cachedUser
         })
 
+        binding.messagesOpenGalleryBtn.setOnClickListener(this)
+        binding.messagesTakePhotoBtn.setOnClickListener(this)
+        binding.messagesAddImageBtn.setOnClickListener(this)
         binding.messagesSendMsgBtn.setOnClickListener(this)
         binding.messagesBackBtn.setOnClickListener(this)
         binding.messagesUserSearchView.setOnQueryTextListener(this)
@@ -94,6 +109,12 @@ class MessagesFragment : Fragment(), View.OnClickListener,
             userSearchListAdapter.submitList(userList)
 
         }
+
+        listOfImageUriObserver = Observer {
+            currentListOfImgUris = it
+            Log.d(TAG, it.toString())
+        }
+        messagesViewModel.getCurrentListOfImgUris().observe(viewLifecycleOwner, listOfImageUriObserver)
     }
 
     override fun onDestroyView() {
@@ -102,6 +123,7 @@ class MessagesFragment : Fragment(), View.OnClickListener,
         _binding = null
         clearFragmentResultListener(CHAT_ROOM_REQUEST_KEY)
         messagesViewModel.getRemoteDbUserList().removeObserver(remoteDbUserListObserver)
+        registerGalleryActivityResult.unregister()
     }
 
     private fun clearEditTextFocus(){
@@ -156,7 +178,25 @@ class MessagesFragment : Fragment(), View.OnClickListener,
                 }
 
             }
+            R.id.messages_add_image_btn->{
+                AndroidUtils.showView(binding.messagesImageMenu)
+            }
+            R.id.messages_take_photo_btn->{
+                launchCamera()
+            }
+            R.id.messages_open_gallery_btn->{
+                openGalleryForImage()
+            }
         }
+    }
+
+    private fun launchCamera() {
+        val imageUri: Uri? = null
+        registerTakePictureActivityResult.launch(imageUri)
+    }
+
+    private fun openGalleryForImage() {
+        registerGalleryActivityResult.launch("image/*")
     }
 
     private fun setCacheMessageObserver(chatId: String){
@@ -174,10 +214,15 @@ class MessagesFragment : Fragment(), View.OnClickListener,
 
     private fun addNewMessage(msg: String, chatRoom: ChatRoom) {
 
-        //TODO Eventually allow offline edits. Currently it is coded to only show in the UI offline
+        //TODO Eventually allow offline edits. Currently it is coded to only show in the UI when online
         if(NetworkUtils.isNetworkAvailable(requireContext())){
-            val newMessage = Message(AndroidUtils.getTimestampInstant(), chatRoom.chatRoomId, firebaseAuth.currentUser?.uid.toString(), hostUser.profilePicUri, msg, null)
+            val timeStamp = AndroidUtils.getTimestampInstant()
+            val newMessage = Message(timeStamp, chatRoom.chatRoomId, firebaseAuth.currentUser?.uid.toString(), hostUser.profilePicUri, msg, currentListOfImgUris)
             binding.messagesSendMsgEt.text?.clear()
+
+            currentListOfImgUris?.let {
+                sendImgsToFirebaseStorage(chatRoom.chatRoomId, timeStamp, it)
+            }
 
             cacheNewMessage(newMessage)
             sendMessageToRealtimeDB(chatRoom.chatRoomId, newMessage)
@@ -186,6 +231,11 @@ class MessagesFragment : Fragment(), View.OnClickListener,
         }else{
             AndroidUtils.showSnackBar(requireActivity(), "You must be connected to the internet to do this.")
         }
+    }
+
+    private fun sendImgsToFirebaseStorage(chatRoomId: String, timeStamp: Long, listOfImgUris: MutableList<String>
+    ){
+        messagesViewModel.uploadImgsToFirebaseStorage(chatRoomId, timeStamp, listOfImgUris)
     }
 
     private fun updateRealTimeDbChatRoom(chatRoom: ChatRoom) {

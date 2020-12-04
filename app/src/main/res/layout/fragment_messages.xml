@@ -61,12 +61,65 @@
         android:layout_width="0dp"
         android:layout_height="0dp"
         app:layout_behavior="@string/appbar_scrolling_view_behavior"
-        app:layout_constraintBottom_toTopOf="@+id/messages_send_msg_et"
+        app:layout_constraintBottom_toTopOf="@+id/messages_image_menu"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/messages_app_bar" />
 
+    <LinearLayout
+        android:id="@+id/messages_image_menu"
+        style="?android:buttonBarStyle"
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"
+        android:orientation="horizontal"
+        app:layout_constraintTop_toBottomOf="@id/chat_message_list"
+        app:layout_constraintBottom_toTopOf="@id/messages_send_msg_et"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:visibility="gone">
 
+        <Button
+            android:id="@+id/messages_take_photo_btn"
+            style="?android:buttonBarButtonStyle"
+            android:layout_height="match_parent"
+            android:layout_width="match_parent"
+            android:layout_margin="2dp"
+            android:paddingEnd="16dp"
+            android:paddingStart="16dp"
+            android:background="@color/colorPrimary"
+            android:layout_weight="1"
+            android:textColor="@color/colorSecondaryLight"
+            android:drawableEnd="@drawable/ic_photo_camera_32"
+            android:text="@string/take_image"/>
+
+        <Button
+            android:id="@+id/messages_open_gallery_btn"
+            style="?android:buttonBarButtonStyle"
+            android:layout_height="match_parent"
+            android:layout_width="match_parent"
+            android:layout_margin="2dp"
+            android:paddingEnd="16dp"
+            android:paddingStart="16dp"
+            android:background="@color/colorPrimary"
+            android:layout_weight="1"
+            android:textColor="@color/colorSecondaryLight"
+            android:drawableEnd="@drawable/ic_gallery_32"
+            android:text="@string/gallery"/>
+
+    </LinearLayout>
+
+    <ImageButton
+        android:id="@+id/messages_add_image_btn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="8dp"
+        android:background="@null"
+        android:contentDescription="@string/this_is_the_send_message_button"
+        android:src="@drawable/ic_image_32"
+        app:layout_constraintBottom_toBottomOf="@+id/messages_send_msg_et"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/messages_send_msg_et"
+        app:layout_constraintEnd_toStartOf="@id/messages_send_msg_et"/>
 
     <EditText
         android:id="@+id/messages_send_msg_et"
@@ -82,15 +135,15 @@
         android:textCursorDrawable="@drawable/color_cursor"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@+id/messages_send_msg_btn"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/chat_message_list"
+        app:layout_constraintStart_toEndOf="@id/messages_add_image_btn"
+        app:layout_constraintTop_toBottomOf="@+id/messages_image_menu"
         tools:ignore="Autofill" />
 
     <ImageButton
         android:id="@+id/messages_send_msg_btn"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_margin="12dp"
+        android:layout_margin="8dp"
         android:background="@null"
         android:contentDescription="@string/this_is_the_send_message_button"
         android:src="@drawable/ic_send_msg_32"

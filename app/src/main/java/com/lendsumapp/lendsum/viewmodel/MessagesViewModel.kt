@@ -1,5 +1,7 @@
 package com.lendsumapp.lendsum.viewmodel
 
+import android.app.Application
+import android.net.Uri
 import androidx.hilt.lifecycle.ViewModelInject
 import androidx.lifecycle.*
 import com.google.firebase.auth.FirebaseAuth
@@ -7,13 +9,19 @@ import com.lendsumapp.lendsum.data.model.ChatRoom
 import com.lendsumapp.lendsum.data.model.Message
 import com.lendsumapp.lendsum.data.model.User
 import com.lendsumapp.lendsum.repository.MessagesRepository
+import com.lendsumapp.lendsum.util.DatabaseUtils
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
 class MessagesViewModel @ViewModelInject constructor(
     private val messagesRepository: MessagesRepository,
-    private val firebaseAuth: FirebaseAuth?
-): ViewModel(){
+    private val firebaseAuth: FirebaseAuth?,
+    application: Application
+): AndroidViewModel(application){
+
+    private val listOfImgUris = mutableListOf<String>()
+    private val currentListOfImgUris: MutableLiveData<MutableList<String>> = MutableLiveData()
+    private val context = getApplication<Application>().applicationContext
 
     fun getCurrentCachedUser(): LiveData<User>{
 
@@ -79,6 +87,27 @@ class MessagesViewModel @ViewModelInject constructor(
     fun syncMessagesData(chatId: String){
         viewModelScope.launch(Dispatchers.IO) {
             messagesRepository.syncMessagesData(chatId, viewModelScope)
+        }
+    }
+
+    fun addImageUriToList(uriString: String){
+        listOfImgUris.add(uriString)
+        currentListOfImgUris.postValue(listOfImgUris)
+    }
+
+    fun getCurrentListOfImgUris():MutableLiveData<MutableList<String>>{
+        return currentListOfImgUris
+    }
+
+    fun uploadImgsToFirebaseStorage(chatRoomId: String, timeStamp: Long, listOfImgUris: MutableList<String>) {
+        viewModelScope.launch(Dispatchers.IO){
+            var counter = 0
+            for (img in listOfImgUris){
+                val uri = Uri.parse(img)
+                val fileName = chatRoomId + timeStamp + counter + "." + DatabaseUtils.getFileExtension(context, uri)
+                counter = counter.inc()
+                messagesRepository.uploadProfilePhotoToFirebaseStorage(chatRoomId, fileName, uri)
+            }
         }
     }
 

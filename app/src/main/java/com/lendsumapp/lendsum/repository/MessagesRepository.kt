@@ -1,9 +1,11 @@
 package com.lendsumapp.lendsum.repository
 
+import android.net.Uri
 import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import com.google.firebase.database.DatabaseReference
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.storage.StorageReference
 import com.lendsumapp.lendsum.data.DataSyncManager
 import com.lendsumapp.lendsum.data.model.ChatRoom
 import com.lendsumapp.lendsum.data.model.Message
@@ -23,9 +25,11 @@ class MessagesRepository @Inject constructor(
     private val firestoreDb: FirebaseFirestore,
     private val lendsumDatabase: LendsumDatabase,
     private val realTimeDb: DatabaseReference,
-    private val dataSyncManager: DataSyncManager
+    private val dataSyncManager: DataSyncManager,
+    private val firebaseStorageReference: StorageReference
 ){
     private val userList: MutableLiveData<List<User>> = MutableLiveData()
+    private val firebaseStorageImageUri: MutableLiveData<Uri> = MutableLiveData()
 
     fun getCurrentCachedUser(userId: String): Flow<User> {
         return lendsumDatabase.getUserDao().getUser(userId)
@@ -120,6 +124,29 @@ class MessagesRepository @Inject constructor(
 
     fun syncMessagesData(chatId: String, viewModelScope: CoroutineScope){
         dataSyncManager.syncMessagesData(chatId, viewModelScope)
+    }
+
+    fun uploadProfilePhotoToFirebaseStorage(chatId: String, fileName: String, uri: Uri) {
+
+        val chatRoomImgRef = firebaseStorageReference.child("chat_room_images").child(chatId).child(fileName)
+
+        val uploadTask = chatRoomImgRef.putFile(uri)
+        uploadTask.addOnCompleteListener{ task->
+            if(task.isSuccessful){
+                Log.d(TAG, "Message pic uploaded to storage")
+                getMsgImgLink(chatRoomImgRef)
+            }else{
+                Log.d(TAG, "Message pic failed to upload to storage ${task.exception}")
+            }
+        }
+    }
+
+    private fun getMsgImgLink(chatRoomImgRef: StorageReference) {
+        chatRoomImgRef.downloadUrl.addOnSuccessListener {
+            Log.d(TAG, "Link: $it")
+        }.addOnFailureListener {
+            Log.d(TAG, "Couldn't get msg img link: $it")
+        }
     }
 
     companion object{
