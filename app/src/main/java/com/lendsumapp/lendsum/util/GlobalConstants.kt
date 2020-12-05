@@ -28,4 +28,12 @@ object GlobalConstants {
     const val REALTIME_DB_USER_PATH = "users"
     const val REALTIME_DB_MESSAGES_PATH = "messages"
     const val REALTIME_DB_CHAT_ROOM_PATH = "chat_rooms"
+
+    /*Firebase storage constants*/
+    const val FIREBASE_STORAGE_PROFILE_PIC_PATH = "profile_pics"
+
+    /*Work manager constants*/
+    const val UPLOAD_PROF_PIC_NAME_KEY = "profile_pic_file_name"
+    const val UPLOAD_PROF_PIC_URI_KEY = "profile_pic_uri"
+    const val PROF_IMAGE_STORAGE_WORK_NAME = "upload_profile_image"
 }

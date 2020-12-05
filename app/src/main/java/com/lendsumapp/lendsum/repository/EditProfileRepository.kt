@@ -1,8 +1,10 @@
 package com.lendsumapp.lendsum.repository
 
+import android.content.Context
 import android.net.Uri
 import android.util.Log
 import androidx.lifecycle.MutableLiveData
+import androidx.work.*
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.storage.StorageReference
@@ -11,15 +13,18 @@ import com.lendsumapp.lendsum.data.model.User
 import com.lendsumapp.lendsum.data.persistence.LendsumDatabase
 import com.lendsumapp.lendsum.util.GlobalConstants
 import com.lendsumapp.lendsum.util.GlobalConstants.FIRESTORE_PROFILE_PIC_URI_KEY
+import com.lendsumapp.lendsum.util.GlobalConstants.UPLOAD_PROF_PIC_NAME_KEY
+import com.lendsumapp.lendsum.util.GlobalConstants.UPLOAD_PROF_PIC_URI_KEY
+import com.lendsumapp.lendsum.workers.UploadImageWorker
 import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
+import kotlin.coroutines.coroutineContext
 
 class EditProfileRepository @Inject constructor(
     private val lendsumDatabase: LendsumDatabase,
     private val emailAndPassAuthComponent: EmailAndPassAuthComponent,
     private val firestoreDb: FirebaseFirestore,
     private val firebaseAuth: FirebaseAuth,
-    private val firebaseStorageReference: StorageReference
 ){
 
     fun getCachedUser(userId:String): Flow<User> {
@@ -76,19 +81,23 @@ class EditProfileRepository @Inject constructor(
 
     }
 
-    fun uploadProfilePhotoToFirebaseStorage(fileName: String, uri: Uri){
+    fun launchUploadImageWorker(fileName: String, uri: Uri){
 
-        val profileImageRef = firebaseStorageReference.child("profile_pics").child(fileName)
+        val constraints = Constraints.Builder().setRequiredNetworkType(NetworkType.CONNECTED).build()
 
-        val uploadTask = profileImageRef.putFile(uri)
-        uploadTask.addOnCompleteListener{ task->
-            if(task.isSuccessful){
-                Log.d(TAG, "Profile pic uploaded to storage")
-                updateProfPicUriInFirebaseDbs(profileImageRef)
-            }else{
-                Log.d(TAG, "Profile pic failed to upload to storage ${task.exception}")
-            }
-        }
+        val workRequest = OneTimeWorkRequestBuilder<UploadImageWorker>()
+            .setInputData(createFileNameAndUriData(fileName, uri))
+            .setConstraints(constraints)
+            .build()
+
+        WorkManager.getInstance().enqueue(workRequest)
+    }
+
+    private fun createFileNameAndUriData(fileName: String, uri: Uri): Data {
+        return Data.Builder()
+            .putString(UPLOAD_PROF_PIC_NAME_KEY,fileName)
+            .putString(UPLOAD_PROF_PIC_URI_KEY, uri.toString())
+            .build()
     }
 
     private fun updateProfPicUriInFirebaseDbs(profileImageRef: StorageReference) {
