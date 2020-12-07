@@ -12,9 +12,11 @@ import com.lendsumapp.lendsum.data.model.User
 import com.lendsumapp.lendsum.data.persistence.LendsumDatabase
 import com.lendsumapp.lendsum.util.GlobalConstants
 import com.lendsumapp.lendsum.util.GlobalConstants.FIRESTORE_PROFILE_PIC_URI_KEY
+import com.lendsumapp.lendsum.util.GlobalConstants.FIRESTORE_USER_COLLECTION_PATH
 import com.lendsumapp.lendsum.util.GlobalConstants.PROF_IMAGE_STORAGE_WORK_NAME
 import com.lendsumapp.lendsum.util.GlobalConstants.UPLOAD_PROF_PIC_NAME_KEY
 import com.lendsumapp.lendsum.util.GlobalConstants.UPLOAD_PROF_PIC_URI_KEY
+import com.lendsumapp.lendsum.workers.RetrieveRemoteImageUriWorker
 import com.lendsumapp.lendsum.workers.UploadImageToDataDirectoryWorker
 import com.lendsumapp.lendsum.workers.UploadImageToFirebaseStorageWorker
 import kotlinx.coroutines.flow.Flow
@@ -56,7 +58,7 @@ class EditProfileRepository @Inject constructor(
     }
 
     fun updateUserValueInFirestore(key: String, stringValue: String?, booleanValue: Boolean?){
-        val userDoc = firestoreDb.collection(GlobalConstants.FIRESTORE_USER_COLLECTION_PATH)
+        val userDoc = firestoreDb.collection(FIRESTORE_USER_COLLECTION_PATH)
             .document(firebaseAuth.currentUser?.uid.toString())
 
         stringValue?.let {
@@ -94,8 +96,13 @@ class EditProfileRepository @Inject constructor(
             .setConstraints(constraints)
             .build()
 
+        val retrieveRemoteImgUri = OneTimeWorkRequestBuilder<RetrieveRemoteImageUriWorker>()
+            .setInputData(createFileNameAndUriData(fileName, uri))
+            .setConstraints(constraints)
+            .build()
+
         WorkManager.getInstance().beginUniqueWork(PROF_IMAGE_STORAGE_WORK_NAME, ExistingWorkPolicy.REPLACE,
-            uploadImgToLocalData).then(uploadImgToFirebaseStorage).enqueue()
+            uploadImgToLocalData).then(uploadImgToFirebaseStorage).then(retrieveRemoteImgUri).enqueue()
     }
 
     private fun createFileNameAndUriData(fileName: String, uri: Uri): Data {
@@ -103,15 +110,6 @@ class EditProfileRepository @Inject constructor(
             .putString(UPLOAD_PROF_PIC_NAME_KEY,fileName)
             .putString(UPLOAD_PROF_PIC_URI_KEY, uri.toString())
             .build()
-    }
-
-    private fun updateProfPicUriInFirebaseDbs(profileImageRef: StorageReference) {
-        profileImageRef.downloadUrl.addOnSuccessListener {
-            updateFirebaseAuthProfile(FIRESTORE_PROFILE_PIC_URI_KEY, it.toString())
-            updateUserValueInFirestore(FIRESTORE_PROFILE_PIC_URI_KEY, it.toString(), null)
-        }.addOnFailureListener {
-            Log.d(TAG, "Prof pic url failed to download: $it")
-        }
     }
 
     companion object {
