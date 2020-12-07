@@ -19,6 +19,7 @@ import com.lendsumapp.lendsum.util.GlobalConstants.UPLOAD_PROF_PIC_URI_KEY
 import com.lendsumapp.lendsum.workers.RetrieveRemoteImageUriWorker
 import com.lendsumapp.lendsum.workers.UploadImageToDataDirectoryWorker
 import com.lendsumapp.lendsum.workers.UploadImageToFirebaseStorageWorker
+import com.lendsumapp.lendsum.workers.UploadImgUriToFirestoreWorker
 import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 
@@ -101,8 +102,12 @@ class EditProfileRepository @Inject constructor(
             .setConstraints(constraints)
             .build()
 
+        val uploadImgToFirestore = OneTimeWorkRequestBuilder<UploadImgUriToFirestoreWorker>()
+            .setConstraints(constraints)
+            .build()
+
         WorkManager.getInstance().beginUniqueWork(PROF_IMAGE_STORAGE_WORK_NAME, ExistingWorkPolicy.REPLACE,
-            uploadImgToLocalData).then(uploadImgToFirebaseStorage).then(retrieveRemoteImgUri).enqueue()
+            uploadImgToLocalData).then(uploadImgToFirebaseStorage).then(retrieveRemoteImgUri).then(uploadImgToFirestore).enqueue()
     }
 
     private fun createFileNameAndUriData(fileName: String, uri: Uri): Data {
