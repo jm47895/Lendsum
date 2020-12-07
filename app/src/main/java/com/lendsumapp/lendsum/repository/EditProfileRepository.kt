@@ -1,6 +1,5 @@
 package com.lendsumapp.lendsum.repository
 
-import android.content.Context
 import android.net.Uri
 import android.util.Log
 import androidx.lifecycle.MutableLiveData
@@ -13,12 +12,13 @@ import com.lendsumapp.lendsum.data.model.User
 import com.lendsumapp.lendsum.data.persistence.LendsumDatabase
 import com.lendsumapp.lendsum.util.GlobalConstants
 import com.lendsumapp.lendsum.util.GlobalConstants.FIRESTORE_PROFILE_PIC_URI_KEY
+import com.lendsumapp.lendsum.util.GlobalConstants.PROF_IMAGE_STORAGE_WORK_NAME
 import com.lendsumapp.lendsum.util.GlobalConstants.UPLOAD_PROF_PIC_NAME_KEY
 import com.lendsumapp.lendsum.util.GlobalConstants.UPLOAD_PROF_PIC_URI_KEY
-import com.lendsumapp.lendsum.workers.UploadImageWorker
+import com.lendsumapp.lendsum.workers.UploadImageToDataDirectoryWorker
+import com.lendsumapp.lendsum.workers.UploadImageToFirebaseStorageWorker
 import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
-import kotlin.coroutines.coroutineContext
 
 class EditProfileRepository @Inject constructor(
     private val lendsumDatabase: LendsumDatabase,
@@ -81,16 +81,21 @@ class EditProfileRepository @Inject constructor(
 
     }
 
-    fun launchUploadImageWorker(fileName: String, uri: Uri){
+    fun launchUploadImageWorkers(fileName: String, uri: Uri){
 
         val constraints = Constraints.Builder().setRequiredNetworkType(NetworkType.CONNECTED).build()
 
-        val workRequest = OneTimeWorkRequestBuilder<UploadImageWorker>()
+        val uploadImgToLocalData = OneTimeWorkRequestBuilder<UploadImageToDataDirectoryWorker>()
+            .setInputData(createFileNameAndUriData(fileName, uri))
+            .build()
+
+        val uploadImgToFirebaseStorage = OneTimeWorkRequestBuilder<UploadImageToFirebaseStorageWorker>()
             .setInputData(createFileNameAndUriData(fileName, uri))
             .setConstraints(constraints)
             .build()
 
-        WorkManager.getInstance().enqueue(workRequest)
+        WorkManager.getInstance().beginUniqueWork(PROF_IMAGE_STORAGE_WORK_NAME, ExistingWorkPolicy.REPLACE,
+            uploadImgToLocalData).then(uploadImgToFirebaseStorage).enqueue()
     }
 
     private fun createFileNameAndUriData(fileName: String, uri: Uri): Data {

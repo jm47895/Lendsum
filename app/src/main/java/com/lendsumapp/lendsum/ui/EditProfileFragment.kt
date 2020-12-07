@@ -25,7 +25,6 @@ import com.lendsumapp.lendsum.util.EditProfileInfoType
 import com.lendsumapp.lendsum.util.GlobalConstants.FIRESTORE_EMAIL_KEY
 import com.lendsumapp.lendsum.util.GlobalConstants.FIRESTORE_IS_PROFILE_PUBLIC_KEY
 import com.lendsumapp.lendsum.util.GlobalConstants.FIRESTORE_PROFILE_NAME_KEY
-import com.lendsumapp.lendsum.util.GlobalConstants.FIRESTORE_PROFILE_PIC_URI_KEY
 import com.lendsumapp.lendsum.util.GlobalConstants.FIRESTORE_USERNAME_KEY
 import com.lendsumapp.lendsum.viewmodel.EditProfileViewModel
 import dagger.hilt.android.AndroidEntryPoint
@@ -233,7 +232,7 @@ class EditProfileFragment : Fragment(), View.OnClickListener, CompoundButton.OnC
     }
 
     private fun uploadProfilePicToFirebaseStorage(uri: Uri) {
-        editProfileViewModel.uploadProfilePhotoToFirebaseStorage(uri)
+        editProfileViewModel.uploadProfilePhoto(uri)
     }
 
     private fun handleUpdateInfoUI(isChecked: Boolean, textView: TextView?, editText: EditText?, toggleButton: ToggleButton) {
