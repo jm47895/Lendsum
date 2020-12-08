@@ -26,6 +26,7 @@ import com.lendsumapp.lendsum.util.GlobalConstants.FIRESTORE_EMAIL_KEY
 import com.lendsumapp.lendsum.util.GlobalConstants.FIRESTORE_IS_PROFILE_PUBLIC_KEY
 import com.lendsumapp.lendsum.util.GlobalConstants.FIRESTORE_PROFILE_NAME_KEY
 import com.lendsumapp.lendsum.util.GlobalConstants.FIRESTORE_USERNAME_KEY
+import com.lendsumapp.lendsum.util.NetworkUtils
 import com.lendsumapp.lendsum.viewmodel.EditProfileViewModel
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -177,9 +178,14 @@ class EditProfileFragment : Fragment(), View.OnClickListener, CompoundButton.OnC
                 val password = binding.editProfilePasswordEt.text.toString().trim()
                 val passwordMatch = binding.editProfileMatchPasswordEt.text.toString().trim()
 
-                if(isPasswordValidated(password, passwordMatch)){
-                    editProfileViewModel.getUpdateAuthPassStatus().observe(viewLifecycleOwner, updateAuthPassStatusObserver)
-                    editProfileViewModel.updateAuthPass(password)
+                if(NetworkUtils.isNetworkAvailable(requireContext())) {
+                    if (isPasswordValidated(password, passwordMatch)) {
+                        editProfileViewModel.getUpdateAuthPassStatus()
+                            .observe(viewLifecycleOwner, updateAuthPassStatusObserver)
+                        editProfileViewModel.updateAuthPass(password)
+                    }
+                }else{
+                    AndroidUtils.showSnackBar(requireActivity(), getString(R.string.not_connected_internet))
                 }
             }
             R.id.edit_profile_back_btn -> {
