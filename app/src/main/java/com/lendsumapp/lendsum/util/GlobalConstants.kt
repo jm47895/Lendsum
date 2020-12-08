@@ -36,6 +36,8 @@ object GlobalConstants {
     const val UPLOAD_PROF_PIC_NAME_KEY = "profile_pic_file_name"
     const val UPLOAD_PROF_PIC_URI_KEY = "profile_pic_uri"
     const val PROF_IMAGE_STORAGE_WORK_NAME = "upload_profile_image"
+    const val FIRESTORE_USER_WORKER_MAP_KEY = "firestore_user_key"
+    const val FIRESTORE_USER_WORKER_MAP_VALUE = "firestore_user_value"
 
     /*Lendsum files constants*/
     const val LENDSUM_PROFILE_PIC_DIR_PATH = "lendsum_images/profile_images"

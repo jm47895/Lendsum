@@ -6,20 +6,16 @@ import androidx.lifecycle.MutableLiveData
 import androidx.work.*
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
-import com.google.firebase.storage.StorageReference
 import com.lendsumapp.lendsum.auth.EmailAndPassAuthComponent
 import com.lendsumapp.lendsum.data.model.User
 import com.lendsumapp.lendsum.data.persistence.LendsumDatabase
-import com.lendsumapp.lendsum.util.GlobalConstants
-import com.lendsumapp.lendsum.util.GlobalConstants.FIRESTORE_PROFILE_PIC_URI_KEY
 import com.lendsumapp.lendsum.util.GlobalConstants.FIRESTORE_USER_COLLECTION_PATH
+import com.lendsumapp.lendsum.util.GlobalConstants.FIRESTORE_USER_WORKER_MAP_KEY
+import com.lendsumapp.lendsum.util.GlobalConstants.FIRESTORE_USER_WORKER_MAP_VALUE
 import com.lendsumapp.lendsum.util.GlobalConstants.PROF_IMAGE_STORAGE_WORK_NAME
 import com.lendsumapp.lendsum.util.GlobalConstants.UPLOAD_PROF_PIC_NAME_KEY
 import com.lendsumapp.lendsum.util.GlobalConstants.UPLOAD_PROF_PIC_URI_KEY
-import com.lendsumapp.lendsum.workers.RetrieveRemoteImageUriWorker
-import com.lendsumapp.lendsum.workers.UploadImageToDataDirectoryWorker
-import com.lendsumapp.lendsum.workers.UploadImageToFirebaseStorageWorker
-import com.lendsumapp.lendsum.workers.UploadImgUriToFirestoreWorker
+import com.lendsumapp.lendsum.workers.*
 import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 
@@ -29,6 +25,7 @@ class EditProfileRepository @Inject constructor(
     private val firestoreDb: FirebaseFirestore,
     private val firebaseAuth: FirebaseAuth,
 ){
+    val constraints = Constraints.Builder().setRequiredNetworkType(NetworkType.CONNECTED).build()
 
     fun getCachedUser(userId:String): Flow<User> {
         return lendsumDatabase.getUserDao().getUser(userId)
@@ -58,35 +55,30 @@ class EditProfileRepository @Inject constructor(
         emailAndPassAuthComponent.updateFirebaseAuthProfile(key, value)
     }
 
-    fun updateUserValueInFirestore(key: String, stringValue: String?, booleanValue: Boolean?){
-        val userDoc = firestoreDb.collection(FIRESTORE_USER_COLLECTION_PATH)
-            .document(firebaseAuth.currentUser?.uid.toString())
+    fun launchUpdateFirestoreUserValueWorker(key: String, value: Any){
 
-        stringValue?.let {
-            userDoc.update(key, it).addOnCompleteListener { task->
-                if(task.isSuccessful){
-                    Log.d(TAG, "$key updated in firestore")
-                }else{
-                    Log.d(TAG, "$key failed to update in firestore")
-                }
-            }
+        val updateUserValueInFirestore = OneTimeWorkRequestBuilder<UpdateUserValueInFirestoreWorker>()
+            .setConstraints(constraints)
+            .setInputData(createUpdateUserFirestoreData(key, value))
+            .build()
+
+        WorkManager.getInstance().enqueue(updateUserValueInFirestore)
+    }
+
+    private fun createUpdateUserFirestoreData(key: String, value: Any): Data {
+
+        val dataBuilder = Data.Builder().putString(FIRESTORE_USER_WORKER_MAP_KEY, key)
+
+        if (value is Boolean){
+            dataBuilder.putBoolean(FIRESTORE_USER_WORKER_MAP_VALUE, value)
+        }else if(value is String){
+            dataBuilder.putString(FIRESTORE_USER_WORKER_MAP_VALUE, value)
         }
 
-        booleanValue?.let {
-            userDoc.update(key, it).addOnCompleteListener { task->
-                if(task.isSuccessful){
-                    Log.d(TAG, "$key updated in firestore")
-                }else{
-                    Log.d(TAG, "$key failed to update in firestore")
-                }
-            }
-        }
-
+        return dataBuilder.build()
     }
 
     fun launchUploadImageWorkers(fileName: String, uri: Uri){
-
-        val constraints = Constraints.Builder().setRequiredNetworkType(NetworkType.CONNECTED).build()
 
         val uploadImgToLocalData = OneTimeWorkRequestBuilder<UploadImageToDataDirectoryWorker>()
             .setInputData(createFileNameAndUriData(fileName, uri))
