@@ -4,6 +4,7 @@ import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import androidx.lifecycle.MutableLiveData
+import androidx.work.*
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.auth.PhoneAuthCredential
@@ -12,6 +13,10 @@ import com.lendsumapp.lendsum.auth.EmailAndPassAuthComponent
 import com.lendsumapp.lendsum.auth.FacebookAuthComponent
 import com.lendsumapp.lendsum.auth.GoogleAuthComponent
 import com.lendsumapp.lendsum.auth.PhoneAuthComponent
+import com.lendsumapp.lendsum.util.GlobalConstants
+import com.lendsumapp.lendsum.util.GlobalConstants.FIREBASE_AUTH_UPDATE_MAP_KEY
+import com.lendsumapp.lendsum.util.GlobalConstants.FIREBASE_AUTH_UPDATE_MAP_VALUE
+import com.lendsumapp.lendsum.workers.UpdateFirebaseAuthProfileWorker
 import dagger.hilt.android.scopes.ActivityScoped
 import javax.inject.Inject
 
@@ -63,8 +68,22 @@ class LoginRepository @Inject constructor(
         emailAndPassAuthComponent.registerWithEmailAndPassword(email, password)
     }
 
-    fun updateCreateAccountAuthProfile(key: String, value: String) {
-        emailAndPassAuthComponent.updateFirebaseAuthProfile(key, value)
+    fun launchUpdateFirebaseAuthProfileWorker(key: String, value: String) {
+
+        val constraints = Constraints.Builder().setRequiredNetworkType(NetworkType.CONNECTED).build()
+        val updateFirebaseAuthProfile = OneTimeWorkRequestBuilder<UpdateFirebaseAuthProfileWorker>()
+            .setConstraints(constraints)
+            .setInputData(createFirebaseAuthData(key, value))
+            .build()
+
+        WorkManager.getInstance().enqueue(updateFirebaseAuthProfile)
+    }
+
+    private fun createFirebaseAuthData(key: String, value: String): Data {
+        return Data.Builder()
+            .putString(FIREBASE_AUTH_UPDATE_MAP_KEY,key)
+            .putString(FIREBASE_AUTH_UPDATE_MAP_VALUE, value)
+            .build()
     }
 
     fun signInWithEmailAndPass(email: String, password: String){

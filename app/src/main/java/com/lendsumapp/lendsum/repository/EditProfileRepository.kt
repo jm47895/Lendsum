@@ -9,6 +9,8 @@ import com.google.firebase.firestore.FirebaseFirestore
 import com.lendsumapp.lendsum.auth.EmailAndPassAuthComponent
 import com.lendsumapp.lendsum.data.model.User
 import com.lendsumapp.lendsum.data.persistence.LendsumDatabase
+import com.lendsumapp.lendsum.util.GlobalConstants.FIREBASE_AUTH_UPDATE_MAP_KEY
+import com.lendsumapp.lendsum.util.GlobalConstants.FIREBASE_AUTH_UPDATE_MAP_VALUE
 import com.lendsumapp.lendsum.util.GlobalConstants.FIRESTORE_USER_COLLECTION_PATH
 import com.lendsumapp.lendsum.util.GlobalConstants.FIRESTORE_USER_WORKER_MAP_KEY
 import com.lendsumapp.lendsum.util.GlobalConstants.FIRESTORE_USER_WORKER_MAP_VALUE
@@ -21,9 +23,7 @@ import javax.inject.Inject
 
 class EditProfileRepository @Inject constructor(
     private val lendsumDatabase: LendsumDatabase,
-    private val emailAndPassAuthComponent: EmailAndPassAuthComponent,
-    private val firestoreDb: FirebaseFirestore,
-    private val firebaseAuth: FirebaseAuth,
+    private val emailAndPassAuthComponent: EmailAndPassAuthComponent
 ){
     val constraints = Constraints.Builder().setRequiredNetworkType(NetworkType.CONNECTED).build()
 
@@ -52,7 +52,19 @@ class EditProfileRepository @Inject constructor(
     }
 
     fun updateFirebaseAuthProfile(key: String, value: String){
-        emailAndPassAuthComponent.updateFirebaseAuthProfile(key, value)
+        val updateFirebaseAuthProfile = OneTimeWorkRequestBuilder<UpdateFirebaseAuthProfileWorker>()
+            .setConstraints(constraints)
+            .setInputData(createFirebaseAuthData(key, value))
+            .build()
+
+        WorkManager.getInstance().enqueue(updateFirebaseAuthProfile)
+    }
+
+    private fun createFirebaseAuthData(key: String, value: String): Data {
+        return Data.Builder()
+            .putString(FIREBASE_AUTH_UPDATE_MAP_KEY,key)
+            .putString(FIREBASE_AUTH_UPDATE_MAP_VALUE, value)
+            .build()
     }
 
     fun launchUpdateFirestoreUserValueWorker(key: String, value: Any){

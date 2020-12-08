@@ -1,9 +1,12 @@
 package com.lendsumapp.lendsum.auth
 
+import android.net.Uri
 import android.util.Log
 import androidx.core.net.toUri
 import androidx.lifecycle.MutableLiveData
+import androidx.work.Data
 import com.google.firebase.auth.*
+import com.lendsumapp.lendsum.util.GlobalConstants
 import com.lendsumapp.lendsum.util.GlobalConstants.FIRESTORE_PROFILE_NAME_KEY
 import com.lendsumapp.lendsum.util.GlobalConstants.FIRESTORE_PROFILE_PIC_URI_KEY
 import javax.inject.Inject
@@ -86,31 +89,6 @@ class EmailAndPassAuthComponent @Inject constructor(){
                  Log.d(TAG, "Password failed to update " + task.exception)
                  updateAuthPassStatus.postValue(false)
              }
-        }
-    }
-
-    fun updateFirebaseAuthProfile(key: String, value: String){
-        val currentUser = firebaseAuth.currentUser
-
-        val profileUpdates: UserProfileChangeRequest? = when(key){
-            FIRESTORE_PROFILE_NAME_KEY ->{
-                UserProfileChangeRequest.Builder().setDisplayName(value).build()
-            }
-            FIRESTORE_PROFILE_PIC_URI_KEY ->{
-                UserProfileChangeRequest.Builder().setPhotoUri(value.toUri()).build()
-            }
-            else-> null
-        }
-
-
-        profileUpdates?.let {
-            currentUser?.updateProfile(it)?.addOnCompleteListener { task->
-                if(task.isSuccessful){
-                    Log.d(TAG, "Firebase auth $key updated")
-                }else{
-                    Log.d(TAG, "Firebase auth failed to update $key.")
-                }
-            }
         }
     }
 

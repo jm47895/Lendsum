@@ -46,8 +46,8 @@ class CreateAccountViewModel @ViewModelInject constructor(
         return loginRepository.getEmailCreateAccountStatus()
     }
 
-    fun updateCreateAccountAuthProfile(key: String, value: String){
-        loginRepository.updateCreateAccountAuthProfile(key, value)
+    fun updateFirebaseAuthProfile(key: String, value: String){
+        loginRepository.launchUpdateFirebaseAuthProfileWorker(key, value)
     }
 
     fun getLinkWithCredentialStatus(): MutableLiveData<Boolean> {

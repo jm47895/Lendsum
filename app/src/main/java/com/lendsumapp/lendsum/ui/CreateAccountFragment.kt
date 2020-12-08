@@ -65,11 +65,17 @@ class CreateAccountFragment : Fragment(), View.OnClickListener {
         emailCreateAccountObserver = Observer { isCreateEmailAccountSuccessful ->
 
             if (isCreateEmailAccountSuccessful){
+
                 sharedPrefs?.edit()?.putInt(NAV_SIGN_UP_TYPE, NavSignUpType.EMAIL_LOGIN.ordinal)?.apply()
+
                 val displayName = binding.createUserFirstNameEt.text.toString().trim() + " " + binding.createUserLastNameEt.text.toString().trim()
-                createAccountViewModel.updateCreateAccountAuthProfile(FIRESTORE_PROFILE_NAME_KEY, displayName)
+
+                createAccountViewModel.updateFirebaseAuthProfile(FIRESTORE_PROFILE_NAME_KEY, displayName)
+
                 clearEditTextFocus()
+
                 Log.d(TAG, "Email create account success")
+
                 findNavController(this).navigate(R.id.action_createAccountFragment_to_numberVerificationFragment)
             }else{
                 Log.d(TAG, "Email sign up failure")
