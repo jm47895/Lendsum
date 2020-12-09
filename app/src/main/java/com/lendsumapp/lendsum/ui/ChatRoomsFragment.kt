@@ -38,7 +38,7 @@ class ChatRoomsFragment : Fragment(), View.OnClickListener, ChatRoomListAdapter.
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
         _binding = FragmentChatRoomsBinding.inflate(inflater, container, false)
         return binding.root
     }

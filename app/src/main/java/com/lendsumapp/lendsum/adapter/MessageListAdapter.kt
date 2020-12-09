@@ -1,6 +1,7 @@
 package com.lendsumapp.lendsum.adapter
 
 import android.graphics.Color
+import android.net.Uri
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -11,17 +12,16 @@ import com.bumptech.glide.Glide
 import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.bumptech.glide.request.RequestOptions
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.ktx.Firebase
-import com.google.firebase.storage.ktx.storage
 import com.lendsumapp.lendsum.R
 import com.lendsumapp.lendsum.data.model.Message
 import com.lendsumapp.lendsum.databinding.MessageListItemBinding
 import com.lendsumapp.lendsum.util.AndroidUtils
 
 
-class MessageListAdapter(private val interaction: Interaction? = null) :
+class MessageListAdapter(private val interaction: Interaction? = null, profPicUri: String) :
     RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
+    val uri = profPicUri
     private val diffCallback = object : DiffUtil.ItemCallback<Message>() {
 
         override fun areItemsTheSame(oldItem: Message, newItem: Message): Boolean {
@@ -37,7 +37,7 @@ class MessageListAdapter(private val interaction: Interaction? = null) :
 
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
-        return MessageViewHolder(LayoutInflater.from(parent.context).inflate(R.layout.message_list_item, parent, false), interaction)
+        return MessageViewHolder(LayoutInflater.from(parent.context).inflate(R.layout.message_list_item, parent, false), interaction, uri)
     }
 
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
@@ -63,9 +63,9 @@ class MessageListAdapter(private val interaction: Interaction? = null) :
         return list.size
     }
 
-    class MessageViewHolder constructor(itemView: View, private val interaction: Interaction?
-    ) : RecyclerView.ViewHolder(itemView) {
+    class MessageViewHolder constructor(itemView: View, private val interaction: Interaction?, profPicUri: String) : RecyclerView.ViewHolder(itemView) {
 
+        val uri = profPicUri
         private val firebaseUser = FirebaseAuth.getInstance().currentUser
         private val binding = MessageListItemBinding.bind(itemView)
 
@@ -110,7 +110,7 @@ class MessageListAdapter(private val interaction: Interaction? = null) :
                                 .error(R.drawable.com_facebook_profile_picture_blank_portrait)
                                 .circleCrop()
                         )
-                        .load(item.senderPicUri)
+                        .load(uri)
                         .circleCrop()
                         .into(binding.messageGuestPic)
                 }

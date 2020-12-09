@@ -89,10 +89,16 @@ class MessagesFragment : Fragment(), View.OnClickListener,
 
             setCacheMessageObserver(currentChatRoom?.chatRoomId.toString())
 
+            val uid = firebaseAuth.currentUser?.uid.toString()
+            val users = currentChatRoom?.participants!!
+            for(user in users){
+                if(user.userId != uid){
+                    guestUser = user
+                }
+            }
+
             initRecyclerView(MESSAGE_RECYCLER_VIEW)
 
-
-            val users = currentChatRoom?.participants!!
             handleMessageUi(users)
 
             binding.chatMessageList.visibility = View.VISIBLE
@@ -109,12 +115,6 @@ class MessagesFragment : Fragment(), View.OnClickListener,
             userSearchListAdapter.submitList(userList)
 
         }
-
-        listOfImageUriObserver = Observer {
-            currentListOfImgUris = it
-            Log.d(TAG, it.toString())
-        }
-        messagesViewModel.getCurrentListOfImgUris().observe(viewLifecycleOwner, listOfImageUriObserver)
     }
 
     override fun onDestroyView() {
@@ -142,7 +142,7 @@ class MessagesFragment : Fragment(), View.OnClickListener,
             }
             MESSAGE_RECYCLER_VIEW->{
 
-                messageListAdapter = MessageListAdapter(this@MessagesFragment)
+                messageListAdapter = MessageListAdapter(this@MessagesFragment, guestUser.profilePicUri!!)
 
                 binding.chatMessageList.layoutManager = LinearLayoutManager(context).apply {
                     stackFromEnd = true
@@ -217,7 +217,7 @@ class MessagesFragment : Fragment(), View.OnClickListener,
         //TODO Eventually allow offline edits. Currently it is coded to only show in the UI when online
         if(NetworkUtils.isNetworkAvailable(requireContext())){
             val timeStamp = AndroidUtils.getTimestampInstant()
-            val newMessage = Message(timeStamp, chatRoom.chatRoomId, firebaseAuth.currentUser?.uid.toString(), hostUser.profilePicUri, msg, currentListOfImgUris)
+            val newMessage = Message(timeStamp, chatRoom.chatRoomId, firebaseAuth.currentUser?.uid.toString(), msg, currentListOfImgUris)
             binding.messagesSendMsgEt.text?.clear()
 
             currentListOfImgUris?.let {
@@ -276,7 +276,7 @@ class MessagesFragment : Fragment(), View.OnClickListener,
 
             currentChatRoom = newChatRoom
         }else{
-            AndroidUtils.showSnackBar(requireActivity(), "You must be connected to the internet to do this.")
+            AndroidUtils.showSnackBar(requireActivity(), getString(R.string.not_connected_internet))
         }
     }
 
