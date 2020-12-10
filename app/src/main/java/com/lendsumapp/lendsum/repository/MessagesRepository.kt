@@ -39,6 +39,10 @@ class MessagesRepository @Inject constructor(
         return lendsumDatabase.getChatMessageDao().getChatRoomMessages(chatRoomId)
     }
 
+    fun getCurrentChatRoom(chatRoomId: String): Flow<ChatRoom>{
+        return lendsumDatabase.getChatRoomDao().getChatRoom(chatRoomId)
+    }
+
     fun findUserInFirestore(username: String){
         firestoreDb.collection(FIRESTORE_USER_COLLECTION_PATH).whereEqualTo(FIRESTORE_IS_PROFILE_PUBLIC_KEY, true).orderBy(
             FIRESTORE_USERNAME_KEY).startAt( "@$username").endAt("$username\uf8ff").limit(3).get()

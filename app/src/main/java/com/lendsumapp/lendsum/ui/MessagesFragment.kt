@@ -258,11 +258,10 @@ class MessagesFragment : Fragment(), View.OnClickListener,
 
     private fun createNewChatRoom(msg: String) {
         if(NetworkUtils.isNetworkAvailable(requireContext())){
-            val guestId = guestUser.userId
-            val hostId = hostUser.userId
-            val idList = listOf(guestId, hostId).sorted()
-            val chatRoomId = idList[0].substring(0, 5) + idList[1].substring(0, 5)
+
+            val chatRoomId = formChatId()
             val chatRoomUserList = listOf(guestUser, hostUser)
+            val idList = listOf(guestUser.userId, hostUser.userId)
 
             val newChatRoom = ChatRoom(chatRoomId, chatRoomUserList, msg, AndroidUtils.getTimestampInstant())
 
@@ -280,13 +279,28 @@ class MessagesFragment : Fragment(), View.OnClickListener,
         }
     }
 
+    private fun formChatId(): String{
+        val guestId = guestUser.userId
+        val hostId = hostUser.userId
+        val sortedIdList = listOf(guestId, hostId).sorted()
+
+        return sortedIdList[0].substring(0, 5) + sortedIdList[1].substring(0, 5)
+    }
+
     override fun onUserItemSelected(position: Int, item: User) {
 
         guestUser = item
 
+        initRecyclerView(MESSAGE_RECYCLER_VIEW)
+
+        val chatRoomId = formChatId()
+        messagesViewModel.getCurrentChatRoom(chatRoomId).observe(viewLifecycleOwner, Observer {
+            currentChatRoom = it
+        })
+        setCacheMessageObserver(chatRoomId)
+
         val newParticipant = listOf(item)
 
-        initRecyclerView(MESSAGE_RECYCLER_VIEW)
         handleMessageUi(newParticipant)
 
         binding.chatMessageList.visibility = View.VISIBLE

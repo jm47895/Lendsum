@@ -18,4 +18,7 @@ interface ChatRoomDao {
 
     @Query("SELECT * FROM chat_rooms ORDER BY lastTimestamp DESC")
     fun getAllChatRooms(): Flow<List<ChatRoom>>
+
+    @Query("SELECT * FROM chat_rooms WHERE chatRoomId = :chatRoomId")
+    fun getChatRoom(chatRoomId: String): Flow<ChatRoom>
 }

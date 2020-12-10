@@ -33,6 +33,10 @@ class MessagesViewModel @ViewModelInject constructor(
        return messagesRepository.getCurrentMessages(chatRoomId).asLiveData()
     }
 
+    fun getCurrentChatRoom(chatRoomId: String): LiveData<ChatRoom>{
+        return messagesRepository.getCurrentChatRoom(chatRoomId).asLiveData()
+    }
+
     fun findUserInRemoteDb(name: String){
         viewModelScope.launch(Dispatchers.IO) {
             messagesRepository.findUserInFirestore(name)
