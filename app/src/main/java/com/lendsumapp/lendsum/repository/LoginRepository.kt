@@ -46,12 +46,8 @@ class LoginRepository @Inject constructor(
         return googleAuthComponent.getGoogleSignInIntent()
     }
 
-    fun handleGoogleSignInIntent(resultCode:Int, data: Intent){
-        googleAuthComponent.handleGoogleSignInIntent(resultCode, data)
-    }
-
-    fun getGoogleRequestCode(): Int{
-        return googleAuthComponent.getGoogleAuthRequestCode()
+    fun handleGoogleSignInIntent(data: Intent){
+        googleAuthComponent.handleGoogleSignInIntent(data)
     }
 
     fun logOutOfGoogle(){

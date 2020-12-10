@@ -33,14 +33,10 @@ class LoginViewModel @ViewModelInject constructor(
         return loginRepository.sendGoogleSignInIntent()
     }
 
-    fun handleGoogleSignInIntent(resultCode: Int, data: Intent){
+    fun handleGoogleSignInIntent(data: Intent){
         viewModelScope.launch(Dispatchers.IO) {
-            loginRepository.handleGoogleSignInIntent(resultCode, data)
+            loginRepository.handleGoogleSignInIntent(data)
         }
-    }
-
-    fun getGoogleAuthCode(): Int{
-        return loginRepository.getGoogleRequestCode()
     }
 
     fun getGoogleLoginState():MutableLiveData<Boolean>{

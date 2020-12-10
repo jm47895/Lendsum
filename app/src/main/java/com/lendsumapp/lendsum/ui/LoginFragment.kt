@@ -8,14 +8,15 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import androidx.navigation.fragment.findNavController
-import com.facebook.login.LoginManager
 import com.lendsumapp.lendsum.R
 import com.lendsumapp.lendsum.databinding.FragmentLoginBinding
 import com.lendsumapp.lendsum.util.AndroidUtils
+import com.lendsumapp.lendsum.util.AndroidUtils.Companion.editSharedPrefs
 import com.lendsumapp.lendsum.util.GlobalConstants.NAV_SIGN_UP_TYPE
 import com.lendsumapp.lendsum.util.GlobalConstants.RETURNING_USER
 import com.lendsumapp.lendsum.util.NavSignUpType
@@ -29,16 +30,22 @@ class LoginFragment : Fragment(), View.OnClickListener{
 
     private var _binding: FragmentLoginBinding? = null
     private val binding get() =  _binding!!
-    private val sharedPrefs by lazy { activity?.getSharedPreferences(R.string.app_name.toString(), Context.MODE_PRIVATE) }
+    private val sharedPrefs by lazy { requireActivity().getSharedPreferences(R.string.app_name.toString(), Context.MODE_PRIVATE) }
     private val loginViewModel: LoginViewModel by viewModels()
     private lateinit var emailSignInObserver: Observer<Boolean>
     private lateinit var googleAuthObserver: Observer<Boolean>
     private lateinit var facebookAuthObserver: Observer<Boolean>
+    private val registerGoogleActivityResult = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result->
+        result.data?.let { loginViewModel.handleGoogleSignInIntent(it) }
+    }
+    private val registerFacebookActivityResult = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
+
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
         _binding = FragmentLoginBinding.inflate(inflater, container, false)
         return binding.root
     }
@@ -47,9 +54,9 @@ class LoginFragment : Fragment(), View.OnClickListener{
         super.onViewCreated(view, savedInstanceState)
 
         val firebaseUser = loginViewModel.getFirebaseUser()
+        val isReturningUser = sharedPrefs.getBoolean(RETURNING_USER, false)
 
-        if(firebaseUser != null
-            && sharedPrefs?.getBoolean(RETURNING_USER, false) == true){
+        if(firebaseUser != null && isReturningUser){
             findNavController().navigate(R.id.action_loginFragment_to_marketplaceFragment)
         }
 
@@ -61,9 +68,9 @@ class LoginFragment : Fragment(), View.OnClickListener{
 
         emailSignInObserver = Observer { isLoginSuccessful ->
             if (isLoginSuccessful){
-                clearEditTextsFocusToPreventNavigationLeaks()
                 Log.d(TAG, "Email login success")
-                sharedPrefs?.edit()?.putBoolean(RETURNING_USER, true)?.apply()
+                clearEditTextsFocusToPreventNavigationLeaks()
+                editSharedPrefs(sharedPrefs, RETURNING_USER, true)
                 findNavController().navigate(R.id.action_loginFragment_to_numberVerificationFragment)
             }else{
                 Log.d(TAG, "Email login failed")
@@ -74,7 +81,7 @@ class LoginFragment : Fragment(), View.OnClickListener{
 
         googleAuthObserver = Observer{ isGoogleLoginSuccessful ->
             if(isGoogleLoginSuccessful){
-                sharedPrefs?.edit()?.putInt(NAV_SIGN_UP_TYPE, NavSignUpType.GOOGLE_LOGIN.ordinal)?.apply()
+                editSharedPrefs(sharedPrefs, NAV_SIGN_UP_TYPE, NavSignUpType.GOOGLE_LOGIN.ordinal)
                 findNavController().navigate(R.id.action_loginFragment_to_createAccountFragment)
                 Log.d(TAG, "Google Auth Observer Success")
             }else{
@@ -84,7 +91,7 @@ class LoginFragment : Fragment(), View.OnClickListener{
 
         facebookAuthObserver = Observer{ isFacebookLoginSuccessful ->
             if (isFacebookLoginSuccessful){
-                sharedPrefs?.edit()?.putInt(NAV_SIGN_UP_TYPE, NavSignUpType.FACEBOOK_LOGIN.ordinal)?.apply()
+                editSharedPrefs(sharedPrefs, NAV_SIGN_UP_TYPE, NavSignUpType.FACEBOOK_LOGIN.ordinal)
                 findNavController().navigate(R.id.action_loginFragment_to_createAccountFragment)
                 Log.d(TAG, "Facebook Auth Observer Success")
             }else{
@@ -94,7 +101,7 @@ class LoginFragment : Fragment(), View.OnClickListener{
     }
 
     private fun clearEditTextsFocusToPreventNavigationLeaks() {
-        /*The fact that I have to do this is sad. You would data binding would take care of
+        /*The fact that I have to do this is sad. You would think view binding would take care of
         * this, but alas it doesn't. This is happening due to the garbage collector not being
         * to collect the edit text after navigation*/
         binding.loginEmailEt.clearFocus()
@@ -108,8 +115,6 @@ class LoginFragment : Fragment(), View.OnClickListener{
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
-
-        data?.let { loginViewModel.handleGoogleSignInIntent(requestCode, it) }
 
         data?.let{ loginViewModel.handleFacebookSignInIntent(requestCode, resultCode, it)}
 
@@ -133,24 +138,20 @@ class LoginFragment : Fragment(), View.OnClickListener{
 
                     if (!TextUtils.isEmpty(signInEmail) && !TextUtils.isEmpty(signInPassword)) {
                         loginViewModel.signInWithEmailAndPass(signInEmail, signInPassword)
-                        sharedPrefs?.edit()?.putInt(NAV_SIGN_UP_TYPE, NavSignUpType.EMAIL_LOGIN.ordinal)?.apply()
+                        editSharedPrefs(sharedPrefs, NAV_SIGN_UP_TYPE, NavSignUpType.EMAIL_LOGIN.ordinal)
                     } else {
                         binding.loginEmailEt.error = getString(R.string.email_or_pass_wrong)
                         binding.loginPasswordEt.error = getString(R.string.email_or_pass_wrong)
                     }
                 }
                 R.id.login_sign_up_email_btn -> {
-                    sharedPrefs?.edit()?.putInt(NAV_SIGN_UP_TYPE, NavSignUpType.EMAIL_LOGIN.ordinal)
-                        ?.apply()
+                    editSharedPrefs(sharedPrefs, NAV_SIGN_UP_TYPE, NavSignUpType.EMAIL_LOGIN.ordinal)
                     action = R.id.action_loginFragment_to_createAccountFragment
                 }
                 R.id.login_sign_in_with_google -> {
                     loginViewModel.getGoogleLoginState().observe(viewLifecycleOwner, googleAuthObserver)
                     loginViewModel.configureGoogleAuth()
-                    startActivityForResult(
-                        loginViewModel.getGoogleAuthIntent(),
-                        loginViewModel.getGoogleAuthCode()
-                    )
+                    registerGoogleActivityResult.launch(loginViewModel.getGoogleAuthIntent())
                 }
                 R.id.login_sign_in_with_facebook -> {
                     /*loginViewModel.getFacebookAuthState().observe(viewLifecycleOwner, facebookAuthObserver)

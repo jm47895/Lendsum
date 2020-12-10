@@ -1,12 +1,15 @@
 package com.lendsumapp.lendsum.util
 
 import android.app.Activity
+import android.content.Context
+import android.content.SharedPreferences
 import android.os.Build
 import android.text.TextUtils
 import android.util.Patterns
 import android.view.View
 import android.view.inputmethod.InputMethodManager
 import androidx.core.content.ContextCompat
+import androidx.core.content.edit
 import com.google.android.material.snackbar.Snackbar
 import com.lendsumapp.lendsum.R
 import com.lendsumapp.lendsum.util.GlobalConstants.PASSWORD_PATTERN
@@ -80,6 +83,16 @@ class AndroidUtils{
             val formattedDate = DateFormat.getDateInstance(DateFormat.MEDIUM).format(timeStamp)
 
             return formattedDate.substring(0, formattedDate.indexOf(","))
+        }
+
+        fun editSharedPrefs(sharedPrefs: SharedPreferences, key: String, value: Any){
+            when(value){
+                is String -> sharedPrefs.edit{ putString(key, value) }
+                is Boolean -> sharedPrefs.edit{ putBoolean(key, value) }
+                is Int -> sharedPrefs.edit{ putInt(key, value) }
+                is Float -> sharedPrefs.edit{ putFloat(key, value)}
+                is Long -> sharedPrefs.edit{ putLong(key, value)}
+            }
         }
     }
 }

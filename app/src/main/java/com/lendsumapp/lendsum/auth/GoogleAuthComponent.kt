@@ -43,23 +43,17 @@ class GoogleAuthComponent @Inject constructor(){
         googleSignInClient.signOut()
     }
 
-    fun getGoogleAuthRequestCode(): Int{
-        return RC_SIGN_IN
-    }
+    fun handleGoogleSignInIntent(data: Intent){
 
-    fun handleGoogleSignInIntent(requestCode: Int, data: Intent){
-        if (requestCode == RC_SIGN_IN){
-            val task = GoogleSignIn.getSignedInAccountFromIntent(data)
-            try {
-                val account = task.getResult(ApiException::class.java)!!
-                Log.d(TAG, "FirebaseAuthWithGoogle:" + account.id)
-                authenticateCredentials(account.idToken!!)
-            }catch (e: ApiException){
-                Log.d(TAG, "Firebase Login failed", e)
-            }
-        }else{
-            Log.d(TAG, "Request code not equal")
+        val task = GoogleSignIn.getSignedInAccountFromIntent(data)
+        try {
+            val account = task.getResult(ApiException::class.java)!!
+            Log.d(TAG, "FirebaseAuthWithGoogle:" + account.id)
+            authenticateCredentials(account.idToken!!)
+        }catch (e: ApiException){
+            Log.d(TAG, "Firebase Login failed", e)
         }
+
     }
 
     private fun authenticateCredentials(idToken: String){
@@ -85,7 +79,6 @@ class GoogleAuthComponent @Inject constructor(){
     }
 
     companion object{
-        private const val RC_SIGN_IN = 9000
         private val TAG = GoogleAuthComponent::class.simpleName
     }
 
