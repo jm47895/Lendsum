@@ -13,6 +13,7 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import androidx.navigation.fragment.findNavController
+import com.facebook.login.LoginManager
 import com.lendsumapp.lendsum.R
 import com.lendsumapp.lendsum.databinding.FragmentLoginBinding
 import com.lendsumapp.lendsum.util.AndroidUtils
@@ -37,9 +38,6 @@ class LoginFragment : Fragment(), View.OnClickListener{
     private lateinit var facebookAuthObserver: Observer<Boolean>
     private val registerGoogleActivityResult = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result->
         result.data?.let { loginViewModel.handleGoogleSignInIntent(it) }
-    }
-    private val registerFacebookActivityResult = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
-
     }
 
     override fun onCreateView(
@@ -113,12 +111,13 @@ class LoginFragment : Fragment(), View.OnClickListener{
         _binding = null
     }
 
+    /*No way to refactor because of Facebook Login. See message below*/
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
 
+        /*Facebook sdk currently doesn't have a way to use the new registerActivityResult due to
+        * not having access to the Intent being sent, which is required to launch the registerActivityResult.*/
         data?.let{ loginViewModel.handleFacebookSignInIntent(requestCode, resultCode, it)}
-
-
     }
 
     override fun onClick(view: View?) {
@@ -154,12 +153,9 @@ class LoginFragment : Fragment(), View.OnClickListener{
                     registerGoogleActivityResult.launch(loginViewModel.getGoogleAuthIntent())
                 }
                 R.id.login_sign_in_with_facebook -> {
-                    /*loginViewModel.getFacebookAuthState().observe(viewLifecycleOwner, facebookAuthObserver)
-                    LoginManager.getInstance().logInWithReadPermissions(
-                        this,
-                        listOf("user_photos", "email", "user_birthday", "public_profile")
-                    )
-                    loginViewModel.sendFacebookIntent()*/
+                    loginViewModel.getFacebookAuthState().observe(viewLifecycleOwner, facebookAuthObserver)
+                    LoginManager.getInstance().logInWithReadPermissions(this, listOf("user_photos", "email", "user_birthday", "public_profile"))
+                    loginViewModel.sendFacebookIntent()
                 }
             }
 
