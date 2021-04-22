@@ -119,7 +119,8 @@
         app:layout_constraintBottom_toBottomOf="@+id/messages_send_msg_et"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="@+id/messages_send_msg_et"
-        app:layout_constraintEnd_toStartOf="@id/messages_send_msg_et"/>
+        app:layout_constraintEnd_toStartOf="@id/messages_send_msg_et"
+        android:visibility="gone"/>
 
     <EditText
         android:id="@+id/messages_send_msg_et"
