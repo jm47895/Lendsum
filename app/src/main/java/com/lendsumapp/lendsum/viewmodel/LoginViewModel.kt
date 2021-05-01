@@ -1,23 +1,19 @@
 package com.lendsumapp.lendsum.viewmodel
 
-import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.util.Log
-import androidx.hilt.lifecycle.ViewModelInject
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.*
 import com.google.firebase.auth.FirebaseUser
 import com.lendsumapp.lendsum.repository.LoginRepository
-import dagger.hilt.android.qualifiers.ActivityContext
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
-class LoginViewModel @ViewModelInject constructor(
-    private val loginRepository: LoginRepository,
-    @ActivityContext private var context: Context
+@HiltViewModel
+class LoginViewModel @Inject constructor(
+    private val loginRepository: LoginRepository
 ): ViewModel(){
 
     fun getFirebaseUser(): FirebaseUser?{
@@ -25,7 +21,7 @@ class LoginViewModel @ViewModelInject constructor(
     }
 
     //Start of Google Auth functions
-    fun configureGoogleAuth(){
+    fun configureGoogleAuth(context: Context){
         loginRepository.configureGoogleAuth(context)
     }
 

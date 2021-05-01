@@ -2,16 +2,18 @@ package com.lendsumapp.lendsum.viewmodel
 
 import android.app.Application
 import android.net.Uri
-import androidx.hilt.lifecycle.ViewModelInject
 import androidx.lifecycle.*
 import com.google.firebase.auth.FirebaseAuth
 import com.lendsumapp.lendsum.data.model.User
 import com.lendsumapp.lendsum.repository.EditProfileRepository
 import com.lendsumapp.lendsum.util.DatabaseUtils
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
-class EditProfileViewModel @ViewModelInject constructor(
+@HiltViewModel
+class EditProfileViewModel @Inject constructor(
     private val editProfileRepository: EditProfileRepository,
     private var firebaseAuth: FirebaseAuth?,
     application: Application

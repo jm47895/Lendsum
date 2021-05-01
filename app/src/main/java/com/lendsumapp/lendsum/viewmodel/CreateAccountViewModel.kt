@@ -1,19 +1,20 @@
 package com.lendsumapp.lendsum.viewmodel
 
 import android.content.Context
-import androidx.hilt.lifecycle.ViewModelInject
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.firebase.auth.FirebaseUser
 import com.lendsumapp.lendsum.repository.LoginRepository
+import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ActivityContext
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
-class CreateAccountViewModel @ViewModelInject constructor(
+@HiltViewModel
+class CreateAccountViewModel @Inject constructor(
     private val loginRepository: LoginRepository,
-    @ActivityContext private var context: Context
 ): ViewModel(){
 
     fun logOutOfGoogle(){
@@ -22,7 +23,7 @@ class CreateAccountViewModel @ViewModelInject constructor(
         }
     }
 
-    fun configureGoogleAuth(){
+    fun configureGoogleAuth(context: Context){
         loginRepository.configureGoogleAuth(context)
     }
 

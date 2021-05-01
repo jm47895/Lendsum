@@ -149,7 +149,7 @@ class LoginFragment : Fragment(), View.OnClickListener{
                 }
                 R.id.login_sign_in_with_google -> {
                     loginViewModel.getGoogleLoginState().observe(viewLifecycleOwner, googleAuthObserver)
-                    loginViewModel.configureGoogleAuth()
+                    context?.let { loginViewModel.configureGoogleAuth(it) }
                     registerGoogleActivityResult.launch(loginViewModel.getGoogleAuthIntent())
                 }
                 R.id.login_sign_in_with_facebook -> {

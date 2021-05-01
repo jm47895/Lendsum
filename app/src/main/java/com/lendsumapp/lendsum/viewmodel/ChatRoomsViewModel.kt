@@ -1,14 +1,16 @@
 package com.lendsumapp.lendsum.viewmodel
 
-import androidx.hilt.lifecycle.ViewModelInject
 import androidx.lifecycle.*
 import com.google.firebase.auth.FirebaseAuth
 import com.lendsumapp.lendsum.data.model.ChatRoom
 import com.lendsumapp.lendsum.repository.ChatRoomsRepository
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
-class ChatRoomsViewModel @ViewModelInject constructor(
+@HiltViewModel
+class ChatRoomsViewModel @Inject constructor(
     private val chatRoomsRepository: ChatRoomsRepository,
     private val firebaseAuth: FirebaseAuth
 ): ViewModel(){

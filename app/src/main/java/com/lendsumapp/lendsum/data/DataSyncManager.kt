@@ -102,7 +102,7 @@ class DataSyncManager @Inject constructor(
                 }
 
                 override fun onCancelled(error: DatabaseError) {
-                    TODO("Not yet implemented")
+                    Log.d(TAG, "There was a databaseError: $error")
                 }
 
 
