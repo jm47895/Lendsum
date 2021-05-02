@@ -7,27 +7,31 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.navigation.findNavController
 import com.lendsumapp.lendsum.R
-import kotlinx.android.synthetic.main.fragment_number_verification.*
-import kotlinx.android.synthetic.main.fragment_terms_conditions.*
+import com.lendsumapp.lendsum.databinding.FragmentFinancialInfoBinding
+import com.lendsumapp.lendsum.databinding.FragmentTermsConditionsBinding
 
 class TermsConditionsFragment : Fragment() {
+
+    private var _binding: FragmentTermsConditionsBinding? = null
+    private val binding get() =  _binding!!
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View{
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_terms_conditions, container, false)
+        _binding = FragmentTermsConditionsBinding.inflate(inflater, container, false)
+        return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        terms_back_btn.setOnClickListener {
+        binding.termsBackBtn.setOnClickListener {
             view.findNavController().navigate(R.id.action_termsConditionsFragment_to_numberVerificationFragment)
         }
 
-        terms_next_btn.setOnClickListener {
+        binding.termsNextBtn.setOnClickListener {
             view.findNavController().navigate(R.id.action_termsConditionsFragment_to_financialInfoFragment)
         }
     }

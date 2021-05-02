@@ -62,7 +62,7 @@ class PhoneAuthComponent @Inject constructor() {
                 Log.d(TAG, "Phone number is linked with current credentials")
                 linkPhoneNumWithCredentialStatus.postValue(true)
             }else{
-                Log.d(TAG, task.exception.toString())
+                Log.d(TAG, "Phone link failed: ${task.exception}")
                 linkPhoneNumWithCredentialStatus.postValue(false)
             }
         }

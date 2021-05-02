@@ -7,27 +7,33 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.navigation.findNavController
 import com.lendsumapp.lendsum.R
-import kotlinx.android.synthetic.main.fragment_financial_info.*
-import kotlinx.android.synthetic.main.fragment_login.*
+import com.lendsumapp.lendsum.databinding.FragmentFinancialInfoBinding
+import com.lendsumapp.lendsum.databinding.FragmentLoginBinding
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class FinancialInfoFragment : Fragment() {
+
+    private var _binding: FragmentFinancialInfoBinding? = null
+    private val binding get() =  _binding!!
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View{
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_financial_info, container, false)
+        _binding = FragmentFinancialInfoBinding.inflate(inflater, container, false)
+        return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        financial_info_next_btn.setOnClickListener {
+        binding.financialInfoNextBtn.setOnClickListener {
             view.findNavController().navigate(R.id.action_financialInfoFragment_to_marketplaceFragment)
         }
 
-        financial_info_back_btn.setOnClickListener {
+        binding.financialInfoBackBtn.setOnClickListener {
             view.findNavController().navigate(R.id.action_financialInfoFragment_to_termsConditionsFragment)
         }
     }
