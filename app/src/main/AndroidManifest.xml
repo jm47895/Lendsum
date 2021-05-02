@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     package="com.lendsumapp.lendsum">
     <uses-permission android:name="android.permission.INTERNET"/>
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
@@ -27,6 +28,10 @@
         <meta-data
             android:name="preloaded_fonts"
             android:resource="@array/preloaded_fonts" />
+        <!--This fixes a warning with Google's FederatedSignInActivity-->
+        <activity
+            android:name="com.google.firebase.auth.internal.FederatedSignInActivity"
+            tools:replace="android:launchMode"
+            android:launchMode="standard" />
     </application>
-
 </manifest>
