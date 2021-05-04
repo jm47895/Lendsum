@@ -31,10 +31,6 @@ class DataSyncManager @Inject constructor(
     val realtimeChatIdList = MutableLiveData<MutableList<String>>()
     val chatIdsList = mutableListOf<String>()
 
-    fun doesLendsumDbExist(context: Context, dbName: String): Boolean{
-        return DatabaseUtils.doesCacheDatabaseExist(context, dbName)
-    }
-
     fun registerRealtimeChatIdListener(uid: String){
 
         val chatIdRef = realTimeDb.child(REALTIME_DB_USER_PATH).child(uid)

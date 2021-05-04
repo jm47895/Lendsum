@@ -1,6 +1,5 @@
 package com.lendsumapp.lendsum.ui
 
-import android.Manifest
 import android.content.Context
 import android.os.Bundle
 import android.util.Log
@@ -8,7 +7,6 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import androidx.navigation.findNavController
@@ -35,27 +33,12 @@ class NumberVerificationFragment : Fragment(), View.OnClickListener, CountryCode
     private val numberVerificationViewModel: NumberVerificationViewModel by viewModels()
     private lateinit var phoneNumberCredentialObserver: Observer<PhoneAuthCredential>
     private lateinit var linkPhoneNumberStatusObserver: Observer<Boolean>
-    private lateinit var localCacheStatusObserver: Observer<Boolean>
     private var credential: PhoneAuthCredential? = null
     private var isPhoneNumberValid = false
     @Inject lateinit var firebaseAuth: FirebaseAuth
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
-        /*The local cache observer checks for a sql cache in the app on sign in with an existing user
-        who installs app on a new phone or re-installs the app. If either case, we re-cache all info
-        from remote databases*/
-        numberVerificationViewModel.doesLendsumDbCacheExist(requireContext(), getString(R.string.database_name))
-        localCacheStatusObserver = Observer { doesSignInCacheExist->
-            if(!doesSignInCacheExist && sharedPrefs?.getBoolean(RETURNING_USER, false) == true){
-                Log.d(TAG, "Database cache does not exist for returning user, syncing user data from remote dbs")
-                numberVerificationViewModel.syncUserData(firebaseAuth.currentUser?.uid.toString())
-            }else{
-                Log.d(TAG, "Local cache exists")
-            }
-        }
-        numberVerificationViewModel.getCacheStatus().observe(this, localCacheStatusObserver)
 
         phoneNumberCredentialObserver = Observer { phoneAuthCredential ->
             credential = phoneAuthCredential
@@ -94,6 +77,16 @@ class NumberVerificationFragment : Fragment(), View.OnClickListener, CountryCode
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        numberVerificationViewModel.checkIfUserExistsInLendsumDbCache().observe(viewLifecycleOwner, { cachedUser->
+
+            if(cachedUser == null && sharedPrefs?.getBoolean(RETURNING_USER, false) == true){
+                Log.d(TAG, "Sync Data")
+                numberVerificationViewModel.syncUserData(firebaseAuth.currentUser?.uid.toString())
+            }else{
+                Log.d(TAG, "User data already synced or is new user")
+            }
+        })
 
         binding.countryCodeSp.setPhoneNumberValidityChangeListener(this)
         binding.countryCodeSp.registerCarrierNumberEditText(binding.numberVerificationPhoneEt)

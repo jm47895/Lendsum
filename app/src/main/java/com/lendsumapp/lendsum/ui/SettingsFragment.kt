@@ -10,7 +10,12 @@ import androidx.fragment.app.viewModels
 import androidx.navigation.findNavController
 import com.lendsumapp.lendsum.R
 import com.lendsumapp.lendsum.databinding.FragmentSettingsBinding
+import com.lendsumapp.lendsum.util.AndroidUtils
+import com.lendsumapp.lendsum.util.AndroidUtils.Companion.editSharedPrefs
 import com.lendsumapp.lendsum.util.GlobalConstants
+import com.lendsumapp.lendsum.util.GlobalConstants.NAV_SIGN_UP_TYPE
+import com.lendsumapp.lendsum.util.GlobalConstants.NUMBER_VERIFIED
+import com.lendsumapp.lendsum.util.GlobalConstants.RETURNING_USER
 import com.lendsumapp.lendsum.util.NavSignUpType
 import com.lendsumapp.lendsum.viewmodel.SettingsViewModel
 import dagger.hilt.android.AndroidEntryPoint
@@ -45,9 +50,10 @@ class SettingsFragment : Fragment(), View.OnClickListener {
     override fun onClick(view: View?) {
         when(view?.id){
             R.id.settings_logout_btn->{
-                sharedPrefs?.edit()?.putBoolean(GlobalConstants.NUMBER_VERIFIED, false)?.apply()
+                editSharedPrefs(sharedPrefs!!, RETURNING_USER, false)
+                editSharedPrefs(sharedPrefs!!, NUMBER_VERIFIED, false)
 
-                when(sharedPrefs?.getInt(GlobalConstants.NAV_SIGN_UP_TYPE, NavSignUpType.EMAIL_LOGIN.ordinal)){
+                when(sharedPrefs?.getInt(NAV_SIGN_UP_TYPE, NavSignUpType.EMAIL_LOGIN.ordinal)){
                     NavSignUpType.EMAIL_LOGIN.ordinal ->{
                         settingsViewModel.logOutOfEmailAndPass()
                         view.findNavController().navigate(R.id.action_settingsFragment_to_loginFragment)

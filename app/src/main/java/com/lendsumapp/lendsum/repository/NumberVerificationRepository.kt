@@ -2,6 +2,7 @@ package com.lendsumapp.lendsum.repository
 
 import android.content.Context
 import android.util.Log
+import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.SetOptions
 import com.lendsumapp.lendsum.data.DataSyncManager
@@ -9,6 +10,7 @@ import com.lendsumapp.lendsum.data.model.User
 import com.lendsumapp.lendsum.data.persistence.LendsumDatabase
 import com.lendsumapp.lendsum.util.GlobalConstants.FIRESTORE_USER_COLLECTION_PATH
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 
 class NumberVerificationRepository @Inject constructor(
@@ -38,9 +40,9 @@ class NumberVerificationRepository @Inject constructor(
     }
     //End firestore functions
 
-    //Sync data functions
-    fun doesLendsumDbCacheExist(context: Context, dbName: String): Boolean{
-        return dataSyncManager.doesLendsumDbExist(context, dbName)
+    //Sync user data function
+    fun doesUserExistInLendsumDbCache(firebaseUser: FirebaseUser): Flow<User>{
+        return cacheDb.getUserDao().getUser(firebaseUser.uid)
     }
 
     fun syncUserData(uid: String, scope: CoroutineScope){

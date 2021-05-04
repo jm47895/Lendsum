@@ -11,11 +11,6 @@ import javax.inject.Inject
 
 class DatabaseUtils{
     companion object {
-        fun doesCacheDatabaseExist(context: Context, dbName: String): Boolean {
-            val dbFile: File = context.getDatabasePath(dbName)
-            return dbFile.exists()
-        }
-
         fun getFileExtension(context: Context, uri: Uri): String{
             val contentResolver = context.contentResolver
             val mime = MimeTypeMap.getSingleton()
