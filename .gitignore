@@ -38,6 +38,7 @@ captures/
 
 # IntelliJ
 *.iml
+.idea
 .idea/
 .idea/inspectionProfiles/
 .idea/workspace.xml
