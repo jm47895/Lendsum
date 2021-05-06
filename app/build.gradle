@@ -134,10 +134,10 @@ dependencies {
 
 
     //Facebook login
-    implementation 'com.facebook.android:facebook-login:8.1.0'
+    implementation 'com.facebook.android:facebook-login:9.1.1'
 
     //Country Code Picker
-    implementation 'com.hbb20:ccp:2.4.0'
+    implementation 'com.hbb20:ccp:2.4.7'
 
     //Circular photo holder
     implementation 'de.hdodenhof:circleimageview:3.1.0'
