@@ -4,6 +4,7 @@ import android.app.Activity
 import android.content.Context
 import androidx.lifecycle.*
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.auth.PhoneAuthCredential
 import com.lendsumapp.lendsum.data.model.User
 import com.lendsumapp.lendsum.repository.LoginRepository
@@ -20,12 +21,6 @@ class NumberVerificationViewModel @Inject constructor(
     private val numberVerificationRepository: NumberVerificationRepository,
     private val firebaseAuth: FirebaseAuth
 ): ViewModel(){
-
-    private val cacheDbStatus: MutableLiveData<Boolean> = MutableLiveData()
-
-    fun getLensumCacheStatus(): MutableLiveData<Boolean> {
-        return cacheDbStatus
-    }
 
     fun sendSMSCode(phoneNumber: String, activity: Activity){
         viewModelScope.launch(Dispatchers.IO) {
@@ -64,12 +59,16 @@ class NumberVerificationViewModel @Inject constructor(
     }
 
     private fun getNewUserObject(): User{
-        val firebaseUser = firebaseAuth.currentUser!!
+        val firebaseUser: FirebaseUser? = firebaseAuth.currentUser
 
-        return User(firebaseUser.uid,
-            firebaseUser.displayName.toString(),
-            createUsername(firebaseUser.displayName.toString(), firebaseUser.uid),
-            firebaseUser.email.toString(), firebaseUser.phoneNumber.toString(),firebaseUser.photoUrl.toString(), karmaScore = 100, friendList = null, isProfilePublic = true)
+        val uid = firebaseUser?.uid.toString()
+        val displayName = firebaseUser?.displayName.toString()
+        val userName =  createUsername(firebaseUser?.displayName.toString(), firebaseUser?.uid.toString())
+        val email = firebaseUser?.email.toString()
+        val phoneNumber = firebaseUser?.phoneNumber.toString()
+        val profPhoto = firebaseUser?.photoUrl.toString()
+
+        return User(uid, displayName, userName, email, phoneNumber, profPhoto, karmaScore = 100, friendList = null, isProfilePublic = true)
     }
 
     private fun createUsername(name: String, uid: String): String{
