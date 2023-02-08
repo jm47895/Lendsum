@@ -12,7 +12,7 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import androidx.navigation.findNavController
-import androidx.navigation.fragment.NavHostFragment.findNavController
+import androidx.navigation.fragment.findNavController
 import com.lendsumapp.lendsum.R
 import com.lendsumapp.lendsum.databinding.FragmentCreateAccountBinding
 import com.lendsumapp.lendsum.util.AndroidUtils
@@ -48,7 +48,7 @@ class CreateAccountFragment : Fragment(), View.OnClickListener {
         requireActivity().onBackPressedDispatcher.addCallback(this){
             sharedPrefs?.getBoolean(RETURNING_USER, false)?.let { logoutOrDeleteUserHandler(it) }
             clearEditTextFocus()
-            findNavController(this@CreateAccountFragment).navigate(R.id.action_createAccountFragment_to_loginFragment)
+            findNavController().navigate(R.id.action_createAccountFragment_to_loginFragment)
         }
 
         val user = createAccountViewModel.getFirebaseUser()
@@ -76,7 +76,7 @@ class CreateAccountFragment : Fragment(), View.OnClickListener {
 
                 Log.d(TAG, "Email create account success")
 
-                findNavController(this).navigate(R.id.action_createAccountFragment_to_numberVerificationFragment)
+                findNavController().navigate(R.id.action_createAccountFragment_to_numberVerificationFragment)
             }else{
                 Log.d(TAG, "Email sign up failure")
             }
@@ -87,7 +87,7 @@ class CreateAccountFragment : Fragment(), View.OnClickListener {
             if(isLinkWithEmailSuccessful){
                 Log.d(TAG, "Link email with other credential provider success")
                 clearEditTextFocus()
-                findNavController(this).navigate(R.id.action_createAccountFragment_to_numberVerificationFragment)
+                findNavController().navigate(R.id.action_createAccountFragment_to_numberVerificationFragment)
             }else{
                 Log.d(TAG, "Link email with other credential provider failed")
                 sharedPrefs?.edit()?.putBoolean(RETURNING_USER, true)?.apply()

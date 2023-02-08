@@ -42,7 +42,7 @@ class EditProfileFragment : Fragment(), View.OnClickListener, CompoundButton.OnC
     private lateinit var updateAuthPassStatusObserver: Observer<Boolean>
     private var user: User = User()
     private val registerOnActivityResult = registerForActivityResult(ActivityResultContracts.GetContent()) {
-        updateProfilePic(it)
+        it?.let { uri -> updateProfilePic(uri) }
     }
 
     override fun onCreateView(
