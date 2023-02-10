@@ -3,6 +3,8 @@ package com.lendsumapp.lendsum.ui
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.MenuItem
+import androidx.activity.compose.setContent
+import androidx.compose.material3.Surface
 import androidx.core.view.get
 import androidx.navigation.NavController
 import androidx.navigation.NavDestination
@@ -23,11 +25,17 @@ class HomeActivity: AppCompatActivity(),
 
     override fun onCreate(savedInstanceState: Bundle?){
         super.onCreate(savedInstanceState)
-        binding = ActivityHomeBinding.inflate(layoutInflater)
+
+        setContent {
+            Surface {
+                LoginScreen()
+            }
+        }
+    /*binding = ActivityHomeBinding.inflate(layoutInflater)
         val view = binding.root
         setContentView(view)
 
-        setupBottomNavigation()
+        setupBottomNavigation()*/
 
     }
 
