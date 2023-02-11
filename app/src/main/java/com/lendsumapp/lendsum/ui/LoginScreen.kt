@@ -25,10 +25,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.lendsumapp.lendsum.R
-import com.lendsumapp.lendsum.ui.components.LendsumButton
-import com.lendsumapp.lendsum.ui.components.LendsumClickableText
-import com.lendsumapp.lendsum.ui.components.LendsumField
-import com.lendsumapp.lendsum.ui.components.noRippleClickable
+import com.lendsumapp.lendsum.ui.components.*
 import com.lendsumapp.lendsum.ui.theme.ColorPrimary
 import com.lendsumapp.lendsum.ui.theme.FacebookBlue
 import com.lendsumapp.lendsum.ui.theme.GoogleFont
@@ -36,7 +33,9 @@ import com.lendsumapp.lendsum.ui.theme.GoogleLoginTextColor
 import com.lendsumapp.lendsum.viewmodel.LoginViewModel
 
 @Composable
-fun LoginScreen(){
+fun LoginScreen(
+    onForgotPasswordClicked: () -> Unit
+){
 
     val loginViewModel = hiltViewModel<LoginViewModel>()
 
@@ -44,9 +43,7 @@ fun LoginScreen(){
         onSignInClicked = { email, pass ->
             //loginViewModel.signInWithEmailAndPass(email, pass)
         },
-        onForgotPasswordClicked = {
-
-        },
+        onForgotPasswordClicked = onForgotPasswordClicked,
         onSignUpWithEmailClicked = {
 
         },
@@ -179,48 +176,6 @@ fun SignUpOptions(
         onContinueWithFacebookClicked.invoke()
     }
 
-}
-
-@Composable
-fun ThirdPartyLogInButton(
-    @DrawableRes drawable: Int,
-    text: String,
-    textColor: Color,
-    backgroundColor: Color,
-    onLoginClicked:() -> Unit
-){
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .shadow(elevation = 2.dp, shape = RoundedCornerShape(100))
-            .background(color = backgroundColor, shape = RoundedCornerShape(100))
-            .noRippleClickable {
-                onLoginClicked.invoke()
-            }
-            .padding(4.dp),
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        Icon(
-            modifier = Modifier
-                .padding(4.dp)
-                .fillMaxWidth()
-                .weight(1f),
-            painter = painterResource(
-                id = drawable
-            ),
-            contentDescription = "",
-            tint = Color.Unspecified
-        )
-        Text(
-            modifier = Modifier
-                .fillMaxWidth()
-                .weight(5f),
-            text = text.uppercase(),
-            textAlign = TextAlign.Center,
-            color = textColor,
-            fontFamily = GoogleFont,
-        )
-    }
 }
 
 @Composable

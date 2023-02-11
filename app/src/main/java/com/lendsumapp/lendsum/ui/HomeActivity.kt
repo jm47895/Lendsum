@@ -28,7 +28,7 @@ class HomeActivity: AppCompatActivity(),
 
         setContent {
             Surface {
-                LoginScreen()
+                LendsumNavHost()
             }
         }
     /*binding = ActivityHomeBinding.inflate(layoutInflater)
