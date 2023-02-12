@@ -13,7 +13,7 @@ import com.lendsumapp.lendsum.auth.EmailAndPassAuthComponent
 import com.lendsumapp.lendsum.auth.FacebookAuthComponent
 import com.lendsumapp.lendsum.auth.GoogleAuthComponent
 import com.lendsumapp.lendsum.auth.PhoneAuthComponent
-import com.lendsumapp.lendsum.data.model.Resource
+import com.lendsumapp.lendsum.data.model.Response
 import com.lendsumapp.lendsum.util.GlobalConstants.FIREBASE_AUTH_UPDATE_MAP_KEY
 import com.lendsumapp.lendsum.util.GlobalConstants.FIREBASE_AUTH_UPDATE_MAP_VALUE
 import com.lendsumapp.lendsum.workers.UpdateFirebaseAuthProfileWorker
@@ -82,7 +82,7 @@ class LoginRepository @Inject constructor(
             .build()
     }
 
-    fun signInWithEmailAndPass(email: String, password: String): Flow<Resource<Unit>> {
+    fun signInWithEmailAndPass(email: String, password: String): Flow<Response<Unit>> {
         return emailAndPassAuthComponent.signInWithEmailAndPass(email, password)
     }
 
@@ -94,12 +94,8 @@ class LoginRepository @Inject constructor(
         return emailAndPassAuthComponent.getEmailCreateAccountStatus()
     }
 
-    fun sendPasswordResetEmail(email: String){
-        emailAndPassAuthComponent.sendPasswordResetEmail(email)
-    }
-
-    fun getResetPasswordEmailStatus(): MutableLiveData<Boolean> {
-        return emailAndPassAuthComponent.getResetPasswordEmailStatus()
+    fun sendPasswordResetEmail(email: String): Flow<Response<Unit>>{
+        return emailAndPassAuthComponent.sendPasswordResetEmail(email)
     }
 
     fun getLinkWithCredentialStatus(): MutableLiveData<Boolean> {

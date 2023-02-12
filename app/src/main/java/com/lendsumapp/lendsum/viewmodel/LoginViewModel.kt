@@ -8,9 +8,10 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.firebase.auth.FirebaseUser
 import com.lendsumapp.lendsum.data.model.Error
-import com.lendsumapp.lendsum.data.model.Resource
+import com.lendsumapp.lendsum.data.model.Response
 import com.lendsumapp.lendsum.data.model.Status
 import com.lendsumapp.lendsum.repository.LoginRepository
+import com.lendsumapp.lendsum.util.AndroidUtils
 import com.lendsumapp.lendsum.util.NetworkUtils
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
@@ -22,13 +23,16 @@ class LoginViewModel @Inject constructor(
     private val loginRepository: LoginRepository
 ): ViewModel(){
 
-    private val _loginState = mutableStateOf(Resource<Unit>())
+    private val _loginState = mutableStateOf(Response<Unit>())
+    private val _resetPassState = mutableStateOf(Response<Unit>())
     private val _firebaseUser = mutableStateOf<FirebaseUser?>(null)
 
-    val loginState: Resource<Unit>
+    val loginState: Response<Unit>
         get() = _loginState.value
     val firebaseUser: FirebaseUser?
         get() = _firebaseUser.value
+    val resetPassState: Response<Unit>
+        get() = _resetPassState.value
 
     init {
         getFirebaseUser()
@@ -62,13 +66,33 @@ class LoginViewModel @Inject constructor(
     fun signInWithEmailAndPass(context: Context, email: String, password: String){
 
         if(!NetworkUtils.isNetworkAvailable(context)){
-            _loginState.value = Resource(status = Status.ERROR, error = Error.NO_INTERNET)
+            _loginState.value =
+                Response(status = Status.ERROR, error = Error.NO_INTERNET)
             return
         }
 
         viewModelScope.launch {
             loginRepository.signInWithEmailAndPass(email, password).collect{
                 _loginState.value = it
+            }
+        }
+    }
+
+    fun sendPasswordResetEmail(context: Context, email: String){
+
+        if(!NetworkUtils.isNetworkAvailable(context)){
+            _resetPassState.value = Response(status = Status.ERROR, error = Error.NO_INTERNET)
+            return
+        }
+
+        if(!AndroidUtils.isValidEmail(email)){
+            _resetPassState.value = Response(status = Status.ERROR, error = Error.INVALID_EMAIL)
+            return
+        }
+
+        viewModelScope.launch {
+            loginRepository.sendPasswordResetEmail(email).collect{
+                _resetPassState.value = it
             }
         }
     }

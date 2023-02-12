@@ -22,8 +22,7 @@ fun LendsumField(
     modifier: Modifier = Modifier,
     keyBoardType: KeyboardType,
     supportingLabel: String,
-    errorLabel: String = "",
-    isError: Boolean = false,
+    errorLabel: String? = null,
     onTextChanged :(String) -> Unit,
 ){
 
@@ -45,7 +44,7 @@ fun LendsumField(
             unfocusedIndicatorColor = Color.Black
         ),
         supportingText = {
-            Text(text = if (isError) errorLabel else supportingLabel, color = if(isError) Color.Red else Color.Black)
+            Text(text = errorLabel?.let{ errorLabel } ?: supportingLabel, color = errorLabel?.let{ Color.Red } ?: Color.Black)
         },
         keyboardOptions = KeyboardOptions(keyboardType = keyBoardType),
         visualTransformation =

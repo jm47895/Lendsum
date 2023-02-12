@@ -12,7 +12,6 @@ import com.lendsumapp.lendsum.R
 import com.lendsumapp.lendsum.databinding.FragmentForgotPasswordBinding
 import com.lendsumapp.lendsum.util.AndroidUtils
 import com.lendsumapp.lendsum.util.NetworkUtils
-import com.lendsumapp.lendsum.viewmodel.ForgotPasswordViewModel
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -20,7 +19,7 @@ class ForgotPasswordFragment : Fragment(), View.OnClickListener {
 
     private var _binding: FragmentForgotPasswordBinding? = null
     private val binding get() =  _binding!!
-    private val forgotPasswordViewModel: ForgotPasswordViewModel by viewModels()
+    //private val forgotPasswordViewModel: ForgotPasswordViewModel by viewModels()
     private lateinit var resetEmailStatusObserver: Observer<Boolean>
 
     override fun onCreateView(
@@ -65,14 +64,14 @@ class ForgotPasswordFragment : Fragment(), View.OnClickListener {
             when (view?.id) {
                 R.id.forgot_send_reset_pass_btn -> {
 
-                    forgotPasswordViewModel.getResetPasswordEmailStatus().observe(viewLifecycleOwner, resetEmailStatusObserver)
+                    //forgotPasswordViewModel.getResetPasswordEmailStatus().observe(viewLifecycleOwner, resetEmailStatusObserver)
 
                     AndroidUtils.hideKeyboard(requireActivity())
 
                     val email = binding.forgotEmailEt.text?.trim().toString()
 
                     if (AndroidUtils.isValidEmail(email)) {
-                        forgotPasswordViewModel.sendPasswordResetEmail(email)
+                        //forgotPasswordViewModel.sendPasswordResetEmail(email)
                     } else {
                         activity?.let {
                             AndroidUtils.showSnackBar(

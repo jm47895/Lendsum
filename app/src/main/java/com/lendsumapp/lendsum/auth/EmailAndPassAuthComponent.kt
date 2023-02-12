@@ -1,21 +1,13 @@
 package com.lendsumapp.lendsum.auth
 
-import android.net.Uri
 import android.util.Log
-import androidx.core.net.toUri
 import androidx.lifecycle.MutableLiveData
-import androidx.work.Data
 import com.google.firebase.auth.*
 import com.lendsumapp.lendsum.data.model.Error
-import com.lendsumapp.lendsum.data.model.Resource
+import com.lendsumapp.lendsum.data.model.Response
 import com.lendsumapp.lendsum.data.model.Status
 import com.lendsumapp.lendsum.util.AndroidUtils
-import com.lendsumapp.lendsum.util.GlobalConstants
-import com.lendsumapp.lendsum.util.GlobalConstants.FIRESTORE_PROFILE_NAME_KEY
-import com.lendsumapp.lendsum.util.GlobalConstants.FIRESTORE_PROFILE_PIC_URI_KEY
-import com.lendsumapp.lendsum.util.NetworkUtils
 import kotlinx.coroutines.channels.awaitClose
-import kotlinx.coroutines.channels.trySendBlocking
 import kotlinx.coroutines.flow.callbackFlow
 import javax.inject.Inject
 
@@ -23,30 +15,29 @@ class EmailAndPassAuthComponent @Inject constructor(){
 
     private val firebaseAuth : FirebaseAuth = FirebaseAuth.getInstance()
     private val emailCreateAccountStatus: MutableLiveData<Boolean> = MutableLiveData()
-    private val resetPasswordEmailStatus: MutableLiveData<Boolean> = MutableLiveData()
     private val linkWithEmailStatus: MutableLiveData<Boolean> = MutableLiveData()
     private val updateAuthEmailStatus: MutableLiveData<Boolean> = MutableLiveData()
     private val updateAuthPassStatus: MutableLiveData<Boolean> = MutableLiveData()
 
-    fun signInWithEmailAndPass(email: String, password: String) = callbackFlow<Resource<Unit>>
+    fun signInWithEmailAndPass(email: String, password: String) = callbackFlow<Response<Unit>>
     {
-        send(Resource(status = Status.LOADING))
+        send(Response(status = Status.LOADING))
 
         when {
             AndroidUtils.isValidEmail(email) && password.isNotEmpty() -> {
                 firebaseAuth.signInWithEmailAndPassword(email, password).addOnCompleteListener { task->
                     if(task.isSuccessful){
-                        trySend(Resource(status = Status.SUCCESS))
+                        trySend(Response(status = Status.SUCCESS))
                         Log.i(TAG, "Sign in with email was successful.")
                     }else{
-                        trySend(Resource(status = Status.ERROR, error = Error.INVALID_LOGIN))
+                        trySend(Response(status = Status.ERROR, error = Error.INVALID_LOGIN))
                         Log.e(TAG, "Sign in with email failed" + task.exception)
                     }
                     channel.close()
                 }
             }
             else -> {
-                send(Resource(status = Status.ERROR, error = Error.INVALID_LOGIN))
+                send(Response(status = Status.ERROR, error = Error.INVALID_LOGIN))
                 channel.close()
             }
         }
@@ -126,20 +117,25 @@ class EmailAndPassAuthComponent @Inject constructor(){
         return emailCreateAccountStatus
     }
 
-    fun sendPasswordResetEmail(email: String){
+    fun sendPasswordResetEmail(email: String) = callbackFlow<Response<Unit>>{
+
+        send(Response(status = Status.LOADING))
+
         firebaseAuth.sendPasswordResetEmail(email).addOnCompleteListener{ task ->
             if(task.isSuccessful){
-                Log.d(TAG, "Reset Password email sent.")
-                resetPasswordEmailStatus.postValue(true)
+                trySend(Response(Status.SUCCESS))
+                Log.i(TAG, "Reset Password email sent.")
+                channel.close()
             }else{
-                Log.d(TAG, "Reset Password email failed to send." + task.exception)
-                resetPasswordEmailStatus.postValue(false)
+                trySend(Response(status = Status.ERROR, error = Error.FAILED_TO_SEND))
+                Log.e(TAG, "Reset Password email failed to send." + task.exception)
+                channel.close(task.exception)
             }
         }
-    }
 
-    fun getResetPasswordEmailStatus(): MutableLiveData<Boolean> {
-        return resetPasswordEmailStatus
+        awaitClose {
+
+        }
     }
 
     fun getLinkWithCredentialStatus(): MutableLiveData<Boolean> {

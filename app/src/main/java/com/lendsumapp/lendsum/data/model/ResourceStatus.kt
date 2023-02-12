@@ -1,6 +1,6 @@
 package com.lendsumapp.lendsum.data.model
 
-data class Resource<T>(
+data class Response<T>(
     val status: Status? = null,
     val data: T? = null,
     val error: Error? = null
@@ -14,5 +14,7 @@ enum class Status {
 
 enum class Error{
     NO_INTERNET,
-    INVALID_LOGIN
+    INVALID_LOGIN,
+    INVALID_EMAIL,
+    FAILED_TO_SEND
 }

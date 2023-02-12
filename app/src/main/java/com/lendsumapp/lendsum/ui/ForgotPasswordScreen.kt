@@ -15,39 +15,48 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.lendsumapp.lendsum.R
+import com.lendsumapp.lendsum.data.model.Error
+import com.lendsumapp.lendsum.data.model.Response
+import com.lendsumapp.lendsum.data.model.Status
 import com.lendsumapp.lendsum.ui.components.LendsumButton
 import com.lendsumapp.lendsum.ui.components.LendsumField
 import com.lendsumapp.lendsum.ui.components.noRippleClickable
-import com.lendsumapp.lendsum.util.AndroidUtils
-import com.lendsumapp.lendsum.util.NetworkUtils
+import com.lendsumapp.lendsum.viewmodel.LoginViewModel
 
 @Composable
 fun ForgotPasswordScreen(
     navController: NavController
 ){
     val context = LocalContext.current
+    val loginViewModel = hiltViewModel<LoginViewModel>()
+    val forgotPassResponse = loginViewModel.resetPassState
 
-    ForgotPasswordScreenContent(
-        onSendResetClicked = {
+    if (forgotPassResponse.status == Status.SUCCESS){
+        LaunchedEffect(Unit){
             Toast.makeText(context, R.string.reset_email_sent, Toast.LENGTH_SHORT).show()
             navController.navigateUp()
-        },
-        onBackButtonClicked = { navController.navigateUp() }
-    )
+        }
+    }else{
+        ForgotPasswordScreenContent(
+            resetPassState = loginViewModel.resetPassState,
+            onSendResetClicked = { email ->
+                loginViewModel.sendPasswordResetEmail(context, email)
+            },
+            onBackButtonClicked = { navController.navigateUp() }
+        )
+    }
 }
 
 @Composable
 fun ForgotPasswordScreenContent(
+    resetPassState: Response<Unit>,
     onSendResetClicked:(String) -> Unit,
     onBackButtonClicked:() -> Unit
 ){
-
-    val context = LocalContext.current
     var emailText by remember { mutableStateOf("") }
-    var showEmailError by remember { mutableStateOf(false) }
-    var showOnlineError by remember { mutableStateOf(false) }
 
     Column(
         modifier = Modifier.fillMaxSize()
@@ -62,16 +71,13 @@ fun ForgotPasswordScreenContent(
         LendsumField(
             keyBoardType = KeyboardType.Email,
             supportingLabel = stringResource(id = R.string.email),
-            errorLabel = when {
-                showOnlineError -> stringResource(id = R.string.not_connected_internet)
-                showEmailError -> stringResource(id = R.string.invalid_email_err_msg)
-                else -> ""
+            errorLabel = when(resetPassState.error){
+                Error.NO_INTERNET-> stringResource(id = R.string.not_connected_internet)
+                Error.INVALID_EMAIL -> stringResource(id = R.string.invalid_email_err_msg)
+                else -> null
             },
-            isError = showEmailError || showOnlineError,
             onTextChanged = {
                 emailText = it
-                showOnlineError = false
-                showEmailError = false
             }
         )
         LendsumButton(
@@ -80,11 +86,7 @@ fun ForgotPasswordScreenContent(
                 .align(Alignment.End),
             text = stringResource(id = R.string.send_password_reset_email)
         ) {
-            when{
-                !NetworkUtils.isNetworkAvailable(context) -> showOnlineError = true
-                !AndroidUtils.isValidEmail(emailText)-> showEmailError = true
-                else -> onSendResetClicked(emailText)
-            }
+            onSendResetClicked(emailText)
         }
     }
 }
@@ -93,6 +95,7 @@ fun ForgotPasswordScreenContent(
 @Composable
 fun ForgotPasswordScreenPreview(){
     ForgotPasswordScreenContent(
+        resetPassState = Response(),
         onSendResetClicked = {},
         onBackButtonClicked =  {}
     )

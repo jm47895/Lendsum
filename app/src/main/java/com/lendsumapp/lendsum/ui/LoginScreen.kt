@@ -23,7 +23,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.lendsumapp.lendsum.R
 import com.lendsumapp.lendsum.data.model.Error
-import com.lendsumapp.lendsum.data.model.Resource
+import com.lendsumapp.lendsum.data.model.Response
 import com.lendsumapp.lendsum.data.model.Status
 import com.lendsumapp.lendsum.ui.components.*
 import com.lendsumapp.lendsum.ui.theme.ColorPrimary
@@ -69,7 +69,7 @@ fun LoginScreen(
 
 @Composable
 fun LoginScreenContent(
-    loginState: Resource<Unit>,
+    loginState: Response<Unit>,
     onSignInClicked: (String, String) -> Unit,
     onForgotPasswordClicked: () -> Unit,
     onSignUpWithEmailClicked: () -> Unit,
@@ -222,7 +222,7 @@ fun LoginTitle() {
 @Composable
 fun LoginScreenPreview(){
     LoginScreenContent(
-        loginState = Resource(),
+        loginState = Response(),
         onSignInClicked = { _, _ ->},
         onForgotPasswordClicked = {},
         onSignUpWithEmailClicked = {},
