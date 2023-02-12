@@ -36,7 +36,7 @@ class EmailAndPassAuthComponent @Inject constructor(){
             AndroidUtils.isValidEmail(email) && password.isNotEmpty() -> {
                 firebaseAuth.signInWithEmailAndPassword(email, password).addOnCompleteListener { task->
                     if(task.isSuccessful){
-                        trySendBlocking(Resource(status = Status.SUCCESS))
+                        trySend(Resource(status = Status.SUCCESS))
                         Log.i(TAG, "Sign in with email was successful.")
                     }else{
                         trySend(Resource(status = Status.ERROR, error = Error.INVALID_LOGIN))

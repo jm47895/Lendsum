@@ -39,7 +39,7 @@ fun LoginScreen(
     val loginViewModel = hiltViewModel<LoginViewModel>()
     val context = LocalContext.current
 
-    if(loginViewModel.loginState.status == Status.SUCCESS || loginViewModel.firebaseUser != null){
+    if(loginViewModel.loginState.status == Status.SUCCESS /*|| loginViewModel.firebaseUser != null*/){
         LaunchedEffect(Unit){
             navController.navigate(NavDestination.HOME.key){
                 popUpTo(NavDestination.LOGIN.key){
@@ -85,12 +85,10 @@ fun LoginScreenContent(
     when(loginState.status){
         Status.LOADING -> { LoadingAnimation() }
         Status.ERROR -> {
-            LaunchedEffect(loginState.error){
-                when(loginState.error){
-                    Error.NO_INTERNET -> Toast.makeText(context, R.string.not_connected_internet, Toast.LENGTH_SHORT).show()
-                    Error.INVALID_LOGIN -> Toast.makeText(context, R.string.email_or_pass_wrong, Toast.LENGTH_SHORT).show()
-                    else ->{}
-                }
+            when(loginState.error){
+                Error.NO_INTERNET -> Toast.makeText(context, R.string.not_connected_internet, Toast.LENGTH_SHORT).show()
+                Error.INVALID_LOGIN -> Toast.makeText(context, R.string.email_or_pass_wrong, Toast.LENGTH_SHORT).show()
+                else ->{}
             }
         }
         Status.SUCCESS -> { /*Handled in top level screen for nav purposes*/ }
