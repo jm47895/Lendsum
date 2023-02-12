@@ -15,6 +15,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.navigation.NavController
 import com.lendsumapp.lendsum.R
 import com.lendsumapp.lendsum.ui.components.LendsumButton
 import com.lendsumapp.lendsum.ui.components.LendsumField
@@ -24,18 +25,16 @@ import com.lendsumapp.lendsum.util.NetworkUtils
 
 @Composable
 fun ForgotPasswordScreen(
-    onBackButtonClicked:() -> Unit,
-    onSendResetClicked: () -> Unit
+    navController: NavController
 ){
-
     val context = LocalContext.current
 
     ForgotPasswordScreenContent(
         onSendResetClicked = {
-            onSendResetClicked.invoke()
             Toast.makeText(context, R.string.reset_email_sent, Toast.LENGTH_SHORT).show()
+            navController.navigateUp()
         },
-        onBackButtonClicked = onBackButtonClicked
+        onBackButtonClicked = { navController.navigateUp() }
     )
 }
 

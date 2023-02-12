@@ -11,27 +11,30 @@ import androidx.navigation.compose.rememberNavController
 fun LendsumNavHost(
     modifier: Modifier = Modifier,
     navController: NavHostController = rememberNavController(),
-    startDestination: String = NavDestination.LOGIN.destination
+    startDestination: String = NavDestination.LOGIN.key
 ){
     NavHost(modifier = modifier, navController = navController, startDestination = startDestination){
-        composable(NavDestination.LOGIN.destination){
+        composable(route = NavDestination.LOGIN.key){
             LoginScreen(
-                onForgotPasswordClicked = { navController.navigate(NavDestination.PASSWORD_RESET.destination)}
+                navController = navController
             )
         }
-        composable(NavDestination.PASSWORD_RESET.destination){
+        composable(route = NavDestination.PASSWORD_RESET.key){
             ForgotPasswordScreen(
-                onBackButtonClicked = {
-                    navController.navigateUp()
-                },
-                onSendResetClicked = { navController.navigateUp() }
+                navController = navController
+            )
+        }
+        composable(route = NavDestination.HOME.key){
+            HomeScreen(
+                navController = navController
             )
         }
     }
 }
 
-enum class NavDestination(val destination: String){
+enum class NavDestination(val key: String){
     LOGIN("login"),
     CREATE_ACCOUNT("create_account"),
-    PASSWORD_RESET("password_reset")
+    PASSWORD_RESET("password_reset"),
+    HOME("home")
 }

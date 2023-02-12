@@ -2,10 +2,16 @@ package com.lendsumapp.lendsum.viewmodel
 
 import android.content.Context
 import android.content.Intent
-import android.util.Log
-import androidx.lifecycle.*
+import androidx.compose.runtime.mutableStateOf
+import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.google.firebase.auth.FirebaseUser
+import com.lendsumapp.lendsum.data.model.Error
+import com.lendsumapp.lendsum.data.model.Resource
+import com.lendsumapp.lendsum.data.model.Status
 import com.lendsumapp.lendsum.repository.LoginRepository
+import com.lendsumapp.lendsum.util.NetworkUtils
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -16,8 +22,20 @@ class LoginViewModel @Inject constructor(
     private val loginRepository: LoginRepository
 ): ViewModel(){
 
-    fun getFirebaseUser(): FirebaseUser?{
-        return loginRepository.getFirebaseUser()
+    private val _loginState = mutableStateOf(Resource<Unit>())
+    private val _firebaseUser = mutableStateOf<FirebaseUser?>(null)
+
+    val loginState: Resource<Unit>
+        get() = _loginState.value
+    val firebaseUser: FirebaseUser?
+        get() = _firebaseUser.value
+
+    init {
+        getFirebaseUser()
+    }
+
+    private fun getFirebaseUser(){
+        _firebaseUser.value = loginRepository.getFirebaseUser()
     }
 
     //Start of Google Auth functions
@@ -41,14 +59,18 @@ class LoginViewModel @Inject constructor(
     //End of Google Auth functions
 
     //Start of Email and Pass functions
-    fun signInWithEmailAndPass(email: String, password: String){
-        viewModelScope.launch(Dispatchers.IO) {
-            loginRepository.signInWithEmailAndPass(email, password)
-        }
-    }
+    fun signInWithEmailAndPass(context: Context, email: String, password: String){
 
-    fun getEmailSignInStatus(): MutableLiveData<Boolean>{
-        return loginRepository.getEmailSignInStatus()
+        if(!NetworkUtils.isNetworkAvailable(context)){
+            _loginState.value = Resource(status = Status.ERROR, error = Error.NO_INTERNET)
+            return
+        }
+
+        viewModelScope.launch {
+            loginRepository.signInWithEmailAndPass(email, password).collect{
+                _loginState.value = it
+            }
+        }
     }
     //End of Email and Pass functions
 

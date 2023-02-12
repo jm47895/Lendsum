@@ -13,11 +13,11 @@ import com.lendsumapp.lendsum.auth.EmailAndPassAuthComponent
 import com.lendsumapp.lendsum.auth.FacebookAuthComponent
 import com.lendsumapp.lendsum.auth.GoogleAuthComponent
 import com.lendsumapp.lendsum.auth.PhoneAuthComponent
-import com.lendsumapp.lendsum.util.GlobalConstants
+import com.lendsumapp.lendsum.data.model.Resource
 import com.lendsumapp.lendsum.util.GlobalConstants.FIREBASE_AUTH_UPDATE_MAP_KEY
 import com.lendsumapp.lendsum.util.GlobalConstants.FIREBASE_AUTH_UPDATE_MAP_VALUE
 import com.lendsumapp.lendsum.workers.UpdateFirebaseAuthProfileWorker
-import dagger.hilt.android.scopes.ActivityScoped
+import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 
 class LoginRepository @Inject constructor(
@@ -82,8 +82,8 @@ class LoginRepository @Inject constructor(
             .build()
     }
 
-    fun signInWithEmailAndPass(email: String, password: String){
-        emailAndPassAuthComponent.signInWithEmailAndPass(email, password)
+    fun signInWithEmailAndPass(email: String, password: String): Flow<Resource<Unit>> {
+        return emailAndPassAuthComponent.signInWithEmailAndPass(email, password)
     }
 
     fun logOutOfEmailAndPass(){
@@ -92,10 +92,6 @@ class LoginRepository @Inject constructor(
 
     fun getEmailCreateAccountStatus(): MutableLiveData<Boolean>{
         return emailAndPassAuthComponent.getEmailCreateAccountStatus()
-    }
-
-    fun getEmailSignInStatus(): MutableLiveData<Boolean> {
-        return emailAndPassAuthComponent.getEmailSignInStatus()
     }
 
     fun sendPasswordResetEmail(email: String){

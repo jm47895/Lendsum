@@ -1,75 +1,101 @@
 package com.lendsumapp.lendsum.ui
 
-import androidx.annotation.DrawableRes
+import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Divider
-import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.navigation.NavController
 import com.lendsumapp.lendsum.R
+import com.lendsumapp.lendsum.data.model.Error
+import com.lendsumapp.lendsum.data.model.Resource
+import com.lendsumapp.lendsum.data.model.Status
 import com.lendsumapp.lendsum.ui.components.*
 import com.lendsumapp.lendsum.ui.theme.ColorPrimary
 import com.lendsumapp.lendsum.ui.theme.FacebookBlue
-import com.lendsumapp.lendsum.ui.theme.GoogleFont
 import com.lendsumapp.lendsum.ui.theme.GoogleLoginTextColor
 import com.lendsumapp.lendsum.viewmodel.LoginViewModel
 
 @Composable
 fun LoginScreen(
-    onForgotPasswordClicked: () -> Unit
+    navController: NavController,
 ){
 
     val loginViewModel = hiltViewModel<LoginViewModel>()
+    val context = LocalContext.current
 
-    LoginScreenContent(
-        onSignInClicked = { email, pass ->
-            //loginViewModel.signInWithEmailAndPass(email, pass)
-        },
-        onForgotPasswordClicked = onForgotPasswordClicked,
-        onSignUpWithEmailClicked = {
-
-        },
-        onContinueWithGoogleClicked = {
-
-        },
-        onContinueWithFacebookClicked = {
-
+    if(loginViewModel.loginState.status == Status.SUCCESS || loginViewModel.firebaseUser != null){
+        LaunchedEffect(Unit){
+            navController.navigate(NavDestination.HOME.key){
+                popUpTo(NavDestination.LOGIN.key){
+                    inclusive = true
+                }
+            }
         }
-    )
+    }else{
+        LoginScreenContent(
+            loginState = loginViewModel.loginState,
+            onSignInClicked = { email, pass ->
+                loginViewModel.signInWithEmailAndPass(context, email, pass)
+            },
+            onForgotPasswordClicked = { navController.navigate(NavDestination.PASSWORD_RESET.key) },
+            onSignUpWithEmailClicked = {
+
+            },
+            onContinueWithGoogleClicked = {
+
+            },
+            onContinueWithFacebookClicked = {
+
+            }
+        )
+    }
 }
 
 @Composable
 fun LoginScreenContent(
+    loginState: Resource<Unit>,
     onSignInClicked: (String, String) -> Unit,
     onForgotPasswordClicked: () -> Unit,
     onSignUpWithEmailClicked: () -> Unit,
     onContinueWithGoogleClicked: () -> Unit,
     onContinueWithFacebookClicked: () -> Unit
-
 ){
-
     val focusManager = LocalFocusManager.current
+    val context = LocalContext.current
     var showSignUpOptions by remember { mutableStateOf(true) }
     var logInEmail by remember { mutableStateOf("") }
     var logInPass by remember { mutableStateOf("") }
+
+    when(loginState.status){
+        Status.LOADING -> { LoadingAnimation() }
+        Status.ERROR -> {
+            LaunchedEffect(loginState.error){
+                when(loginState.error){
+                    Error.NO_INTERNET -> Toast.makeText(context, R.string.not_connected_internet, Toast.LENGTH_SHORT).show()
+                    Error.INVALID_LOGIN -> Toast.makeText(context, R.string.email_or_pass_wrong, Toast.LENGTH_SHORT).show()
+                    else ->{}
+                }
+            }
+        }
+        Status.SUCCESS -> { /*Handled in top level screen for nav purposes*/ }
+        null -> { /*Default status*/ }
+    }
 
     Column(
         modifier = Modifier
@@ -99,7 +125,7 @@ fun LoginScreenContent(
 
 
         LendsumButton(text = stringResource(id = R.string.sign_in).uppercase()) {
-            onSignInClicked(logInEmail, logInPass)
+            onSignInClicked(logInEmail.trim(), logInPass)
         }
 
         LendsumClickableText(text = stringResource(id = R.string.forgot_password)) {
@@ -198,6 +224,7 @@ fun LoginTitle() {
 @Composable
 fun LoginScreenPreview(){
     LoginScreenContent(
+        loginState = Resource(),
         onSignInClicked = { _, _ ->},
         onForgotPasswordClicked = {},
         onSignUpWithEmailClicked = {},

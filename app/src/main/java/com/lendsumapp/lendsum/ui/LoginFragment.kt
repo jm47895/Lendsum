@@ -51,12 +51,12 @@ class LoginFragment : Fragment(), View.OnClickListener{
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        val firebaseUser = loginViewModel.getFirebaseUser()
-        val isReturningUser = sharedPrefs.getBoolean(RETURNING_USER, false)
+        //val firebaseUser = loginViewModel.getFirebaseUser()
+        //val isReturningUser = sharedPrefs.getBoolean(RETURNING_USER, false)
 
-        if(firebaseUser != null && isReturningUser){
+        /*if(firebaseUser != null && isReturningUser){
             findNavController().navigate(R.id.action_loginFragment_to_marketplaceFragment)
-        }
+        }*/
 
         binding.loginSignUpEmailBtn.setOnClickListener(this)
         binding.loginSignInBtn.setOnClickListener(this)
@@ -127,21 +127,21 @@ class LoginFragment : Fragment(), View.OnClickListener{
 
         if(isOnline!!) {
             when (view?.id) {
-                R.id.login_forgot_password_tv -> {
+               /* R.id.login_forgot_password_tv -> {
                     action = R.id.action_loginFragment_to_forgotPasswordFragment
-                }
+                }*/
                 R.id.login_sign_in_btn -> {
-                    loginViewModel.getEmailSignInStatus().observe(viewLifecycleOwner, emailSignInObserver)
-                    val signInEmail = binding.loginEmailEt.text?.trim().toString()
-                    val signInPassword = binding.loginPasswordEt.text?.trim().toString()
+                    //loginViewModel.getEmailSignInStatus().observe(viewLifecycleOwner, emailSignInObserver)
+                    /*val signInEmail = binding.loginEmailEt.text?.trim().toString()
+                    val signInPassword = binding.loginPasswordEt.text?.trim().toString()*/
 
-                    if (!TextUtils.isEmpty(signInEmail) && !TextUtils.isEmpty(signInPassword)) {
-                        loginViewModel.signInWithEmailAndPass(signInEmail, signInPassword)
-                        editSharedPrefs(sharedPrefs, NAV_SIGN_UP_TYPE, NavSignUpType.EMAIL_LOGIN.ordinal)
-                    } else {
+                    //if (!TextUtils.isEmpty(signInEmail) && !TextUtils.isEmpty(signInPassword)) {
+                        //loginViewModel.signInWithEmailAndPass(signInEmail, signInPassword)
+                        //editSharedPrefs(sharedPrefs, NAV_SIGN_UP_TYPE, NavSignUpType.EMAIL_LOGIN.ordinal)
+                    /*} else {
                         binding.loginEmailEt.error = getString(R.string.email_or_pass_wrong)
                         binding.loginPasswordEt.error = getString(R.string.email_or_pass_wrong)
-                    }
+                    }*/
                 }
                 R.id.login_sign_up_email_btn -> {
                     editSharedPrefs(sharedPrefs, NAV_SIGN_UP_TYPE, NavSignUpType.EMAIL_LOGIN.ordinal)
