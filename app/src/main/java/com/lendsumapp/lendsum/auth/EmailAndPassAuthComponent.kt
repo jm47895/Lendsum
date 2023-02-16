@@ -2,6 +2,7 @@ package com.lendsumapp.lendsum.auth
 
 import android.util.Log
 import androidx.lifecycle.MutableLiveData
+import com.google.firebase.FirebaseError.ERROR_EMAIL_ALREADY_IN_USE
 import com.google.firebase.auth.*
 import com.lendsumapp.lendsum.data.model.LendsumError
 import com.lendsumapp.lendsum.data.model.Response
@@ -14,8 +15,6 @@ import javax.inject.Inject
 class EmailAndPassAuthComponent @Inject constructor(){
 
     private val firebaseAuth : FirebaseAuth = FirebaseAuth.getInstance()
-    private val emailCreateAccountStatus: MutableLiveData<Boolean> = MutableLiveData()
-    private val linkWithEmailStatus: MutableLiveData<Boolean> = MutableLiveData()
     private val updateAuthEmailStatus: MutableLiveData<Boolean> = MutableLiveData()
     private val updateAuthPassStatus: MutableLiveData<Boolean> = MutableLiveData()
 
@@ -48,29 +47,41 @@ class EmailAndPassAuthComponent @Inject constructor(){
     }
 
 
-    fun registerWithEmailAndPassword(email: String, password: String){
+    fun registerWithEmailAndPassword(email: String, password: String) = callbackFlow<Response<Unit>>{
+
+        send(Response(status = Status.LOADING))
 
         if(firebaseAuth.currentUser == null) {
             firebaseAuth.createUserWithEmailAndPassword(email, password).addOnCompleteListener { task ->
                 if (task.isSuccessful){
-                    Log.d(TAG, "Create new user with email and pass was a success")
-                    emailCreateAccountStatus.postValue(true)
+                    Log.i(TAG, "Create new user with email and pass was a success")
+                    trySend(Response(status = Status.SUCCESS))
                 }else{
-                    Log.d(TAG, "Create new user with email and pass failed " + task.exception)
-                    emailCreateAccountStatus.postValue(false)
+                    Log.e(TAG, "Create new user with email and pass failed " + task.exception)
+                    val firebaseAuthException = task.exception as FirebaseAuthException
+                    trySend(Response(
+                        status = Status.ERROR,
+                        error = if (firebaseAuthException.errorCode == "ERROR_EMAIL_ALREADY_IN_USE") LendsumError.USER_EMAIL_ALREADY_EXISTS else LendsumError.FAILED_TO_CREATE_USER)
+                    )
                 }
+                channel.close()
             }
         }else{
             val emailAndPassCredential = EmailAuthProvider.getCredential(email, password)
             firebaseAuth.currentUser?.linkWithCredential(emailAndPassCredential)?.addOnCompleteListener { task ->
                 if (task.isSuccessful){
-                    linkWithEmailStatus.postValue(true)
+                    trySend(Response(status = Status.SUCCESS))
                     Log.i(TAG, "Email and Google or Facebook credential link was successful")
                 }else{
-                    linkWithEmailStatus.postValue(false)
-                    Log.e(TAG, task.exception.toString())
+                    trySend(Response(status = Status.ERROR, error = LendsumError.FAILED_TO_LINK_USER))
+                    Log.e(TAG, "Account link was unsuccessful: " + task.exception.toString())
                 }
             }
+            channel.close()
+        }
+
+        awaitClose {
+
         }
     }
 
@@ -113,10 +124,6 @@ class EmailAndPassAuthComponent @Inject constructor(){
         firebaseAuth.signOut()
     }
 
-    fun getEmailCreateAccountStatus(): MutableLiveData<Boolean>{
-        return emailCreateAccountStatus
-    }
-
     fun sendPasswordResetEmail(email: String) = callbackFlow<Response<Unit>>{
 
         send(Response(status = Status.LOADING))
@@ -136,10 +143,6 @@ class EmailAndPassAuthComponent @Inject constructor(){
         awaitClose {
 
         }
-    }
-
-    fun getLinkWithCredentialStatus(): MutableLiveData<Boolean> {
-        return linkWithEmailStatus
     }
 
     companion object{

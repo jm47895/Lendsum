@@ -1,6 +1,7 @@
 package com.lendsumapp.lendsum.viewmodel
 
 import android.content.Context
+import android.util.Log
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.MutableLiveData
@@ -8,11 +9,14 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.firebase.auth.FirebaseUser
 import com.lendsumapp.lendsum.data.model.LendsumError
+import com.lendsumapp.lendsum.data.model.Response
+import com.lendsumapp.lendsum.data.model.Status
 import com.lendsumapp.lendsum.repository.LoginRepository
 import com.lendsumapp.lendsum.util.AndroidUtils
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ActivityContext
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -21,10 +25,10 @@ class CreateAccountViewModel @Inject constructor(
     private val loginRepository: LoginRepository,
 ): ViewModel(){
 
-    private val _createAccountError = mutableStateOf<LendsumError?>(null)
+    private val _createAccountStatus = mutableStateOf<Response<Unit>>(Response())
 
-    val createAccountError: LendsumError?
-     get() = _createAccountError.value
+    val createAccountStatus: Response<Unit>
+        get() = _createAccountStatus.value
 
     fun logOutOfGoogle(){
         viewModelScope.launch(Dispatchers.IO) {
@@ -48,20 +52,14 @@ class CreateAccountViewModel @Inject constructor(
 
     fun createUserAccount(email: String, password: String){
         viewModelScope.launch(Dispatchers.IO) {
-            loginRepository.registerWithEmailAndPassword(email, password)
+            loginRepository.registerWithEmailAndPassword(email, password).collect{
+                _createAccountStatus.value = it
+            }
         }
-    }
-
-    fun getEmailCreateAccountStatus(): MutableLiveData<Boolean> {
-        return loginRepository.getEmailCreateAccountStatus()
     }
 
     fun updateFirebaseAuthProfile(key: String, value: String){
         loginRepository.launchUpdateFirebaseAuthProfileWorker(key, value)
-    }
-
-    fun getLinkWithCredentialStatus(): MutableLiveData<Boolean> {
-        return loginRepository.getLinkWithCredentialStatus()
     }
 
     fun logOutOfEmailAndPass(){
@@ -77,29 +75,32 @@ class CreateAccountViewModel @Inject constructor(
     fun isValidAccountForm(firstName: String, lastName: String, email: String, password: String, matchPassword: String): Boolean{
         return when{
             firstName.isEmpty() -> {
-                _createAccountError.value = LendsumError.EMPTY_FIRST_NAME
+                _createAccountStatus.value = Response(status = Status.ERROR, error = LendsumError.EMPTY_FIRST_NAME)
                 return false
             }
             lastName.isEmpty() -> {
-                _createAccountError.value = LendsumError.EMPTY_LAST_NAME
+                _createAccountStatus.value = Response(status = Status.ERROR, error = LendsumError.EMPTY_LAST_NAME)
                 return false
             }
             !AndroidUtils.isValidEmail(email) -> {
-                _createAccountError.value = LendsumError.INVALID_EMAIL
+                _createAccountStatus.value = Response(status = Status.ERROR, error = LendsumError.INVALID_EMAIL)
                 return false
             }
             password.isEmpty() || !AndroidUtils.isValidPassword(password) -> {
-                _createAccountError.value = LendsumError.INVALID_PASS
+                _createAccountStatus.value = Response(status = Status.ERROR, error = LendsumError.INVALID_PASS)
                 return false
             }
             password != matchPassword -> {
-                _createAccountError.value = LendsumError.PASS_NO_MATCH
+                _createAccountStatus.value = Response(status = Status.ERROR, error = LendsumError.PASS_NO_MATCH)
                 return false
             }
             else -> {
-                _createAccountError.value = LendsumError.NONE
                 true
             }
         }
+    }
+
+    fun resetResponse(){
+        _createAccountStatus.value = Response()
     }
 }

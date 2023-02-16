@@ -159,8 +159,8 @@ class CreateAccountFragment : Fragment(), View.OnClickListener {
                 val matchPassword = binding.createUserMatchPasswordEt.text.toString().trim()
 
                 if(isValidAccountForm(firstName, lastName, email, password, matchPassword)){
-                    createAccountViewModel.getEmailCreateAccountStatus().observe(viewLifecycleOwner, emailCreateAccountObserver)
-                    createAccountViewModel.getLinkWithCredentialStatus().observe(viewLifecycleOwner, linkWithEmailObserver)
+                    //createAccountViewModel.getEmailCreateAccountStatus().observe(viewLifecycleOwner, emailCreateAccountObserver)
+                    //createAccountViewModel.getLinkWithCredentialStatus().observe(viewLifecycleOwner, linkWithEmailObserver)
                     signUpUser(email, password)
                 }
             }

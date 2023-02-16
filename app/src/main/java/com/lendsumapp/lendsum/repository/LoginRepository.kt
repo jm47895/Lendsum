@@ -60,8 +60,8 @@ class LoginRepository @Inject constructor(
     //End of Google Auth functions
 
     //Start of Email and Pass functions
-    fun registerWithEmailAndPassword(email: String, password: String){
-        emailAndPassAuthComponent.registerWithEmailAndPassword(email, password)
+    fun registerWithEmailAndPassword(email: String, password: String): Flow<Response<Unit>>{
+        return emailAndPassAuthComponent.registerWithEmailAndPassword(email, password)
     }
 
     fun launchUpdateFirebaseAuthProfileWorker(key: String, value: String) {
@@ -90,17 +90,10 @@ class LoginRepository @Inject constructor(
         emailAndPassAuthComponent.signOutOfEmailAndPass()
     }
 
-    fun getEmailCreateAccountStatus(): MutableLiveData<Boolean>{
-        return emailAndPassAuthComponent.getEmailCreateAccountStatus()
-    }
-
     fun sendPasswordResetEmail(email: String): Flow<Response<Unit>>{
         return emailAndPassAuthComponent.sendPasswordResetEmail(email)
     }
 
-    fun getLinkWithCredentialStatus(): MutableLiveData<Boolean> {
-        return emailAndPassAuthComponent.getLinkWithCredentialStatus()
-    }
     //End of Email and Pass functions
 
     //Facebook login functions

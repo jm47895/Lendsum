@@ -40,7 +40,7 @@ class GoogleAuthComponent @Inject constructor(){
     fun signOutOfGoogle(){
         googleAuthState.postValue(false)
         firebaseAuth.signOut()
-        googleSignInClient.signOut()
+        //googleSignInClient.signOut()
     }
 
     fun handleGoogleSignInIntent(data: Intent){
