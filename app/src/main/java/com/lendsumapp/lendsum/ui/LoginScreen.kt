@@ -22,7 +22,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.lendsumapp.lendsum.R
-import com.lendsumapp.lendsum.data.model.Error
+import com.lendsumapp.lendsum.data.model.LendsumError
 import com.lendsumapp.lendsum.data.model.Response
 import com.lendsumapp.lendsum.data.model.Status
 import com.lendsumapp.lendsum.ui.components.*
@@ -54,9 +54,7 @@ fun LoginScreen(
                 loginViewModel.signInWithEmailAndPass(context, email, pass)
             },
             onForgotPasswordClicked = { navController.navigate(NavDestination.PASSWORD_RESET.key) },
-            onSignUpWithEmailClicked = {
-
-            },
+            onSignUpWithEmailClicked = { navController.navigate(NavDestination.CREATE_ACCOUNT.key) },
             onContinueWithGoogleClicked = {
 
             },
@@ -78,7 +76,7 @@ fun LoginScreenContent(
 ){
     val focusManager = LocalFocusManager.current
     val context = LocalContext.current
-    var showSignUpOptions by remember { mutableStateOf(true) }
+    var showSignUpOptions by remember { mutableStateOf(false) }
     var logInEmail by remember { mutableStateOf("") }
     var logInPass by remember { mutableStateOf("") }
 
@@ -86,8 +84,8 @@ fun LoginScreenContent(
         Status.LOADING -> { LoadingAnimation() }
         Status.ERROR -> {
             when(loginState.error){
-                Error.NO_INTERNET -> Toast.makeText(context, R.string.not_connected_internet, Toast.LENGTH_SHORT).show()
-                Error.INVALID_LOGIN -> Toast.makeText(context, R.string.email_or_pass_wrong, Toast.LENGTH_SHORT).show()
+                LendsumError.NO_INTERNET -> Toast.makeText(context, R.string.not_connected_internet, Toast.LENGTH_SHORT).show()
+                LendsumError.INVALID_LOGIN -> Toast.makeText(context, R.string.email_or_pass_wrong, Toast.LENGTH_SHORT).show()
                 else ->{}
             }
         }

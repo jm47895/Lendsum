@@ -29,6 +29,11 @@ fun LendsumNavHost(
                 navController = navController
             )
         }
+        composable(route = NavDestination.CREATE_ACCOUNT.key){
+            CreateAccountScreen(
+                navController = navController
+            )
+        }
     }
 }
 

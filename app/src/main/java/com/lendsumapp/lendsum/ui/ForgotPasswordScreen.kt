@@ -4,13 +4,11 @@ import android.widget.Toast
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.material3.Icon
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Devices
@@ -18,12 +16,12 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.lendsumapp.lendsum.R
-import com.lendsumapp.lendsum.data.model.Error
+import com.lendsumapp.lendsum.data.model.LendsumError
 import com.lendsumapp.lendsum.data.model.Response
 import com.lendsumapp.lendsum.data.model.Status
+import com.lendsumapp.lendsum.ui.components.BackButton
 import com.lendsumapp.lendsum.ui.components.LendsumButton
 import com.lendsumapp.lendsum.ui.components.LendsumField
-import com.lendsumapp.lendsum.ui.components.noRippleClickable
 import com.lendsumapp.lendsum.viewmodel.LoginViewModel
 
 @Composable
@@ -61,19 +59,15 @@ fun ForgotPasswordScreenContent(
     Column(
         modifier = Modifier.fillMaxSize()
     ) {
-        Icon(
-            modifier = Modifier.noRippleClickable {
-                onBackButtonClicked.invoke()
-            },
-            painter = painterResource(id = R.drawable.ic_arrow_back_32),
-            contentDescription = "Back Arrow", tint = Color.Black
-        )
+        BackButton(color = Color.Black) {
+            onBackButtonClicked.invoke()
+        }
         LendsumField(
             keyBoardType = KeyboardType.Email,
             supportingLabel = stringResource(id = R.string.email),
             errorLabel = when(resetPassState.error){
-                Error.NO_INTERNET-> stringResource(id = R.string.not_connected_internet)
-                Error.INVALID_EMAIL -> stringResource(id = R.string.invalid_email_err_msg)
+                LendsumError.NO_INTERNET-> stringResource(id = R.string.not_connected_internet)
+                LendsumError.INVALID_EMAIL -> stringResource(id = R.string.invalid_email_err_msg)
                 else -> null
             },
             onTextChanged = {

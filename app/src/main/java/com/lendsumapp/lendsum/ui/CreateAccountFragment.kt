@@ -120,14 +120,19 @@ class CreateAccountFragment : Fragment(), View.OnClickListener {
             binding.createUserFirstNameEt.error = getString(R.string.first_name_error_msg)
             binding.createUserLastNameEt.error = getString(R.string.last_name_err_msg)
             return false
-        } else if (!AndroidUtils.isValidEmail(email)) {
+        }
+
+        if (!AndroidUtils.isValidEmail(email)) {
             binding.createUserEmailEt.error = getString(R.string.invalid_email_err_msg)
             return false
-        } else if (TextUtils.isEmpty(password) || !AndroidUtils.isValidPassword(password)
-        ) {
+        }
+
+        if (TextUtils.isEmpty(password) || !AndroidUtils.isValidPassword(password)) {
             binding.createUserPasswordEt.error = getString(R.string.password_param_err_msg)
             return false
-        }else if(password != matchPassword){
+        }
+
+        if(password != matchPassword){
             binding.createUserMatchPasswordEt.error = getString(R.string.pass_dont_match_err_msg)
             binding.createUserPasswordEt.error = getString(R.string.pass_dont_match_err_msg)
             return false

@@ -3,7 +3,7 @@ package com.lendsumapp.lendsum.auth
 import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import com.google.firebase.auth.*
-import com.lendsumapp.lendsum.data.model.Error
+import com.lendsumapp.lendsum.data.model.LendsumError
 import com.lendsumapp.lendsum.data.model.Response
 import com.lendsumapp.lendsum.data.model.Status
 import com.lendsumapp.lendsum.util.AndroidUtils
@@ -30,14 +30,14 @@ class EmailAndPassAuthComponent @Inject constructor(){
                         trySend(Response(status = Status.SUCCESS))
                         Log.i(TAG, "Sign in with email was successful.")
                     }else{
-                        trySend(Response(status = Status.ERROR, error = Error.INVALID_LOGIN))
+                        trySend(Response(status = Status.ERROR, error = LendsumError.INVALID_LOGIN))
                         Log.e(TAG, "Sign in with email failed" + task.exception)
                     }
                     channel.close()
                 }
             }
             else -> {
-                send(Response(status = Status.ERROR, error = Error.INVALID_LOGIN))
+                send(Response(status = Status.ERROR, error = LendsumError.INVALID_LOGIN))
                 channel.close()
             }
         }
@@ -65,10 +65,10 @@ class EmailAndPassAuthComponent @Inject constructor(){
             firebaseAuth.currentUser?.linkWithCredential(emailAndPassCredential)?.addOnCompleteListener { task ->
                 if (task.isSuccessful){
                     linkWithEmailStatus.postValue(true)
-                    Log.d(TAG, "Email and Google or Facebook credential link was successful")
+                    Log.i(TAG, "Email and Google or Facebook credential link was successful")
                 }else{
                     linkWithEmailStatus.postValue(false)
-                    Log.d(TAG, task.exception.toString())
+                    Log.e(TAG, task.exception.toString())
                 }
             }
         }
@@ -127,7 +127,7 @@ class EmailAndPassAuthComponent @Inject constructor(){
                 Log.i(TAG, "Reset Password email sent.")
                 channel.close()
             }else{
-                trySend(Response(status = Status.ERROR, error = Error.FAILED_TO_SEND))
+                trySend(Response(status = Status.ERROR, error = LendsumError.FAILED_TO_SEND))
                 Log.e(TAG, "Reset Password email failed to send." + task.exception)
                 channel.close(task.exception)
             }

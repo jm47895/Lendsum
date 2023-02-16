@@ -7,7 +7,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.firebase.auth.FirebaseUser
-import com.lendsumapp.lendsum.data.model.Error
+import com.lendsumapp.lendsum.data.model.LendsumError
 import com.lendsumapp.lendsum.data.model.Response
 import com.lendsumapp.lendsum.data.model.Status
 import com.lendsumapp.lendsum.repository.LoginRepository
@@ -67,7 +67,7 @@ class LoginViewModel @Inject constructor(
 
         if(!NetworkUtils.isNetworkAvailable(context)){
             _loginState.value =
-                Response(status = Status.ERROR, error = Error.NO_INTERNET)
+                Response(status = Status.ERROR, error = LendsumError.NO_INTERNET)
             return
         }
 
@@ -81,12 +81,12 @@ class LoginViewModel @Inject constructor(
     fun sendPasswordResetEmail(context: Context, email: String){
 
         if(!NetworkUtils.isNetworkAvailable(context)){
-            _resetPassState.value = Response(status = Status.ERROR, error = Error.NO_INTERNET)
+            _resetPassState.value = Response(status = Status.ERROR, error = LendsumError.NO_INTERNET)
             return
         }
 
         if(!AndroidUtils.isValidEmail(email)){
-            _resetPassState.value = Response(status = Status.ERROR, error = Error.INVALID_EMAIL)
+            _resetPassState.value = Response(status = Status.ERROR, error = LendsumError.INVALID_EMAIL)
             return
         }
 
