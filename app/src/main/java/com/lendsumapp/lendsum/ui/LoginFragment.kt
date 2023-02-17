@@ -64,7 +64,7 @@ class LoginFragment : Fragment(), View.OnClickListener{
         binding.loginSignInWithFacebook.setOnClickListener(this)
         binding.loginSignInWithGoogle.setOnClickListener(this)
 
-        emailSignInObserver = Observer { isLoginSuccessful ->
+        /*emailSignInObserver = Observer { isLoginSuccessful ->
             if (isLoginSuccessful){
                 Log.d(TAG, "Email login success")
                 clearEditTextsFocusToPreventNavigationLeaks()
@@ -75,7 +75,7 @@ class LoginFragment : Fragment(), View.OnClickListener{
                 binding.loginEmailEt.error = getString(R.string.email_or_pass_wrong)
                 binding.loginPasswordEt.error = getString(R.string.email_or_pass_wrong)
             }
-        }
+        }*/
 
         googleAuthObserver = Observer{ isGoogleLoginSuccessful ->
             if(isGoogleLoginSuccessful){
@@ -144,13 +144,13 @@ class LoginFragment : Fragment(), View.OnClickListener{
                     }*/
                 }
                 R.id.login_sign_up_email_btn -> {
-                    editSharedPrefs(sharedPrefs, NAV_SIGN_UP_TYPE, NavSignUpType.EMAIL_LOGIN.ordinal)
-                    action = R.id.action_loginFragment_to_createAccountFragment
+                    /*editSharedPrefs(sharedPrefs, NAV_SIGN_UP_TYPE, NavSignUpType.EMAIL_LOGIN.ordinal)
+                    action = R.id.action_loginFragment_to_createAccountFragment*/
                 }
                 R.id.login_sign_in_with_google -> {
-                    loginViewModel.getGoogleLoginState().observe(viewLifecycleOwner, googleAuthObserver)
-                    context?.let { loginViewModel.configureGoogleAuth(it) }
-                    registerGoogleActivityResult.launch(loginViewModel.getGoogleAuthIntent())
+                    //loginViewModel.getGoogleLoginState().observe(viewLifecycleOwner, googleAuthObserver)
+                    //context?.let { loginViewModel.configureGoogleAuth(it) }
+                    //registerGoogleActivityResult.launch(loginViewModel.getGoogleAuthIntent())
                 }
                 R.id.login_sign_in_with_facebook -> {
                     loginViewModel.getFacebookAuthState().observe(viewLifecycleOwner, facebookAuthObserver)

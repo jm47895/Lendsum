@@ -60,7 +60,7 @@ class SettingsFragment : Fragment(), View.OnClickListener {
                     }
                     NavSignUpType.GOOGLE_LOGIN.ordinal ->{
                         context?.let {
-                            settingsViewModel.configureGoogleAuth(it)
+                            //settingsViewModel.configureGoogleAuth(it)
                             settingsViewModel.logOutOfGoogle()
                             view.findNavController().navigate(R.id.action_settingsFragment_to_loginFragment)
                         }

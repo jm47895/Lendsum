@@ -26,6 +26,7 @@ class LoginViewModel @Inject constructor(
     private val _loginState = mutableStateOf(Response<Unit>())
     private val _resetPassState = mutableStateOf(Response<Unit>())
     private val _firebaseUser = mutableStateOf<FirebaseUser?>(null)
+    private val _googleSignInState = mutableStateOf(Response<Unit>())
 
     val loginState: Response<Unit>
         get() = _loginState.value
@@ -33,6 +34,8 @@ class LoginViewModel @Inject constructor(
         get() = _firebaseUser.value
     val resetPassState: Response<Unit>
         get() = _resetPassState.value
+    val googleSignInState: Response<Unit>
+        get() = _googleSignInState.value
 
     init {
         getFirebaseUser()
@@ -43,22 +46,16 @@ class LoginViewModel @Inject constructor(
     }
 
     //Start of Google Auth functions
-    fun configureGoogleAuth(context: Context){
-        loginRepository.configureGoogleAuth(context)
-    }
-
     fun getGoogleAuthIntent(): Intent {
         return loginRepository.sendGoogleSignInIntent()
     }
 
     fun handleGoogleSignInIntent(data: Intent){
-        viewModelScope.launch(Dispatchers.IO) {
-            loginRepository.handleGoogleSignInIntent(data)
+        viewModelScope.launch{
+            loginRepository.handleGoogleSignInIntent(data).collect{
+                _googleSignInState.value = it
+            }
         }
-    }
-
-    fun getGoogleLoginState():MutableLiveData<Boolean>{
-        return loginRepository.getGoogleLoginState()
     }
     //End of Google Auth functions
 
@@ -115,6 +112,14 @@ class LoginViewModel @Inject constructor(
         return loginRepository.getFacebookAuthState()
     }
     //End of Facebook login functions
+
+    fun resetLoginState(){
+        _loginState.value = Response()
+    }
+
+    fun resetGoogleSigInState(){
+        _googleSignInState.value = Response()
+    }
 
     companion object{
         private val TAG = LoginViewModel::class.simpleName

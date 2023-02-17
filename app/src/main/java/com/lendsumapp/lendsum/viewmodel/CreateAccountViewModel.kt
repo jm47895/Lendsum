@@ -36,10 +36,6 @@ class CreateAccountViewModel @Inject constructor(
         }
     }
 
-    fun configureGoogleAuth(context: Context){
-        loginRepository.configureGoogleAuth(context)
-    }
-
     fun logOutOfFacebook(){
         viewModelScope.launch(Dispatchers.IO) {
             loginRepository.logOutOfFacebook()

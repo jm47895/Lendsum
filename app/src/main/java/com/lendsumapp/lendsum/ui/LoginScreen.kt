@@ -1,6 +1,9 @@
 package com.lendsumapp.lendsum.ui
 
+import android.util.Log
 import android.widget.Toast
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.*
@@ -21,7 +24,14 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
+import com.google.android.gms.auth.api.identity.BeginSignInRequest
+import com.google.android.gms.auth.api.signin.GoogleSignIn
+import com.google.android.gms.auth.api.signin.GoogleSignInOptions
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.GoogleAuthCredential
+import com.google.firebase.auth.GoogleAuthProvider
 import com.lendsumapp.lendsum.R
+import com.lendsumapp.lendsum.auth.GoogleAuthComponent
 import com.lendsumapp.lendsum.data.model.LendsumError
 import com.lendsumapp.lendsum.data.model.Response
 import com.lendsumapp.lendsum.data.model.Status
@@ -38,31 +48,51 @@ fun LoginScreen(
 
     val loginViewModel = hiltViewModel<LoginViewModel>()
     val context = LocalContext.current
+    val googleSignInLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.StartActivityForResult(),
+        onResult = { result ->
+            result.data?.let { loginViewModel.handleGoogleSignInIntent(it) }
+        }
+    )
+
+    if(loginViewModel.googleSignInState.status == Status.SUCCESS){
+        loginViewModel.resetGoogleSigInState()
+        navController.navigate(NavDestination.CREATE_ACCOUNT.key)
+    }
+
+
 
     if(loginViewModel.loginState.status == Status.SUCCESS /*|| loginViewModel.firebaseUser != null*/){
-        LaunchedEffect(Unit){
-            navController.navigate(NavDestination.HOME.key){
-                popUpTo(NavDestination.LOGIN.key){
-                    inclusive = true
-                }
+        loginViewModel.resetLoginState()
+        navController.navigate(NavDestination.HOME.key){
+            popUpTo(NavDestination.LOGIN.key){
+                inclusive = true
             }
         }
-    }else{
-        LoginScreenContent(
-            loginState = loginViewModel.loginState,
-            onSignInClicked = { email, pass ->
-                loginViewModel.signInWithEmailAndPass(context, email, pass)
-            },
-            onForgotPasswordClicked = { navController.navigate(NavDestination.PASSWORD_RESET.key) },
-            onSignUpWithEmailClicked = { navController.navigate(NavDestination.CREATE_ACCOUNT.key) },
-            onContinueWithGoogleClicked = {
-
-            },
-            onContinueWithFacebookClicked = {
-
-            }
-        )
     }
+
+    LoginScreenContent(
+        loginState = loginViewModel.loginState,
+        onSignInClicked = { email, pass ->
+            loginViewModel.signInWithEmailAndPass(context, email, pass)
+        },
+        onForgotPasswordClicked = { navController.navigate(NavDestination.PASSWORD_RESET.key) },
+        onSignUpWithEmailClicked = { navController.navigate(NavDestination.CREATE_ACCOUNT.key) },
+        onContinueWithGoogleClicked = {
+            val options = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+                .requestIdToken(context.getString(R.string.default_web_client_id))
+                .requestEmail()
+                .requestProfile()
+                .build()
+
+            val intent = GoogleSignIn.getClient(context, options)
+            googleSignInLauncher.launch(intent.signInIntent)
+        },
+        onContinueWithFacebookClicked = {
+
+        }
+    )
+
 }
 
 @Composable

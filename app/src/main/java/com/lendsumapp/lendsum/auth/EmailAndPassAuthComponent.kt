@@ -73,7 +73,7 @@ class EmailAndPassAuthComponent @Inject constructor(){
                     trySend(Response(status = Status.SUCCESS))
                     Log.i(TAG, "Email and Google or Facebook credential link was successful")
                 }else{
-                    trySend(Response(status = Status.ERROR, error = LendsumError.FAILED_TO_LINK_USER))
+                    trySend(Response(status = Status.ERROR, error = LendsumError.FAILED_TO_LINK_FIREBASE))
                     Log.e(TAG, "Account link was unsuccessful: " + task.exception.toString())
                 }
             }

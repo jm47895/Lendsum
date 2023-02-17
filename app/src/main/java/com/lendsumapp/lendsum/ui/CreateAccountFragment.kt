@@ -182,7 +182,7 @@ class CreateAccountFragment : Fragment(), View.OnClickListener {
                     createAccountViewModel.logOutOfEmailAndPass()
                 }
                 NavSignUpType.GOOGLE_LOGIN.ordinal -> {
-                    context?.let { createAccountViewModel.configureGoogleAuth(it) }
+                    //context?.let { createAccountViewModel.configureGoogleAuth(it) }
                     createAccountViewModel.logOutOfGoogle()
                 }
                 NavSignUpType.FACEBOOK_LOGIN.ordinal -> {

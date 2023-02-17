@@ -15,11 +15,11 @@
       },
       "oauth_client": [
         {
-          "client_id": "550559154955-culsvr3c31ivhu0i619e2uv3s1pi94du.apps.googleusercontent.com",
+          "client_id": "550559154955-liih1603tnsbvpo2aeflcqd6l5cvcmu1.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
             "package_name": "com.lendsumapp.lendsum",
-            "certificate_hash": "dfb71662d58914ac6056d5730cde75f40cbaf83d"
+            "certificate_hash": "fcef30c64432e39b49eefc06100eda3136cfe2d1"
           }
         },
         {
@@ -36,7 +36,7 @@
         "appinvite_service": {
           "other_platform_oauth_client": [
             {
-              "client_id": "550559154955-n9odltmn44a6687vlmvjjtiagj7jebam.apps.googleusercontent.com",
+              "client_id": "550559154955-805jbfrlejidpuuuh9n3ledsvr3are2l.apps.googleusercontent.com",
               "client_type": 3
             }
           ]

@@ -38,24 +38,16 @@ class LoginRepository @Inject constructor(
     }
 
     //Start of Google Auth functions
-    fun configureGoogleAuth(context: Context){
-        googleAuthComponent.configureGoogleAuth(context, context.resources.getString(R.string.default_web_client_id))
-    }
-
     fun sendGoogleSignInIntent(): Intent{
         return googleAuthComponent.getGoogleSignInIntent()
     }
 
-    fun handleGoogleSignInIntent(data: Intent){
-        googleAuthComponent.handleGoogleSignInIntent(data)
+    fun handleGoogleSignInIntent(data: Intent): Flow<Response<Unit>>{
+        return googleAuthComponent.handleGoogleSignInIntent(data)
     }
 
     fun logOutOfGoogle(){
         googleAuthComponent.signOutOfGoogle()
-    }
-
-    fun getGoogleLoginState():MutableLiveData<Boolean>{
-        return googleAuthComponent.getGoogleLoginState()
     }
     //End of Google Auth functions
 

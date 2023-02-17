@@ -1,81 +1,62 @@
 package com.lendsumapp.lendsum.auth
 
-import android.content.Context
 import android.content.Intent
 import android.util.Log
-import androidx.lifecycle.MutableLiveData
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInClient
-import com.google.android.gms.auth.api.signin.GoogleSignInOptions
-import com.google.android.gms.common.api.ApiException
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.auth.GoogleAuthProvider
-import dagger.hilt.android.scopes.ActivityScoped
-import dagger.hilt.android.scopes.FragmentScoped
+import com.lendsumapp.lendsum.data.model.LendsumError
+import com.lendsumapp.lendsum.data.model.Response
+import com.lendsumapp.lendsum.data.model.Status
+import kotlinx.coroutines.channels.awaitClose
+import kotlinx.coroutines.flow.callbackFlow
 import javax.inject.Inject
-import javax.inject.Singleton
 
 class GoogleAuthComponent @Inject constructor(){
 
     private val firebaseAuth : FirebaseAuth = FirebaseAuth.getInstance()
     private lateinit var googleSignInClient : GoogleSignInClient
-    private val googleAuthState: MutableLiveData<Boolean> = MutableLiveData()
-
-    fun configureGoogleAuth(context: Context, clientId: String) {
-        val gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-            .requestIdToken(clientId)
-            .requestEmail()
-            .build()
-
-        context.let {
-            googleSignInClient = GoogleSignIn.getClient(it, gso)
-        }
-    }
 
     fun getGoogleSignInIntent(): Intent {
         return googleSignInClient.signInIntent
     }
 
     fun signOutOfGoogle(){
-        googleAuthState.postValue(false)
         firebaseAuth.signOut()
         //googleSignInClient.signOut()
     }
 
-    fun handleGoogleSignInIntent(data: Intent){
+    fun handleGoogleSignInIntent(intent: Intent) = callbackFlow<Response<Unit>>{
 
-        val task = GoogleSignIn.getSignedInAccountFromIntent(data)
-        try {
-            val account = task.getResult(ApiException::class.java)!!
-            Log.d(TAG, "FirebaseAuthWithGoogle:" + account.id)
-            authenticateCredentials(account.idToken!!)
-        }catch (e: ApiException){
-            Log.d(TAG, "Firebase Login failed", e)
-        }
+        send(Response(status = Status.LOADING))
 
-    }
+        val task = GoogleSignIn.getSignedInAccountFromIntent(intent)
 
-    private fun authenticateCredentials(idToken: String){
-
-        val credential = GoogleAuthProvider.getCredential(idToken, null)
-
-        firebaseAuth.signInWithCredential(credential)
-            .addOnCompleteListener { task ->
-                if (task.isSuccessful) {
-                    Log.d(TAG, "Google Firebase Sign-in Success")
-                    googleAuthState.postValue(true)
+        if(task.isSuccessful){
+            Log.i(TAG, "Get google account success: ${task.result.displayName}")
+            val credential = GoogleAuthProvider.getCredential(task.result.idToken, null)
+            FirebaseAuth.getInstance().signInWithCredential(credential).addOnCompleteListener { loginTask ->
+                if (loginTask.isSuccessful) {
+                    trySend(Response(status = Status.SUCCESS))
+                    Log.i(TAG, "Google Firebase Sign-in Success")
                 } else {
                     // If sign in fails, display a message to the user.
-                    Log.d(TAG, "Google Firebase Sign-in Failed", task.exception)
-                    googleAuthState.postValue(false)
+                    trySend(Response(status = Status.ERROR, error = LendsumError.FAILED_TO_LINK_FIREBASE))
+                    Log.e(TAG, "Google Firebase Sign-in Failed", loginTask.exception)
                 }
+                channel.close()
             }
+        }else{
+            trySend(Response(status = Status.ERROR, error = LendsumError.FAILED_TO_GET_GOOGLE_INFO))
+            Log.d("ASDF", "Get google account failed: ${task.exception}")
+            channel.close()
+        }
 
-    }
+        awaitClose {
 
-    fun getGoogleLoginState():MutableLiveData<Boolean>{
-        return googleAuthState
+        }
+
     }
 
     companion object{

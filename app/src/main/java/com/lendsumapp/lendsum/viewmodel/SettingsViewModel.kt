@@ -20,10 +20,6 @@ class SettingsViewModel @Inject constructor(
         }
     }
 
-    fun configureGoogleAuth(context: Context){
-        loginRepository.configureGoogleAuth(context)
-    }
-
     fun logOutOfEmailAndPass(){
         viewModelScope.launch(Dispatchers.IO) {
             loginRepository.logOutOfEmailAndPass()
