@@ -68,6 +68,7 @@ fun ForgotPasswordScreenContent(
             errorLabel = when(resetPassState.error){
                 LendsumError.NO_INTERNET-> stringResource(id = R.string.not_connected_internet)
                 LendsumError.INVALID_EMAIL -> stringResource(id = R.string.invalid_email_err_msg)
+                LendsumError.USER_NOT_FOUND -> stringResource(id = R.string.email_doesnt_exist)
                 else -> null
             },
             onTextChanged = {

@@ -99,5 +99,6 @@
     <string name="pick_user_first">You must pick a user first</string>
     <string name="take_image">Take Photo</string>
     <string name="gallery">Gallery</string>
+    <string name="email_doesnt_exist">This email doesn\'t exist. Please try another one.</string>
 
 </resources>

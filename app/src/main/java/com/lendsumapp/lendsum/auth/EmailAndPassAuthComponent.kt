@@ -132,12 +132,15 @@ class EmailAndPassAuthComponent @Inject constructor(){
             if(task.isSuccessful){
                 trySend(Response(Status.SUCCESS))
                 Log.i(TAG, "Reset Password email sent.")
-                channel.close()
             }else{
-                trySend(Response(status = Status.ERROR, error = LendsumError.FAILED_TO_SEND))
+                val exception = task.exception as FirebaseAuthException
+                when(exception.errorCode){
+                   "ERROR_USER_NOT_FOUND" -> trySend(Response(status = Status.ERROR, error = LendsumError.USER_NOT_FOUND))
+                    else -> trySend(Response(status = Status.ERROR, error = LendsumError.FAILED_TO_SEND))
+                }
                 Log.e(TAG, "Reset Password email failed to send." + task.exception)
-                channel.close(task.exception)
             }
+            channel.close()
         }
 
         awaitClose {
