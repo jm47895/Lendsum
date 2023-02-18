@@ -24,7 +24,6 @@ class GoogleAuthComponent @Inject constructor(){
 
     fun signOutOfGoogle(){
         firebaseAuth.signOut()
-        //googleSignInClient.signOut()
     }
 
     fun handleGoogleSignInIntent(intent: Intent) = callbackFlow<Response<Unit>>{

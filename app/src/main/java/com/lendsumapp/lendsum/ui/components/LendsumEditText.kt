@@ -20,13 +20,14 @@ import com.lendsumapp.lendsum.ui.theme.ColorPrimary
 @Composable
 fun LendsumField(
     modifier: Modifier = Modifier,
+    defaultValue: String? = null,
     keyBoardType: KeyboardType,
     supportingLabel: String,
     errorLabel: String? = null,
     onTextChanged :(String) -> Unit,
 ){
 
-    var input by remember { mutableStateOf("") }
+    var input by remember { mutableStateOf(defaultValue?:"") }
 
     TextField(
         modifier = modifier

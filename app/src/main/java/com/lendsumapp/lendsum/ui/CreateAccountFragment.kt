@@ -51,13 +51,13 @@ class CreateAccountFragment : Fragment(), View.OnClickListener {
             findNavController().navigate(R.id.action_createAccountFragment_to_loginFragment)
         }
 
-        val user = createAccountViewModel.getFirebaseUser()
+        //val user = createAccountViewModel.getFirebaseUser()
 
-        if(user != null){
+        /*if(user != null){
             binding.createUserFirstNameEt.setText(user.displayName?.let { getFirstName(it) })
             binding.createUserLastNameEt.setText(user.displayName?.let { getLastName(it) })
             binding.createUserEmailEt.setText(user.email)
-        }
+        }*/
 
         binding.createAccountBackBtn.setOnClickListener(this)
         binding.createAccountNextBtn.setOnClickListener(this)

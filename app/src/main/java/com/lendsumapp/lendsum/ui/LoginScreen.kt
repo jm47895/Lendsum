@@ -73,6 +73,7 @@ fun LoginScreen(
 
     LoginScreenContent(
         loginState = loginViewModel.loginState,
+        googleSignInState = loginViewModel.googleSignInState,
         onSignInClicked = { email, pass ->
             loginViewModel.signInWithEmailAndPass(context, email, pass)
         },
@@ -98,6 +99,7 @@ fun LoginScreen(
 @Composable
 fun LoginScreenContent(
     loginState: Response<Unit>,
+    googleSignInState: Response<Unit>,
     onSignInClicked: (String, String) -> Unit,
     onForgotPasswordClicked: () -> Unit,
     onSignUpWithEmailClicked: () -> Unit,
@@ -110,8 +112,11 @@ fun LoginScreenContent(
     var logInEmail by remember { mutableStateOf("") }
     var logInPass by remember { mutableStateOf("") }
 
+    if(loginState.status == Status.LOADING || googleSignInState.status == Status.LOADING){
+        LoadingAnimation()
+    }
+
     when(loginState.status){
-        Status.LOADING -> { LoadingAnimation() }
         Status.ERROR -> {
             when(loginState.error){
                 LendsumError.NO_INTERNET -> Toast.makeText(context, R.string.not_connected_internet, Toast.LENGTH_SHORT).show()
@@ -119,8 +124,7 @@ fun LoginScreenContent(
                 else ->{}
             }
         }
-        Status.SUCCESS -> { /*Handled in top level screen for nav purposes*/ }
-        null -> { /*Default status*/ }
+        else -> {}
     }
 
     Column(
@@ -251,6 +255,7 @@ fun LoginTitle() {
 fun LoginScreenPreview(){
     LoginScreenContent(
         loginState = Response(),
+        googleSignInState = Response(),
         onSignInClicked = { _, _ ->},
         onForgotPasswordClicked = {},
         onSignUpWithEmailClicked = {},

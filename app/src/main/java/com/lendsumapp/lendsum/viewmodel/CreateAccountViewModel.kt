@@ -1,10 +1,6 @@
 package com.lendsumapp.lendsum.viewmodel
 
-import android.content.Context
-import android.util.Log
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.firebase.auth.FirebaseUser
@@ -14,9 +10,7 @@ import com.lendsumapp.lendsum.data.model.Status
 import com.lendsumapp.lendsum.repository.LoginRepository
 import com.lendsumapp.lendsum.util.AndroidUtils
 import dagger.hilt.android.lifecycle.HiltViewModel
-import dagger.hilt.android.qualifiers.ActivityContext
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -26,9 +20,16 @@ class CreateAccountViewModel @Inject constructor(
 ): ViewModel(){
 
     private val _createAccountStatus = mutableStateOf<Response<Unit>>(Response())
+    private val _firebaseUser = mutableStateOf<FirebaseUser?>(null)
 
     val createAccountStatus: Response<Unit>
         get() = _createAccountStatus.value
+    val firebaseUser: FirebaseUser?
+        get() = _firebaseUser.value
+
+    init {
+        getFirebaseUser()
+    }
 
     fun logOutOfGoogle(){
         viewModelScope.launch(Dispatchers.IO) {
@@ -42,8 +43,8 @@ class CreateAccountViewModel @Inject constructor(
         }
     }
 
-    fun getFirebaseUser(): FirebaseUser?{
-        return loginRepository.getFirebaseUser()
+    private fun getFirebaseUser(){
+        _firebaseUser.value = loginRepository.getFirebaseUser()
     }
 
     fun createUserAccount(email: String, password: String){
@@ -93,6 +94,21 @@ class CreateAccountViewModel @Inject constructor(
             else -> {
                 true
             }
+        }
+    }
+
+    fun splitName(fullName: String): Pair<String,String>?{
+
+        if(fullName.isEmpty()) return null
+
+        val nameSplit = fullName.split("\\s".toRegex())
+
+        if (nameSplit.isEmpty()) return null
+
+        return if(nameSplit.size < 2){
+            Pair(nameSplit[0], nameSplit[0])
+        }else{
+            Pair(nameSplit[0], nameSplit[1])
         }
     }
 

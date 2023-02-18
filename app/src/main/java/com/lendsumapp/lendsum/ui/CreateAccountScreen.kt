@@ -29,8 +29,11 @@ fun CreateAccountScreen(
     navController: NavController
 ){
     val createAccountViewModel = hiltViewModel<CreateAccountViewModel>()
+    val firebaseUser = createAccountViewModel.firebaseUser
 
     CreateAccountContent(
+        pulledName = firebaseUser?.displayName?.let { createAccountViewModel.splitName(it) },
+        pulledEmail = firebaseUser?.email,
         createAccountStatus = createAccountViewModel.createAccountStatus,
         onBackButtonPressed = {
             createAccountViewModel.logOutOfGoogle()
@@ -47,15 +50,18 @@ fun CreateAccountScreen(
 
 @Composable
 fun CreateAccountContent(
+    pulledName: Pair<String, String>?,
+    pulledEmail: String?,
     createAccountStatus: Response<Unit>,
     onBackButtonPressed:() -> Unit,
     onNextPressed:(AccountForm) -> Unit,
     onFieldChanged:() -> Unit
 ){
+
     val focusManager = LocalFocusManager.current
-    var firstName by remember { mutableStateOf("") }
-    var lastName by remember { mutableStateOf("") }
-    var email by remember { mutableStateOf("") }
+    var firstName by remember { mutableStateOf(pulledName?.first ?:" ") }
+    var lastName by remember { mutableStateOf( pulledName?.second ?:" ")}
+    var email by remember { mutableStateOf(pulledEmail ?:" ") }
     var password by remember { mutableStateOf("") }
     var matchPassword by remember { mutableStateOf("") }
 
@@ -74,6 +80,7 @@ fun CreateAccountContent(
         }
         LendsumField(
             keyBoardType = KeyboardType.Text,
+            defaultValue = pulledName?.first,
             supportingLabel = stringResource(id = R.string.first_name),
             errorLabel = if (createAccountStatus.error == LendsumError.EMPTY_FIRST_NAME) stringResource(id = R.string.first_name_error_msg) else null,
             onTextChanged ={
@@ -83,6 +90,7 @@ fun CreateAccountContent(
         )
         LendsumField(
             keyBoardType = KeyboardType.Text,
+            defaultValue = pulledName?.second,
             supportingLabel = stringResource(id = R.string.last_name),
             errorLabel = if(createAccountStatus.error == LendsumError.EMPTY_LAST_NAME) stringResource(id = R.string.last_name_err_msg) else null,
             onTextChanged ={
@@ -91,6 +99,7 @@ fun CreateAccountContent(
         )
         LendsumField(
             keyBoardType = KeyboardType.Email,
+            defaultValue = pulledEmail,
             supportingLabel = stringResource(id = R.string.email),
             errorLabel = when (createAccountStatus.error) {
                 LendsumError.INVALID_EMAIL -> stringResource(id = R.string.invalid_email_err_msg)
