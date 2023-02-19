@@ -137,19 +137,15 @@ dependencies {
     implementation 'com.google.firebase:firebase-storage-ktx'
     implementation 'com.firebaseui:firebase-ui-storage:7.1.1'
 
-
     //Facebook login
     implementation 'com.facebook.android:facebook-login:9.1.1'
-
-    //Country Code Picker
-    implementation 'com.hbb20:ccp:2.5.0'
 
     //Circular photo holder
     implementation 'de.hdodenhof:circleimageview:3.1.0'
 
     //Work Manager
-    implementation 'androidx.work:work-runtime-ktx:2.7.1'
-    androidTestImplementation 'androidx.work:work-testing:2.7.1'
+    implementation 'androidx.work:work-runtime-ktx:2.8.0'
+    androidTestImplementation 'androidx.work:work-testing:2.8.0'
 
     //Compose
     def composeBom = platform('androidx.compose:compose-bom:2022.12.00')
@@ -165,7 +161,7 @@ dependencies {
     implementation 'androidx.hilt:hilt-navigation-compose:1.0.0'
 
     implementation 'androidx.core:core-ktx:1.9.0'
-    implementation 'androidx.appcompat:appcompat:1.6.0'
+    implementation 'androidx.appcompat:appcompat:1.6.1'
     implementation 'androidx.constraintlayout:constraintlayout:2.1.4'
     implementation 'com.google.android.material:material:1.8.0'
     testImplementation 'junit:junit:4.13.2'

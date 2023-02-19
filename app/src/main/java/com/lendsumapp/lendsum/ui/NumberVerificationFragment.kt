@@ -13,7 +13,6 @@ import androidx.navigation.findNavController
 import androidx.navigation.fragment.findNavController
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.PhoneAuthCredential
-import com.hbb20.CountryCodePicker
 import com.lendsumapp.lendsum.R
 import com.lendsumapp.lendsum.databinding.FragmentNumberVerificationBinding
 import com.lendsumapp.lendsum.util.AndroidUtils
@@ -25,7 +24,7 @@ import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
 @AndroidEntryPoint
-class NumberVerificationFragment : Fragment(), View.OnClickListener, CountryCodePicker.PhoneNumberValidityChangeListener{
+class NumberVerificationFragment : Fragment(), View.OnClickListener{
 
     private var _binding: FragmentNumberVerificationBinding? = null
     private val binding get() = _binding!!
@@ -88,8 +87,6 @@ class NumberVerificationFragment : Fragment(), View.OnClickListener, CountryCode
             }
         })
 
-        binding.countryCodeSp.setPhoneNumberValidityChangeListener(this)
-        binding.countryCodeSp.registerCarrierNumberEditText(binding.numberVerificationPhoneEt)
         binding.numberVerificationSendCodeBtn.setOnClickListener(this)
         binding.numberVerificationVerifyCodeBtn.setOnClickListener(this)
         binding.numberVerificationBackBtn.setOnClickListener(this)
@@ -120,11 +117,11 @@ class NumberVerificationFragment : Fragment(), View.OnClickListener, CountryCode
 
                         activity?.let { AndroidUtils.showSnackBar(it, getString(R.string.verification_code_sent)) }
 
-                        val phoneNumber = binding.countryCodeSp.fullNumberWithPlus
+                        //val phoneNumber = binding.countryCodeSp.fullNumberWithPlus
 
-                        Log.d(TAG, "Phone number $phoneNumber sending")
+                       // Log.d(TAG, "Phone number $phoneNumber sending")
                         activity?.let { mainActivity ->
-                            phoneNumber?.let { number -> numberVerificationViewModel.sendSMSCode(number, mainActivity) }
+                            //phoneNumber?.let { number -> numberVerificationViewModel.sendSMSCode(number, mainActivity) }
                         }
 
                         numberVerificationViewModel.getGeneratedPhoneAuthCode().observe(viewLifecycleOwner, phoneNumberCredentialObserver)
@@ -171,15 +168,6 @@ class NumberVerificationFragment : Fragment(), View.OnClickListener, CountryCode
             }
         }else{
             activity?.let { AndroidUtils.showSnackBar(it, getString(R.string.not_connected_internet)) }
-        }
-    }
-
-    override fun onValidityChanged(isValidNumber: Boolean) {
-        isPhoneNumberValid = if(isValidNumber){
-            Log.d(TAG, "Phone Number: " + binding.countryCodeSp.fullNumberWithPlus)
-            true
-        }else{
-            false
         }
     }
 
