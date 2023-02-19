@@ -1,6 +1,5 @@
 package com.lendsumapp.lendsum.ui
 
-import android.util.Log
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -24,14 +23,9 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
-import com.google.android.gms.auth.api.identity.BeginSignInRequest
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
-import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.auth.GoogleAuthCredential
-import com.google.firebase.auth.GoogleAuthProvider
 import com.lendsumapp.lendsum.R
-import com.lendsumapp.lendsum.auth.GoogleAuthComponent
 import com.lendsumapp.lendsum.data.model.LendsumError
 import com.lendsumapp.lendsum.data.model.Response
 import com.lendsumapp.lendsum.data.model.Status
@@ -91,7 +85,8 @@ fun LoginScreen(
         },
         onContinueWithFacebookClicked = {
 
-        }
+        },
+        afterErrorToastDisplay = { loginViewModel.resetLoginState() }
     )
 
 }
@@ -104,7 +99,8 @@ fun LoginScreenContent(
     onForgotPasswordClicked: () -> Unit,
     onSignUpWithEmailClicked: () -> Unit,
     onContinueWithGoogleClicked: () -> Unit,
-    onContinueWithFacebookClicked: () -> Unit
+    onContinueWithFacebookClicked: () -> Unit,
+    afterErrorToastDisplay: () -> Unit
 ){
     val focusManager = LocalFocusManager.current
     val context = LocalContext.current
@@ -125,7 +121,7 @@ fun LoginScreenContent(
             }
         }
         else -> {}
-    }
+    }.also { afterErrorToastDisplay.invoke()  }
 
     Column(
         modifier = Modifier
@@ -260,6 +256,7 @@ fun LoginScreenPreview(){
         onForgotPasswordClicked = {},
         onSignUpWithEmailClicked = {},
         onContinueWithGoogleClicked = {},
-        onContinueWithFacebookClicked = {}
+        onContinueWithFacebookClicked = {},
+        afterErrorToastDisplay = {}
     )
 }
