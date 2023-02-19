@@ -41,7 +41,7 @@
     <string name="invalid_email_err_msg">Invalid Email.</string>
     <string name="password_param_err_msg">Password must contain between 6 and 20 characters long and have at least one UpperCase, one number, and one symbol</string>
     <string name="pass_dont_match_err_msg">Passwords don\'t match</string>
-    <string name="enter_phone_number">Enter phone number</string>
+    <string name="enter_phone_number">Phone Number</string>
     <string name="country_code">Country Code</string>
     <string name="email_or_pass_wrong">The email or password is incorrect</string>
     <string name="not_connected_internet">Internet is required to do this action</string>
@@ -100,5 +100,6 @@
     <string name="take_image">Take Photo</string>
     <string name="gallery">Gallery</string>
     <string name="email_doesnt_exist">This email doesn\'t exist. Please try another one.</string>
+    <string name="verify">Verify</string>
 
 </resources>

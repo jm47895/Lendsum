@@ -15,6 +15,7 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import com.lendsumapp.lendsum.ui.theme.ColorPrimary
+import java.util.regex.Pattern
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -24,6 +25,7 @@ fun LendsumField(
     keyBoardType: KeyboardType,
     supportingLabel: String,
     errorLabel: String? = null,
+    regEx: Regex? = null,
     onTextChanged :(String) -> Unit,
 ){
 
@@ -34,8 +36,16 @@ fun LendsumField(
             .fillMaxWidth()
             .padding(8.dp),
         value = input,
-        onValueChange = {
-            input = it
+        onValueChange = { text ->
+
+            if(regEx != null){
+                if(text.isEmpty() || text.matches(regEx)){
+                    input = text
+                }
+            }else{
+                input = text
+            }
+
             onTextChanged(input)
         },
         maxLines = 1,

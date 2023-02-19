@@ -19,9 +19,11 @@ import com.lendsumapp.lendsum.R
 import com.lendsumapp.lendsum.data.model.AccountForm
 import com.lendsumapp.lendsum.data.model.LendsumError
 import com.lendsumapp.lendsum.data.model.Response
+import com.lendsumapp.lendsum.data.model.Status
 import com.lendsumapp.lendsum.ui.components.BackButton
 import com.lendsumapp.lendsum.ui.components.LendsumButton
 import com.lendsumapp.lendsum.ui.components.LendsumField
+import com.lendsumapp.lendsum.ui.components.LoadingAnimation
 import com.lendsumapp.lendsum.viewmodel.CreateAccountViewModel
 
 @Composable
@@ -31,10 +33,15 @@ fun CreateAccountScreen(
     val createAccountViewModel = hiltViewModel<CreateAccountViewModel>()
     val firebaseUser = createAccountViewModel.firebaseUser
 
+    if(createAccountViewModel.createAccountState.status == Status.SUCCESS){
+        createAccountViewModel.resetCreateAccountState()
+        navController.navigate(NavDestination.NUMBER_VERIFICATION.key)
+    }
+
     CreateAccountContent(
         pulledName = firebaseUser?.displayName?.let { createAccountViewModel.splitName(it) },
         pulledEmail = firebaseUser?.email,
-        createAccountStatus = createAccountViewModel.createAccountStatus,
+        createAccountStatus = createAccountViewModel.createAccountState,
         onBackButtonPressed = {
             createAccountViewModel.logOutOfGoogle()
             navController.navigateUp()
@@ -44,7 +51,7 @@ fun CreateAccountScreen(
                 createAccountViewModel.createUserAccount(it.email, it.pass)
             }
         },
-        onFieldChanged = { createAccountViewModel.resetResponse() }
+        onFieldChanged = { createAccountViewModel.resetCreateAccountState() }
     )
 }
 
@@ -64,6 +71,10 @@ fun CreateAccountContent(
     var email by remember { mutableStateOf(pulledEmail ?:" ") }
     var password by remember { mutableStateOf("") }
     var matchPassword by remember { mutableStateOf("") }
+
+    if (createAccountStatus.status == Status.LOADING){
+        LoadingAnimation()
+    }
 
     Column(modifier = Modifier
         .fillMaxSize()
@@ -104,6 +115,7 @@ fun CreateAccountContent(
             errorLabel = when (createAccountStatus.error) {
                 LendsumError.INVALID_EMAIL -> stringResource(id = R.string.invalid_email_err_msg)
                 LendsumError.USER_EMAIL_ALREADY_EXISTS -> stringResource(id = R.string.account_already_exists)
+                LendsumError.LINK_ALREADY_EXISTS -> stringResource(id = R.string.account_already_exists)
                 else -> null
             },
             onTextChanged ={

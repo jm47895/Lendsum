@@ -13,5 +13,6 @@ val ColorSecondaryLight = Color(0xFFFFFFFF)
 val ColorSecondaryDark = Color(0xFFA8A19E)
 val DarkBrown = Color(0xFF654321)
 val Opacity80Black = Color(0xCC000000)
+val LightGray12 = Color(0x66CCCCCC)
 
 

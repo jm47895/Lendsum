@@ -34,6 +34,11 @@ fun LendsumNavHost(
                 navController = navController
             )
         }
+        composable(route = NavDestination.NUMBER_VERIFICATION.key){
+            NumberVerificationScreen(
+                navController = navController
+            )
+        }
     }
 }
 
@@ -41,5 +46,6 @@ enum class NavDestination(val key: String){
     LOGIN("login"),
     CREATE_ACCOUNT("create_account"),
     PASSWORD_RESET("password_reset"),
+    NUMBER_VERIFICATION("number_verification"),
     HOME("home")
 }

@@ -19,11 +19,11 @@ class CreateAccountViewModel @Inject constructor(
     private val loginRepository: LoginRepository,
 ): ViewModel(){
 
-    private val _createAccountStatus = mutableStateOf<Response<Unit>>(Response())
+    private val _createAccountState = mutableStateOf<Response<Unit>>(Response())
     private val _firebaseUser = mutableStateOf<FirebaseUser?>(null)
 
-    val createAccountStatus: Response<Unit>
-        get() = _createAccountStatus.value
+    val createAccountState: Response<Unit>
+        get() = _createAccountState.value
     val firebaseUser: FirebaseUser?
         get() = _firebaseUser.value
 
@@ -50,7 +50,7 @@ class CreateAccountViewModel @Inject constructor(
     fun createUserAccount(email: String, password: String){
         viewModelScope.launch(Dispatchers.IO) {
             loginRepository.registerWithEmailAndPassword(email, password).collect{
-                _createAccountStatus.value = it
+                _createAccountState.value = it
             }
         }
     }
@@ -72,23 +72,23 @@ class CreateAccountViewModel @Inject constructor(
     fun isValidAccountForm(firstName: String, lastName: String, email: String, password: String, matchPassword: String): Boolean{
         return when{
             firstName.isEmpty() -> {
-                _createAccountStatus.value = Response(status = Status.ERROR, error = LendsumError.EMPTY_FIRST_NAME)
+                _createAccountState.value = Response(status = Status.ERROR, error = LendsumError.EMPTY_FIRST_NAME)
                 return false
             }
             lastName.isEmpty() -> {
-                _createAccountStatus.value = Response(status = Status.ERROR, error = LendsumError.EMPTY_LAST_NAME)
+                _createAccountState.value = Response(status = Status.ERROR, error = LendsumError.EMPTY_LAST_NAME)
                 return false
             }
             !AndroidUtils.isValidEmail(email) -> {
-                _createAccountStatus.value = Response(status = Status.ERROR, error = LendsumError.INVALID_EMAIL)
+                _createAccountState.value = Response(status = Status.ERROR, error = LendsumError.INVALID_EMAIL)
                 return false
             }
             password.isEmpty() || !AndroidUtils.isValidPassword(password) -> {
-                _createAccountStatus.value = Response(status = Status.ERROR, error = LendsumError.INVALID_PASS)
+                _createAccountState.value = Response(status = Status.ERROR, error = LendsumError.INVALID_PASS)
                 return false
             }
             password != matchPassword -> {
-                _createAccountStatus.value = Response(status = Status.ERROR, error = LendsumError.PASS_NO_MATCH)
+                _createAccountState.value = Response(status = Status.ERROR, error = LendsumError.PASS_NO_MATCH)
                 return false
             }
             else -> {
@@ -112,7 +112,7 @@ class CreateAccountViewModel @Inject constructor(
         }
     }
 
-    fun resetResponse(){
-        _createAccountStatus.value = Response()
+    fun resetCreateAccountState(){
+        _createAccountState.value = Response()
     }
 }
