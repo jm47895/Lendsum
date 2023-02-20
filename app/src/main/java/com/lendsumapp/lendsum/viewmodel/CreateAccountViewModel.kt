@@ -37,12 +37,6 @@ class CreateAccountViewModel @Inject constructor(
         }
     }
 
-    fun logOutOfFacebook(){
-        viewModelScope.launch(Dispatchers.IO) {
-            loginRepository.logOutOfFacebook()
-        }
-    }
-
     private fun getFirebaseUser(){
         _firebaseUser.value = loginRepository.getFirebaseUser()
     }

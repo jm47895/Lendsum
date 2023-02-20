@@ -137,9 +137,6 @@ dependencies {
     implementation 'com.google.firebase:firebase-storage-ktx'
     implementation 'com.firebaseui:firebase-ui-storage:7.1.1'
 
-    //Facebook login
-    implementation 'com.facebook.android:facebook-login:9.1.1'
-
     //Circular photo holder
     implementation 'de.hdodenhof:circleimageview:3.1.0'
 

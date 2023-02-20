@@ -1,16 +1,13 @@
 package com.lendsumapp.lendsum.repository
 
 import android.app.Activity
-import android.content.Context
 import android.content.Intent
 import androidx.lifecycle.MutableLiveData
 import androidx.work.*
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.auth.PhoneAuthCredential
-import com.lendsumapp.lendsum.R
 import com.lendsumapp.lendsum.auth.EmailAndPassAuthComponent
-import com.lendsumapp.lendsum.auth.FacebookAuthComponent
 import com.lendsumapp.lendsum.auth.GoogleAuthComponent
 import com.lendsumapp.lendsum.auth.PhoneAuthComponent
 import com.lendsumapp.lendsum.data.model.Response
@@ -22,7 +19,6 @@ import javax.inject.Inject
 
 class LoginRepository @Inject constructor(
     private val googleAuthComponent: GoogleAuthComponent,
-    private val facebookAuthComponent: FacebookAuthComponent,
     private val emailAndPassAuthComponent: EmailAndPassAuthComponent,
     private val phoneAuthComponent: PhoneAuthComponent,
     private var firebaseAuth: FirebaseAuth?
@@ -38,10 +34,6 @@ class LoginRepository @Inject constructor(
     }
 
     //Start of Google Auth functions
-    fun sendGoogleSignInIntent(): Intent{
-        return googleAuthComponent.getGoogleSignInIntent()
-    }
-
     fun handleGoogleSignInIntent(data: Intent): Flow<Response<Unit>>{
         return googleAuthComponent.handleGoogleSignInIntent(data)
     }
@@ -87,24 +79,6 @@ class LoginRepository @Inject constructor(
     }
 
     //End of Email and Pass functions
-
-    //Facebook login functions
-    fun sendFacebookIntent(){
-        facebookAuthComponent.sendFacebookSignInIntent()
-    }
-
-    fun handleFacebookSignInIntent(requestCode: Int, resultCode: Int, data: Intent){
-        facebookAuthComponent.handleFacebookSignInIntent(requestCode, resultCode, data)
-    }
-
-    fun logOutOfFacebook(){
-        facebookAuthComponent.signOutOfFacebook()
-    }
-
-    fun getFacebookAuthState(): MutableLiveData<Boolean>{
-        return facebookAuthComponent.getFacebookAuthState()
-    }
-    //End of Facebook login functions
 
     //Phone Auth functions
     fun sendSMSCode(phoneNumber: String, activity: Activity){

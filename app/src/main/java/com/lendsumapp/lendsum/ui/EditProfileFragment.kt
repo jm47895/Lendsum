@@ -127,8 +127,8 @@ class EditProfileFragment : Fragment(), View.OnClickListener, CompoundButton.OnC
             .apply(
                 RequestOptions()
                     .diskCacheStrategy(DiskCacheStrategy.AUTOMATIC)
-                    .placeholder(R.drawable.com_facebook_profile_picture_blank_portrait)
-                    .error(R.drawable.com_facebook_profile_picture_blank_portrait))
+                    //.placeholder(R.drawable.com_facebook_profile_picture_blank_portrait)
+                    .error(R.drawable.ic_close_24))
             .circleCrop()
             .into(imageView)
     }

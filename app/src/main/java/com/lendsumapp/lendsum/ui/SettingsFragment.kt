@@ -65,10 +65,6 @@ class SettingsFragment : Fragment(), View.OnClickListener {
                             view.findNavController().navigate(R.id.action_settingsFragment_to_loginFragment)
                         }
                     }
-                    NavSignUpType.FACEBOOK_LOGIN.ordinal ->{
-                        settingsViewModel.logOutOfFacebook()
-                        view.findNavController().navigate(R.id.action_settingsFragment_to_loginFragment)
-                    }
                 }
             }
         }

@@ -106,8 +106,8 @@ class MessageListAdapter(private val interaction: Interaction? = null, profPicUr
                         .applyDefaultRequestOptions(
                             RequestOptions()
                                 .diskCacheStrategy(DiskCacheStrategy.AUTOMATIC)
-                                .placeholder(R.drawable.com_facebook_profile_picture_blank_portrait)
-                                .error(R.drawable.com_facebook_profile_picture_blank_portrait)
+                                //.placeholder(R.drawable.com_facebook_profile_picture_blank_portrait)
+                                //.error(R.drawable.com_facebook_profile_picture_blank_portrait)
                                 .circleCrop()
                         )
                         .load(uri)

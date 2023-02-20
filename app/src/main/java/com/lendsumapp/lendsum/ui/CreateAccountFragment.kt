@@ -185,9 +185,6 @@ class CreateAccountFragment : Fragment(), View.OnClickListener {
                     //context?.let { createAccountViewModel.configureGoogleAuth(it) }
                     createAccountViewModel.logOutOfGoogle()
                 }
-                NavSignUpType.FACEBOOK_LOGIN.ordinal -> {
-                    createAccountViewModel.logOutOfFacebook()
-                }
             }
         }else {
             createAccountViewModel.deleteFirebaseUser()

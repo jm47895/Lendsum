@@ -30,10 +30,6 @@
     <string name="enter_code">Enter Code</string>
     <string name="sign_up_with_email">Sign up with email</string>
     <string name="continue_with_google">Continue with Google</string>
-    <string name="continue_with_facebook">Continue with Facebook</string>
-
-    <!--Facebook Login protocol-->
-    <string name="facebook_app_id">756998231815638</string>
 
     <string name="re_enter_password">Re-enter Password</string>
     <string name="first_name_error_msg">First name cannot be left blank</string>

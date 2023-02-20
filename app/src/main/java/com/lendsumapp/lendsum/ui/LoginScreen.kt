@@ -31,7 +31,6 @@ import com.lendsumapp.lendsum.data.model.Response
 import com.lendsumapp.lendsum.data.model.Status
 import com.lendsumapp.lendsum.ui.components.*
 import com.lendsumapp.lendsum.ui.theme.ColorPrimary
-import com.lendsumapp.lendsum.ui.theme.FacebookBlue
 import com.lendsumapp.lendsum.ui.theme.GoogleLoginTextColor
 import com.lendsumapp.lendsum.viewmodel.LoginViewModel
 
@@ -83,9 +82,6 @@ fun LoginScreen(
             val intent = GoogleSignIn.getClient(context, options)
             googleSignInLauncher.launch(intent.signInIntent)
         },
-        onContinueWithFacebookClicked = {
-
-        },
         afterErrorToastDisplay = { loginViewModel.resetLoginState() }
     )
 
@@ -99,7 +95,6 @@ fun LoginScreenContent(
     onForgotPasswordClicked: () -> Unit,
     onSignUpWithEmailClicked: () -> Unit,
     onContinueWithGoogleClicked: () -> Unit,
-    onContinueWithFacebookClicked: () -> Unit,
     afterErrorToastDisplay: () -> Unit
 ){
     val focusManager = LocalFocusManager.current
@@ -191,8 +186,7 @@ fun LoginScreenContent(
         if(showSignUpOptions){
             SignUpOptions(
                 onSignUpWithEmailClicked = onSignUpWithEmailClicked,
-                onContinueWithGoogleClicked = onContinueWithGoogleClicked,
-                onContinueWithFacebookClicked = onContinueWithFacebookClicked
+                onContinueWithGoogleClicked = onContinueWithGoogleClicked
             )
         }
     }
@@ -201,8 +195,7 @@ fun LoginScreenContent(
 @Composable
 fun SignUpOptions(
     onSignUpWithEmailClicked: () -> Unit,
-    onContinueWithGoogleClicked: () -> Unit,
-    onContinueWithFacebookClicked: () -> Unit
+    onContinueWithGoogleClicked: () -> Unit
 ){
     LendsumButton(
         text = stringResource(id = R.string.sign_up_with_email).uppercase()
@@ -218,16 +211,6 @@ fun SignUpOptions(
     ){
         onContinueWithGoogleClicked.invoke()
     }
-    Spacer(modifier = Modifier.height(8.dp))
-    ThirdPartyLogInButton(
-        drawable = R.drawable.facebook_logo_58,
-        text = stringResource(id = R.string.continue_with_facebook),
-        textColor = Color.White,
-        backgroundColor = FacebookBlue
-    ){
-        onContinueWithFacebookClicked.invoke()
-    }
-
 }
 
 @Composable
@@ -256,7 +239,6 @@ fun LoginScreenPreview(){
         onForgotPasswordClicked = {},
         onSignUpWithEmailClicked = {},
         onContinueWithGoogleClicked = {},
-        onContinueWithFacebookClicked = {},
         afterErrorToastDisplay = {}
     )
 }

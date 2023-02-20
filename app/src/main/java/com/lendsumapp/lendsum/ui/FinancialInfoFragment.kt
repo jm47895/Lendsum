@@ -8,7 +8,6 @@ import android.view.ViewGroup
 import androidx.navigation.findNavController
 import com.lendsumapp.lendsum.R
 import com.lendsumapp.lendsum.databinding.FragmentFinancialInfoBinding
-import com.lendsumapp.lendsum.databinding.FragmentLoginBinding
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint

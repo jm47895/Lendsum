@@ -4,8 +4,7 @@ import androidx.annotation.Keep
 
 @Keep enum class NavSignUpType {
     EMAIL_LOGIN,
-    GOOGLE_LOGIN,
-    FACEBOOK_LOGIN
+    GOOGLE_LOGIN
 }
 
 @Keep enum class EditProfileInfoType{

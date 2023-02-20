@@ -71,7 +71,7 @@ class EmailAndPassAuthComponent @Inject constructor(){
             firebaseAuth.currentUser?.linkWithCredential(emailAndPassCredential)?.addOnCompleteListener { task ->
                 if (task.isSuccessful){
                     trySend(Response(status = Status.SUCCESS))
-                    Log.i(TAG, "Email and Google or Facebook credential link was successful")
+                    Log.i(TAG, "Email and Google credential link was successful")
                 }else{
                     Log.e(TAG, "Account link was unsuccessful: " + task.exception.toString())
                     if(task.exception.toString().contains("linked")){

@@ -46,10 +46,6 @@ class LoginViewModel @Inject constructor(
     }
 
     //Start of Google Auth functions
-    fun getGoogleAuthIntent(): Intent {
-        return loginRepository.sendGoogleSignInIntent()
-    }
-
     fun handleGoogleSignInIntent(data: Intent){
         viewModelScope.launch{
             loginRepository.handleGoogleSignInIntent(data).collect{
@@ -94,24 +90,6 @@ class LoginViewModel @Inject constructor(
         }
     }
     //End of Email and Pass functions
-
-    //Facebook login functions
-    fun sendFacebookIntent(){
-        viewModelScope.launch(Dispatchers.IO) {
-            loginRepository.sendFacebookIntent()
-        }
-    }
-
-    fun handleFacebookSignInIntent(requestCode: Int, resultCode: Int, data: Intent){
-        viewModelScope.launch(Dispatchers.IO) {
-            loginRepository.handleFacebookSignInIntent(requestCode, resultCode, data)
-        }
-    }
-
-    fun getFacebookAuthState(): MutableLiveData<Boolean>{
-        return loginRepository.getFacebookAuthState()
-    }
-    //End of Facebook login functions
 
     fun resetLoginState(){
         _loginState.value = Response()

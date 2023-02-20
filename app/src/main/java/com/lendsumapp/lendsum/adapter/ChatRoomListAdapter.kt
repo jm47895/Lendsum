@@ -79,8 +79,8 @@ class ChatRoomListAdapter(private val interaction: Interaction? = null) :
                 .applyDefaultRequestOptions(
                     RequestOptions()
                         .diskCacheStrategy(DiskCacheStrategy.AUTOMATIC)
-                        .placeholder(R.drawable.com_facebook_profile_picture_blank_portrait)
-                        .error(R.drawable.com_facebook_profile_picture_blank_portrait)
+                        //.placeholder(R.drawable.com_facebook_profile_picture_blank_portrait)
+                        //.error(R.drawable.com_facebook_profile_picture_blank_portrait)
                         .circleCrop()
                 )
                 .load(guestUser.profilePicUri)

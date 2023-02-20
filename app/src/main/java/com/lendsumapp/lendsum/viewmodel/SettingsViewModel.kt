@@ -25,10 +25,4 @@ class SettingsViewModel @Inject constructor(
             loginRepository.logOutOfEmailAndPass()
         }
     }
-
-    fun logOutOfFacebook(){
-        viewModelScope.launch(Dispatchers.IO) {
-            loginRepository.logOutOfFacebook()
-        }
-    }
 }

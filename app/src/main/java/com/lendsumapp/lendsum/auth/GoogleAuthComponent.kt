@@ -16,11 +16,6 @@ import javax.inject.Inject
 class GoogleAuthComponent @Inject constructor(){
 
     private val firebaseAuth : FirebaseAuth = FirebaseAuth.getInstance()
-    private lateinit var googleSignInClient : GoogleSignInClient
-
-    fun getGoogleSignInIntent(): Intent {
-        return googleSignInClient.signInIntent
-    }
 
     fun signOutOfGoogle(){
         firebaseAuth.signOut()
@@ -35,6 +30,7 @@ class GoogleAuthComponent @Inject constructor(){
         if(task.isSuccessful){
             Log.i(TAG, "Get google account success: ${task.result.displayName}")
             val credential = GoogleAuthProvider.getCredential(task.result.idToken, null)
+
             FirebaseAuth.getInstance().signInWithCredential(credential).addOnCompleteListener { loginTask ->
                 if (loginTask.isSuccessful) {
                     trySend(Response(status = Status.SUCCESS))
