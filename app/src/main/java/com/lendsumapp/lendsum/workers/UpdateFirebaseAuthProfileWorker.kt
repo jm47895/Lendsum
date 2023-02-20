@@ -18,7 +18,7 @@ class UpdateFirebaseAuthProfileWorker(context: Context, params: WorkerParameters
 
         val latch = CountDownLatch(1)
         var result = Result.failure()
-        val currentUser = FirebaseAuth.getInstance().currentUser!!
+        val currentUser = FirebaseAuth.getInstance().currentUser
         val key = inputData.getString(FIREBASE_AUTH_UPDATE_MAP_KEY)
         val value = inputData.getString(FIREBASE_AUTH_UPDATE_MAP_VALUE)
 
@@ -30,9 +30,9 @@ class UpdateFirebaseAuthProfileWorker(context: Context, params: WorkerParameters
                 UserProfileChangeRequest.Builder().setPhotoUri(value?.toUri()).build()
             }
             else -> null
-        }.let { profChangeRequest->
-            profChangeRequest?.let {
-                currentUser.updateProfile(it).addOnCompleteListener { task->
+        }?.let { profChangeRequest->
+            profChangeRequest.let {
+                currentUser?.updateProfile(it)?.addOnCompleteListener { task->
                     if(task.isSuccessful){
                         Log.d(TAG, "Firebase auth $key updated to ${currentUser.displayName}")
                         result = Result.success()
@@ -44,7 +44,7 @@ class UpdateFirebaseAuthProfileWorker(context: Context, params: WorkerParameters
                     }
                 }
             }
-        }
+        } ?: latch.countDown()
         latch.await()
 
         return result

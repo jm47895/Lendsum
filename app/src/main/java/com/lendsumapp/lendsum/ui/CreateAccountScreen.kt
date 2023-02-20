@@ -1,5 +1,6 @@
 package com.lendsumapp.lendsum.ui
 
+import android.util.Log
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.*
 import androidx.compose.runtime.*
@@ -24,6 +25,7 @@ import com.lendsumapp.lendsum.ui.components.BackButton
 import com.lendsumapp.lendsum.ui.components.LendsumButton
 import com.lendsumapp.lendsum.ui.components.LendsumField
 import com.lendsumapp.lendsum.ui.components.LoadingAnimation
+import com.lendsumapp.lendsum.util.GlobalConstants
 import com.lendsumapp.lendsum.viewmodel.CreateAccountViewModel
 
 @Composable
@@ -32,8 +34,10 @@ fun CreateAccountScreen(
 ){
     val createAccountViewModel = hiltViewModel<CreateAccountViewModel>()
     val firebaseUser = createAccountViewModel.firebaseUser
+    var accountForm: AccountForm? by remember { mutableStateOf(null) }
 
     if(createAccountViewModel.createAccountState.status == Status.SUCCESS){
+        accountForm?.let{ createAccountViewModel.updateFirebaseAuthProfile(GlobalConstants.FIRESTORE_PROFILE_NAME_KEY, "${it.firstName} ${it.lastName}") }
         createAccountViewModel.resetCreateAccountState()
         navController.navigate(NavDestination.NUMBER_VERIFICATION.key)
     }
@@ -48,6 +52,7 @@ fun CreateAccountScreen(
         },
         onNextPressed = {
             if(createAccountViewModel.isValidAccountForm(it.firstName, it.lastName, it.email, it.pass, it.matchPass)){
+                accountForm = it
                 createAccountViewModel.createUserAccount(it.email, it.pass)
             }
         },
