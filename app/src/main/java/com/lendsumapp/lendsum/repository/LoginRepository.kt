@@ -1,6 +1,7 @@
 package com.lendsumapp.lendsum.repository
 
 import android.app.Activity
+import android.content.Context
 import android.content.Intent
 import androidx.lifecycle.MutableLiveData
 import androidx.work.*
@@ -81,20 +82,12 @@ class LoginRepository @Inject constructor(
     //End of Email and Pass functions
 
     //Phone Auth functions
-    fun sendSMSCode(phoneNumber: String, activity: Activity){
-        phoneAuthComponent.verifyPhoneNumber(phoneNumber, activity)
+    fun requestSMSCode(phoneNumber: String, activity: Activity): Flow<Response<String>>{
+        return phoneAuthComponent.requestSMSCode(phoneNumber, activity)
     }
 
-    fun getGeneratedPhoneAuthCode(): MutableLiveData<PhoneAuthCredential>{
-        return phoneAuthComponent.getGeneratedPhoneAuthCode()
-    }
-
-    fun linkPhoneNumWithLoginCredential(credential: PhoneAuthCredential){
-        phoneAuthComponent.linkPhoneNumWithLoginCredential(credential)
-    }
-
-    fun getPhoneNumberLinkStatus(): MutableLiveData<Boolean>{
-        return phoneAuthComponent.getPhoneNumberLinkStatus()
+    fun linkPhoneNumWithLoginCredential(credential: PhoneAuthCredential): Flow<Response<Unit>>{
+       return phoneAuthComponent.linkPhoneNumWithLoginCredential(credential)
     }
     //End phone auth functions
 

@@ -43,7 +43,7 @@
     <string name="not_connected_internet">Internet is required to do this action</string>
     <string name="verification_code_sent">Verification Code Sent</string>
     <string name="phone_number_invalid">Phone number is invalid for the country code</string>
-    <string name="code_not_match">The code does not match or is empty.</string>
+    <string name="code_not_match">The code does not match.</string>
     <string name="send_password_reset_email">Send Password Reset Email</string>
     <string name="enter_email">Enter email</string>
     <string name="reset_email_sent">Reset password email was sent</string>
@@ -97,5 +97,7 @@
     <string name="gallery">Gallery</string>
     <string name="email_doesnt_exist">This email doesn\'t exist. Please try another one.</string>
     <string name="verify">Verify</string>
+    <string name="exceeded_code_attempts">You have exceeded the amount of codes that can be sent. Please try again later.</string>
+    <string name="code_timeout">This code has timed out. Please send new code.</string>
 
 </resources>

@@ -2,16 +2,21 @@ package com.lendsumapp.lendsum.viewmodel
 
 import android.app.Activity
 import android.content.Context
+import android.util.Log
+import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.*
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.auth.PhoneAuthCredential
+import com.google.firebase.auth.PhoneAuthProvider
+import com.lendsumapp.lendsum.data.model.Response
+import com.lendsumapp.lendsum.data.model.Status
 import com.lendsumapp.lendsum.data.model.User
 import com.lendsumapp.lendsum.repository.LoginRepository
 import com.lendsumapp.lendsum.repository.NumberVerificationRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -22,23 +27,36 @@ class NumberVerificationViewModel @Inject constructor(
     private val firebaseAuth: FirebaseAuth
 ): ViewModel(){
 
+    private val _phoneCodeState = mutableStateOf( Response<String>())
+    private val _phoneLinkState = mutableStateOf( Response<Unit>())
+
+    val phoneCodeState: Response<String>
+        get() = _phoneCodeState.value
+    val phoneLinkState: Response<Unit>
+        get() = _phoneLinkState.value
+
     fun sendSMSCode(phoneNumber: String, activity: Activity){
         viewModelScope.launch(Dispatchers.IO) {
-            loginRepository.sendSMSCode(phoneNumber, activity)
+            loginRepository.requestSMSCode(phoneNumber, activity).collect{
+                _phoneCodeState.value = it
+            }
         }
     }
 
-    fun getGeneratedPhoneAuthCode(): MutableLiveData<PhoneAuthCredential> {
-        return loginRepository.getGeneratedPhoneAuthCode()
-    }
+    fun verifyPhoneNumber(inputCode: String){
+        _phoneCodeState.value.data?.let { verificationId ->
 
-    fun getPhoneNumberLinkStatus(): MutableLiveData<Boolean>{
-        return loginRepository.getPhoneNumberLinkStatus()
+            val credential = PhoneAuthProvider.getCredential(verificationId, inputCode)
+
+            linkPhoneNumWithLoginCredential(credential)
+        }
     }
 
     fun linkPhoneNumWithLoginCredential(credential: PhoneAuthCredential){
         viewModelScope.launch(Dispatchers.IO) {
-            loginRepository.linkPhoneNumWithLoginCredential(credential)
+            loginRepository.linkPhoneNumWithLoginCredential(credential).collect{
+                _phoneLinkState.value = it
+            }
         }
     }
 
@@ -92,6 +110,14 @@ class NumberVerificationViewModel @Inject constructor(
         }
     }
     //End sync data functions
+
+    fun resetLinkStatus(){
+        _phoneLinkState.value = Response()
+    }
+
+    fun resetPhoneCodeStatus(){
+        _phoneCodeState.value = Response()
+    }
 
     companion object{
         private val TAG = NumberVerificationViewModel::class.simpleName

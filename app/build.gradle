@@ -129,12 +129,13 @@ dependencies {
     debugImplementation 'com.squareup.leakcanary:leakcanary-android:2.8.1'
 
     //Firebase
-    implementation platform('com.google.firebase:firebase-bom:27.1.0')
+    implementation platform('com.google.firebase:firebase-bom:31.2.2')
     implementation 'com.google.firebase:firebase-analytics'
     implementation 'com.google.firebase:firebase-auth-ktx'
     implementation 'com.google.firebase:firebase-firestore-ktx'
     implementation 'com.google.firebase:firebase-database-ktx'
     implementation 'com.google.firebase:firebase-storage-ktx'
+    implementation 'com.google.firebase:firebase-appcheck-playintegrity'
     implementation 'com.firebaseui:firebase-ui-storage:7.1.1'
 
     //Circular photo holder
@@ -156,6 +157,13 @@ dependencies {
     implementation 'androidx.activity:activity-compose:1.6.1'
     implementation 'androidx.lifecycle:lifecycle-viewmodel-compose:2.5.1'
     implementation 'androidx.hilt:hilt-navigation-compose:1.0.0'
+
+    //Play integrity (Used for phone auth)
+    implementation 'com.google.android.play:integrity:1.1.0'
+    //App check in conjunction with play integrity for testing
+    implementation 'com.google.firebase:firebase-appcheck-debug:16.1.1'
+    //For unit testing and CI of App Check
+    androidTestImplementation 'com.google.firebase:firebase-appcheck-debug-testing:16.1.1'
 
     implementation 'androidx.core:core-ktx:1.9.0'
     implementation 'androidx.appcompat:appcompat:1.6.1'

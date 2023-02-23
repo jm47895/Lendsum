@@ -124,7 +124,7 @@ class NumberVerificationFragment : Fragment(), View.OnClickListener{
                             //phoneNumber?.let { number -> numberVerificationViewModel.sendSMSCode(number, mainActivity) }
                         }
 
-                        numberVerificationViewModel.getGeneratedPhoneAuthCode().observe(viewLifecycleOwner, phoneNumberCredentialObserver)
+                        //numberVerificationViewModel.getGeneratedPhoneAuthCode().observe(viewLifecycleOwner, phoneNumberCredentialObserver)
 
                     }else{
                         Log.d(TAG, "Phone number not sending")
@@ -142,7 +142,7 @@ class NumberVerificationFragment : Fragment(), View.OnClickListener{
                         Log.d(TAG, "Code: $code matches $credential")
 
                         if(sharedPrefs?.getBoolean(RETURNING_USER, false) == false){
-                            numberVerificationViewModel.getPhoneNumberLinkStatus().observe(viewLifecycleOwner, linkPhoneNumberStatusObserver)
+                            //numberVerificationViewModel.getPhoneNumberLinkStatus().observe(viewLifecycleOwner, linkPhoneNumberStatusObserver)
                             numberVerificationViewModel.linkPhoneNumWithLoginCredential(credential!!)
                         }else{
                             clearEditTextFocus()
