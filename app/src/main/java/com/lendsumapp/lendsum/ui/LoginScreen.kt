@@ -55,7 +55,7 @@ fun LoginScreen(
 
 
 
-    if(loginViewModel.loginState.status == Status.SUCCESS /*|| loginViewModel.firebaseUser != null*/){
+    if(loginViewModel.loginState.status == Status.SUCCESS || loginViewModel.firebaseUser != null){
         loginViewModel.resetLoginState()
         navController.navigate(NavDestination.HOME.key){
             popUpTo(NavDestination.LOGIN.key){

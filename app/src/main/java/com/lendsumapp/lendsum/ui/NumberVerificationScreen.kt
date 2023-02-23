@@ -77,6 +77,10 @@ fun NumberVerificationContent(
     var countryCode by remember { mutableStateOf(CountryCode.US.countryCode) }
     val numPattern by remember { mutableStateOf(Regex("^\\d+\$")) }
 
+    if(phoneCodeState.status == Status.LOADING || phoneLinkState.status == Status.LOADING){
+        LoadingAnimation()
+    }
+
     Column(
         modifier = Modifier
             .fillMaxSize()

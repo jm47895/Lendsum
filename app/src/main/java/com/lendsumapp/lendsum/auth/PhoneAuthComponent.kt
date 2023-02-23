@@ -28,17 +28,17 @@ class PhoneAuthComponent @Inject constructor() {
 
         send(Response(status = Status.LOADING))
 
-        /*val number: String
+        val number: String
 
         if(com.lendsumapp.lendsum.BuildConfig.DEBUG) {
             number = testNum
             firebaseAuth.firebaseAuthSettings.setAutoRetrievedSmsCodeForPhoneNumber(number, code)
         }else{
             number = phoneNumber
-        }*/
+        }
 
         val options = PhoneAuthOptions.newBuilder(firebaseAuth)
-            .setPhoneNumber(phoneNumber)       // Phone number to verify
+            .setPhoneNumber(number)       // Phone number to verify
             .setTimeout(60L, TimeUnit.SECONDS) // Timeout and unit
             .setActivity(activity)                 // Activity (for callback binding)
             .setCallbacks(
