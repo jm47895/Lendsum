@@ -147,7 +147,7 @@ fun NumberVerificationContent(
                 .align(Alignment.End),
             text = stringResource(id = R.string.send_verification_code).uppercase()
         ){
-            onSendCodeClicked(countryCode + phoneNumber)
+            onSendCodeClicked(countryCode + phoneNumber.trim())
         }
         LendsumField(
             keyBoardType = KeyboardType.Number,
@@ -170,7 +170,7 @@ fun NumberVerificationContent(
                 .align(Alignment.End),
             text = stringResource(R.string.verify).uppercase()
         ){
-            onVerifyCodeClicked(inputCode)
+            onVerifyCodeClicked(inputCode.trim())
         }
 
     }
