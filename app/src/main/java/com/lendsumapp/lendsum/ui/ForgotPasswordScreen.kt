@@ -41,7 +41,7 @@ fun ForgotPasswordScreen(
         ForgotPasswordScreenContent(
             resetPassState = loginViewModel.resetPassState,
             onSendResetClicked = { email ->
-                loginViewModel.sendPasswordResetEmail(context, email)
+                loginViewModel.sendPasswordResetEmail(email)
             },
             onBackButtonClicked = { navController.navigateUp() }
         )

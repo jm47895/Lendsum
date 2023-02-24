@@ -2,21 +2,22 @@ package com.lendsumapp.lendsum.viewmodel
 
 import android.app.Activity
 import android.content.Context
-import android.util.Log
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.*
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.auth.PhoneAuthCredential
 import com.google.firebase.auth.PhoneAuthProvider
+import com.lendsumapp.lendsum.data.model.LendsumError
 import com.lendsumapp.lendsum.data.model.Response
 import com.lendsumapp.lendsum.data.model.Status
 import com.lendsumapp.lendsum.data.model.User
 import com.lendsumapp.lendsum.repository.LoginRepository
 import com.lendsumapp.lendsum.repository.NumberVerificationRepository
+import com.lendsumapp.lendsum.util.NetworkUtils
 import dagger.hilt.android.lifecycle.HiltViewModel
+import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -24,7 +25,8 @@ import javax.inject.Inject
 class NumberVerificationViewModel @Inject constructor(
     private val loginRepository: LoginRepository,
     private val numberVerificationRepository: NumberVerificationRepository,
-    private val firebaseAuth: FirebaseAuth
+    private val firebaseAuth: FirebaseAuth,
+    @ApplicationContext val context: Context
 ): ViewModel(){
 
     private val _phoneCodeState = mutableStateOf( Response<String>())
@@ -36,6 +38,12 @@ class NumberVerificationViewModel @Inject constructor(
         get() = _phoneLinkState.value
 
     fun sendSMSCode(phoneNumber: String, activity: Activity){
+
+        if(!NetworkUtils.isNetworkAvailable(activity)){
+            _phoneCodeState.value = Response(status = Status.ERROR, error = LendsumError.NO_INTERNET)
+            return
+        }
+
         viewModelScope.launch(Dispatchers.IO) {
             loginRepository.requestSMSCode(phoneNumber, activity).collect{
                 _phoneCodeState.value = it
@@ -44,6 +52,12 @@ class NumberVerificationViewModel @Inject constructor(
     }
 
     fun verifyPhoneNumber(inputCode: String){
+
+        if(!NetworkUtils.isNetworkAvailable(context)){
+            _phoneLinkState.value = Response(status = Status.ERROR, error = LendsumError.NO_INTERNET)
+            return
+        }
+
         _phoneCodeState.value.data?.let { verificationId ->
 
             val credential = PhoneAuthProvider.getCredential(verificationId, inputCode)
@@ -111,11 +125,11 @@ class NumberVerificationViewModel @Inject constructor(
     }
     //End sync data functions
 
-    fun resetLinkStatus(){
+    fun resetLinkState(){
         _phoneLinkState.value = Response()
     }
 
-    fun resetPhoneCodeStatus(){
+    fun resetPhoneCodeState(){
         _phoneCodeState.value = Response()
     }
 

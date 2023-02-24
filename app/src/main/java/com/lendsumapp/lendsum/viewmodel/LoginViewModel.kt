@@ -3,7 +3,6 @@ package com.lendsumapp.lendsum.viewmodel
 import android.content.Context
 import android.content.Intent
 import androidx.compose.runtime.mutableStateOf
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.firebase.auth.FirebaseUser
@@ -14,13 +13,14 @@ import com.lendsumapp.lendsum.repository.LoginRepository
 import com.lendsumapp.lendsum.util.AndroidUtils
 import com.lendsumapp.lendsum.util.NetworkUtils
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.Dispatchers
+import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
 class LoginViewModel @Inject constructor(
-    private val loginRepository: LoginRepository
+    private val loginRepository: LoginRepository,
+    @ApplicationContext val context: Context
 ): ViewModel(){
 
     private val _loginState = mutableStateOf(Response<Unit>())
@@ -56,7 +56,7 @@ class LoginViewModel @Inject constructor(
     //End of Google Auth functions
 
     //Start of Email and Pass functions
-    fun signInWithEmailAndPass(context: Context, email: String, password: String){
+    fun signInWithEmailAndPass(email: String, password: String){
 
         if(!NetworkUtils.isNetworkAvailable(context)){
             _loginState.value =
@@ -71,7 +71,7 @@ class LoginViewModel @Inject constructor(
         }
     }
 
-    fun sendPasswordResetEmail(context: Context, email: String){
+    fun sendPasswordResetEmail(email: String){
 
         if(!NetworkUtils.isNetworkAvailable(context)){
             _resetPassState.value = Response(status = Status.ERROR, error = LendsumError.NO_INTERNET)

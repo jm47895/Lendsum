@@ -32,6 +32,7 @@ import com.lendsumapp.lendsum.data.model.Status
 import com.lendsumapp.lendsum.ui.components.*
 import com.lendsumapp.lendsum.ui.theme.ColorPrimary
 import com.lendsumapp.lendsum.ui.theme.GoogleLoginTextColor
+import com.lendsumapp.lendsum.util.NetworkUtils
 import com.lendsumapp.lendsum.viewmodel.LoginViewModel
 
 @Composable
@@ -47,15 +48,21 @@ fun LoginScreen(
             result.data?.let { loginViewModel.handleGoogleSignInIntent(it) }
         }
     )
+    
+    if(loginViewModel.loginState.error == LendsumError.NO_INTERNET){
+        Toast.makeText(context, context.getString(R.string.not_connected_internet).uppercase() , Toast.LENGTH_SHORT).show()
+            .also { 
+                loginViewModel.resetLoginState() 
+                loginViewModel.resetGoogleSigInState()
+            }
+    }
 
     if(loginViewModel.googleSignInState.status == Status.SUCCESS){
         loginViewModel.resetGoogleSigInState()
         navController.navigate(NavDestination.CREATE_ACCOUNT.key)
     }
 
-
-
-    if(loginViewModel.loginState.status == Status.SUCCESS || loginViewModel.firebaseUser != null){
+    if(loginViewModel.loginState.status == Status.SUCCESS /*|| loginViewModel.firebaseUser != null*/){
         loginViewModel.resetLoginState()
         navController.navigate(NavDestination.HOME.key){
             popUpTo(NavDestination.LOGIN.key){
@@ -68,7 +75,7 @@ fun LoginScreen(
         loginState = loginViewModel.loginState,
         googleSignInState = loginViewModel.googleSignInState,
         onSignInClicked = { email, pass ->
-            loginViewModel.signInWithEmailAndPass(context, email, pass)
+            loginViewModel.signInWithEmailAndPass(email, pass)
         },
         onForgotPasswordClicked = { navController.navigate(NavDestination.PASSWORD_RESET.key) },
         onSignUpWithEmailClicked = { navController.navigate(NavDestination.CREATE_ACCOUNT.key) },
@@ -82,7 +89,6 @@ fun LoginScreen(
             val intent = GoogleSignIn.getClient(context, options)
             googleSignInLauncher.launch(intent.signInIntent)
         },
-        afterErrorToastDisplay = { loginViewModel.resetLoginState() }
     )
 
 }
@@ -94,8 +100,7 @@ fun LoginScreenContent(
     onSignInClicked: (String, String) -> Unit,
     onForgotPasswordClicked: () -> Unit,
     onSignUpWithEmailClicked: () -> Unit,
-    onContinueWithGoogleClicked: () -> Unit,
-    afterErrorToastDisplay: () -> Unit
+    onContinueWithGoogleClicked: () -> Unit
 ){
     val focusManager = LocalFocusManager.current
     val context = LocalContext.current
@@ -106,17 +111,6 @@ fun LoginScreenContent(
     if(loginState.status == Status.LOADING || googleSignInState.status == Status.LOADING){
         LoadingAnimation()
     }
-
-    when(loginState.status){
-        Status.ERROR -> {
-            when(loginState.error){
-                LendsumError.NO_INTERNET -> Toast.makeText(context, R.string.not_connected_internet, Toast.LENGTH_SHORT).show()
-                LendsumError.INVALID_LOGIN -> Toast.makeText(context, R.string.email_or_pass_wrong, Toast.LENGTH_SHORT).show()
-                else ->{}
-            }
-        }
-        else -> {}
-    }.also { afterErrorToastDisplay.invoke()  }
 
     Column(
         modifier = Modifier
@@ -132,6 +126,7 @@ fun LoginScreenContent(
         LendsumField(
             keyBoardType = KeyboardType.Email,
             supportingLabel = stringResource(id = R.string.email),
+            errorLabel = if (loginState.error == LendsumError.INVALID_LOGIN) stringResource(id = R.string.email_or_pass_wrong) else null,
             onTextChanged = {
                 logInEmail = it
             }
@@ -139,6 +134,7 @@ fun LoginScreenContent(
         LendsumField(
             keyBoardType = KeyboardType.Password,
             supportingLabel = stringResource(id = R.string.password),
+            errorLabel = if (loginState.error == LendsumError.INVALID_LOGIN) stringResource(id = R.string.email_or_pass_wrong) else null,
             onTextChanged = {
                 logInPass = it
             }
@@ -238,7 +234,6 @@ fun LoginScreenPreview(){
         onSignInClicked = { _, _ ->},
         onForgotPasswordClicked = {},
         onSignUpWithEmailClicked = {},
-        onContinueWithGoogleClicked = {},
-        afterErrorToastDisplay = {}
+        onContinueWithGoogleClicked = {}
     )
 }

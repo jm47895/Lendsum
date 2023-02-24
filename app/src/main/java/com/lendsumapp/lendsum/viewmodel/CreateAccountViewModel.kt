@@ -1,5 +1,6 @@
 package com.lendsumapp.lendsum.viewmodel
 
+import android.content.Context
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -9,7 +10,9 @@ import com.lendsumapp.lendsum.data.model.Response
 import com.lendsumapp.lendsum.data.model.Status
 import com.lendsumapp.lendsum.repository.LoginRepository
 import com.lendsumapp.lendsum.util.AndroidUtils
+import com.lendsumapp.lendsum.util.NetworkUtils
 import dagger.hilt.android.lifecycle.HiltViewModel
+import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -17,6 +20,7 @@ import javax.inject.Inject
 @HiltViewModel
 class CreateAccountViewModel @Inject constructor(
     private val loginRepository: LoginRepository,
+    @ApplicationContext val context: Context
 ): ViewModel(){
 
     private val _createAccountState = mutableStateOf<Response<Unit>>(Response())
@@ -42,6 +46,12 @@ class CreateAccountViewModel @Inject constructor(
     }
 
     fun createUserAccount(email: String, password: String){
+
+        if(!NetworkUtils.isNetworkAvailable(context)){
+            _createAccountState.value = Response(Status.ERROR, error = LendsumError.NO_INTERNET)
+            return
+        }
+
         viewModelScope.launch(Dispatchers.IO) {
             loginRepository.registerWithEmailAndPassword(email, password).collect{
                 _createAccountState.value = it

@@ -1,6 +1,7 @@
 package com.lendsumapp.lendsum.ui
 
 import android.util.Log
+import android.widget.Toast
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.*
 import androidx.compose.runtime.*
@@ -8,6 +9,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
@@ -27,6 +29,7 @@ import com.lendsumapp.lendsum.ui.components.LendsumField
 import com.lendsumapp.lendsum.ui.components.LoadingAnimation
 import com.lendsumapp.lendsum.util.GlobalConstants
 import com.lendsumapp.lendsum.viewmodel.CreateAccountViewModel
+import kotlin.coroutines.coroutineContext
 
 @Composable
 fun CreateAccountScreen(
@@ -35,6 +38,11 @@ fun CreateAccountScreen(
     val createAccountViewModel = hiltViewModel<CreateAccountViewModel>()
     val firebaseUser = createAccountViewModel.firebaseUser
     var accountForm: AccountForm? by remember { mutableStateOf(null) }
+    val context = LocalContext.current
+
+    if(createAccountViewModel.createAccountState.error == LendsumError.NO_INTERNET){
+        Toast.makeText(context, context.getString(R.string.not_connected_internet).uppercase(), Toast.LENGTH_SHORT).show().also { createAccountViewModel.resetCreateAccountState() }
+    }
 
     if(createAccountViewModel.createAccountState.status == Status.SUCCESS){
         accountForm?.let{ createAccountViewModel.updateFirebaseAuthProfile(GlobalConstants.FIRESTORE_PROFILE_NAME_KEY, "${it.firstName} ${it.lastName}") }
@@ -47,6 +55,7 @@ fun CreateAccountScreen(
         pulledEmail = firebaseUser?.email,
         createAccountStatus = createAccountViewModel.createAccountState,
         onBackButtonPressed = {
+            createAccountViewModel.logOutOfEmailAndPass()
             createAccountViewModel.logOutOfGoogle()
             navController.navigateUp()
         },

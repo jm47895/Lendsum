@@ -1,6 +1,7 @@
 package com.lendsumapp.lendsum.ui
 
 import android.app.Activity
+import android.widget.Toast
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.*
 import androidx.compose.runtime.*
@@ -33,8 +34,15 @@ fun NumberVerificationScreen(
     val numberVerificationViewModel = hiltViewModel<NumberVerificationViewModel>()
     val context = LocalContext.current as Activity
 
+    if(numberVerificationViewModel.phoneCodeState.error == LendsumError.NO_INTERNET || numberVerificationViewModel.phoneLinkState.error == LendsumError.NO_INTERNET){
+        Toast.makeText(context, context.getString(R.string.not_connected_internet).uppercase(), Toast.LENGTH_SHORT).show().also {
+            numberVerificationViewModel.resetLinkState()
+            numberVerificationViewModel.resetPhoneCodeState()
+        }
+    }
+
     if(numberVerificationViewModel.phoneLinkState.status == Status.SUCCESS){
-        numberVerificationViewModel.resetLinkStatus()
+        numberVerificationViewModel.resetLinkState()
         numberVerificationViewModel.insertNewUserIntoSqlCache()
         numberVerificationViewModel.insertNewUserIntoFirestoreDb()
         navController.navigate(NavDestination.HOME.key)
@@ -52,10 +60,10 @@ fun NumberVerificationScreen(
             numberVerificationViewModel.verifyPhoneNumber(inputCode)
         },
         onCodeFieldChanged = {
-            numberVerificationViewModel.resetLinkStatus()
+            numberVerificationViewModel.resetLinkState()
         },
         onNumberFieldChanged = {
-            numberVerificationViewModel.resetPhoneCodeStatus()
+            numberVerificationViewModel.resetPhoneCodeState()
         }
     )
 }
