@@ -11,9 +11,14 @@ import androidx.navigation.compose.rememberNavController
 fun LendsumNavHost(
     modifier: Modifier = Modifier,
     navController: NavHostController = rememberNavController(),
-    startDestination: String = NavDestination.LOGIN.key
+    startDestination: String = NavDestination.SPLASH_SCREEN.key
 ){
     NavHost(modifier = modifier, navController = navController, startDestination = startDestination){
+        composable(route = NavDestination.SPLASH_SCREEN.key){
+            SplashScreen(
+                navController = navController
+            )
+        }
         composable(route = NavDestination.LOGIN.key){
             LoginScreen(
                 navController = navController
@@ -43,6 +48,7 @@ fun LendsumNavHost(
 }
 
 enum class NavDestination(val key: String){
+    SPLASH_SCREEN("splash_screen"),
     LOGIN("login"),
     CREATE_ACCOUNT("create_account"),
     PASSWORD_RESET("password_reset"),

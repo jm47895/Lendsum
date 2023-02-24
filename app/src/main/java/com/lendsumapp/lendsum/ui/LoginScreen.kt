@@ -57,18 +57,18 @@ fun LoginScreen(
             }
     }
 
-    if(loginViewModel.googleSignInState.status == Status.SUCCESS){
-        loginViewModel.resetGoogleSigInState()
-        navController.navigate(NavDestination.CREATE_ACCOUNT.key)
-    }
-
-    if(loginViewModel.loginState.status == Status.SUCCESS || loginViewModel.firebaseUser != null){
+    if(loginViewModel.loginState.status == Status.SUCCESS){
         loginViewModel.resetLoginState()
         navController.navigate(NavDestination.HOME.key){
             popUpTo(NavDestination.LOGIN.key){
                 inclusive = true
             }
         }
+    }
+
+    if(loginViewModel.googleSignInState.status == Status.SUCCESS){
+        loginViewModel.resetGoogleSigInState()
+        navController.navigate(NavDestination.CREATE_ACCOUNT.key)
     }
 
     LoginScreenContent(
