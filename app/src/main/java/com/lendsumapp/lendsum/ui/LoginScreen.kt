@@ -103,7 +103,6 @@ fun LoginScreenContent(
     onContinueWithGoogleClicked: () -> Unit
 ){
     val focusManager = LocalFocusManager.current
-    val context = LocalContext.current
     var showSignUpOptions by remember { mutableStateOf(false) }
     var logInEmail by remember { mutableStateOf("") }
     var logInPass by remember { mutableStateOf("") }
