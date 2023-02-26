@@ -31,7 +31,7 @@ class MessagesRepository @Inject constructor(
     private val userList: MutableLiveData<List<User>> = MutableLiveData()
     private val firebaseStorageImageUri: MutableLiveData<Uri> = MutableLiveData()
 
-    fun getCurrentCachedUser(userId: String): Flow<User> {
+    fun getCurrentCachedUser(userId: String): Flow<User?> {
         return lendsumDatabase.getUserDao().getUser(userId)
     }
 

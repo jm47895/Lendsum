@@ -89,3 +89,7 @@ lint/tmp/
 
 # Android Profiling
 *.hprof
+
+#generated files
+app/release
+app/schemas

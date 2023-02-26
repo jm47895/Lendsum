@@ -41,7 +41,7 @@ class NumberVerificationRepository @Inject constructor(
     //End firestore functions
 
     //Sync user data function
-    fun doesUserExistInLendsumDbCache(firebaseUser: FirebaseUser): Flow<User>{
+    fun doesUserExistInLendsumDbCache(firebaseUser: FirebaseUser): Flow<User?>{
         return cacheDb.getUserDao().getUser(firebaseUser.uid)
     }
 

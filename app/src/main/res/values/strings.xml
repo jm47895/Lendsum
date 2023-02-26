@@ -52,7 +52,7 @@
     <string name="no_account_with_email">There is no account associated with this email</string>
     <string name="sign_out">Sign Out</string>
     <string name="database_name">lendsum.db</string>
-    <string name="karma_score">Karma Score: %1$d"</string>
+    <string name="karma_score">Karma Score: "</string>
     <string name="profile_name_place_holder">Profile name place holder</string>
     <string name="username_placeholder">Username placeholder</string>
     <string name="email_placeholder">email placeholder</string>
@@ -99,5 +99,6 @@
     <string name="verify">Verify</string>
     <string name="exceeded_code_attempts">You have exceeded the amount of codes that can be sent. Please try again later.</string>
     <string name="code_timeout">This code has timed out. Please send new code.</string>
+    <string name="friends">friends</string>
 
 </resources>

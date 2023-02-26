@@ -23,13 +23,13 @@ class EditProfileViewModel @Inject constructor(
     private val context = getApplication<Application>().applicationContext
 
     //Room cache sql functions
-    fun getCachedUser(): LiveData<User>{
+    /*fun getCachedUser(): LiveData<User>{
 
         val uid = firebaseAuth?.currentUser?.uid.toString()
 
         return editProfileRepository.getCachedUser(uid).asLiveData()
 
-    }
+    }*/
 
     fun updateLocalCachedUser(userObject: User){
         viewModelScope.launch(Dispatchers.IO) {

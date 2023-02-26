@@ -27,8 +27,19 @@ fun SplashScreen(
     val loginViewModel = hiltViewModel<LoginViewModel>()
 
     LaunchedEffect(Unit){
+
+        loginViewModel.firebaseUser?.let {
+            loginViewModel.syncUserData(it.uid)
+        }
+
         delay(1500)
-        loginViewModel.firebaseUser?.let { navController.navigate(NavDestination.HOME.key) } ?: navController.navigate(NavDestination.LOGIN.key)
+        val destination = loginViewModel.firebaseUser?.let { NavDestination.HOME } ?: NavDestination.LOGIN
+
+        navController.navigate(destination.key){
+            popUpTo(NavDestination.SPLASH_SCREEN.key){
+                inclusive = true
+            }
+        }
     }
 
     SplashScreenContent()
@@ -43,7 +54,6 @@ fun SplashScreenContent(){
             .background(ColorPrimary),
         contentAlignment = Alignment.Center
     ){
-
         Icon(painter = painterResource(id = R.drawable.ic_handshake_24), contentDescription = "Splash Icon", tint = Color.White)
     }
 }

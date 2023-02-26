@@ -46,7 +46,7 @@ class ProfileFragment : Fragment(), View.OnClickListener {
         binding.profileSettingsBtn.setOnClickListener(this)
         binding.profileProfileEditBtn.setOnClickListener(this)
 
-        profileViewModel.getCachedUser().observe(viewLifecycleOwner, Observer { user->
+        /*profileViewModel.getCachedUser().observe(viewLifecycleOwner, Observer { user->
             binding.profileName.text = user.name
             binding.profileUsername.text = user.username
             binding.profileKarmaScore.text = getString(R.string.karma_score, user.karmaScore)
@@ -60,7 +60,7 @@ class ProfileFragment : Fragment(), View.OnClickListener {
                     .placeholder(R.drawable.ic_close_24))
                 .circleCrop()
                 .into(binding.profilePicImage)
-        })
+        })*/
 
         binding.profilePicImage.visibility = View.VISIBLE
     }

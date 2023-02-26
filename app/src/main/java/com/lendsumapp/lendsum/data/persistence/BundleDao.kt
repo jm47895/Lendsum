@@ -6,7 +6,7 @@ import com.lendsumapp.lendsum.data.model.Bundle
 @Dao
 interface BundleDao {
 
-    @Insert
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertBundle(bundle: Bundle): Long
 
     @Update

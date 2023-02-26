@@ -111,12 +111,12 @@ class NumberVerificationViewModel @Inject constructor(
     }
 
     //Sync data functions
-    fun checkIfUserExistsInLendsumDbCache(): LiveData<User>{
+    /*fun checkIfUserExistsInLendsumDbCache(): LiveData<User>{
         val firebaseUser = firebaseAuth.currentUser!!
 
         return numberVerificationRepository.doesUserExistInLendsumDbCache(firebaseUser).asLiveData()
 
-    }
+    }*/
 
     fun syncUserData(uid: String){
         viewModelScope.launch(Dispatchers.IO) {

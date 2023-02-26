@@ -65,12 +65,12 @@ class EditProfileFragment : Fragment(), View.OnClickListener, CompoundButton.OnC
         binding.editProfileVisibilityToggle.setOnCheckedChangeListener(this)
 
 
-        editProfileViewModel.getCachedUser().observe(viewLifecycleOwner, Observer { cachedUser ->
+        /*editProfileViewModel.getCachedUser().observe(viewLifecycleOwner, Observer { cachedUser ->
 
             user = cachedUser
 
             loadCachedUserProfile(user)
-        })
+        })*/
 
         updateAuthEmailStatusObserver = Observer { isAuthEmailUpdated ->
             if(isAuthEmailUpdated){

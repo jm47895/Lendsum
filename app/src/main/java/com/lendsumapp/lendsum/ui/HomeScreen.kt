@@ -83,7 +83,7 @@ enum class BottomNavOption(val drawableRes: Int){
     MESSAGES(R.drawable.ic_message_24),
     BUNDLES(R.drawable.ic_bundle_24),
     PROFILE(R.drawable.ic_profile_24),
-    SERVICES(R.drawable.ic_services_24),
+    SERVICES(R.drawable.ic_handshake_24),
     NOTIFICATIONS(R.drawable.ic_notifications_24)
 }
 

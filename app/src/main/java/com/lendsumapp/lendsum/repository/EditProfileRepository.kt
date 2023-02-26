@@ -27,7 +27,7 @@ class EditProfileRepository @Inject constructor(
 ){
     val constraints = Constraints.Builder().setRequiredNetworkType(NetworkType.CONNECTED).build()
 
-    fun getCachedUser(userId:String): Flow<User> {
+    fun getCachedUser(userId:String): Flow<User?> {
         return lendsumDatabase.getUserDao().getUser(userId)
     }
 

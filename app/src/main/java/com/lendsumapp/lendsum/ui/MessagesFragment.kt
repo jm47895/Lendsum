@@ -71,9 +71,9 @@ class MessagesFragment : Fragment(), View.OnClickListener,
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        messagesViewModel.getCurrentCachedUser().observe(viewLifecycleOwner, Observer { cachedUser->
+        /*messagesViewModel.getCurrentCachedUser().observe(viewLifecycleOwner, Observer { cachedUser->
             hostUser = cachedUser
-        })
+        })*/
 
         binding.messagesOpenGalleryBtn.setOnClickListener(this)
         binding.messagesTakePhotoBtn.setOnClickListener(this)

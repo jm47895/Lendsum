@@ -25,11 +25,11 @@ class MessagesViewModel @Inject constructor(
     private val currentListOfImgUris: MutableLiveData<MutableList<String>> = MutableLiveData()
     private val context = getApplication<Application>().applicationContext
 
-    fun getCurrentCachedUser(): LiveData<User>{
+    /*fun getCurrentCachedUser(): LiveData<User>{
 
         val uid = firebaseAuth?.currentUser?.uid.toString()
         return messagesRepository.getCurrentCachedUser(uid).asLiveData()
-    }
+    }*/
 
     fun getCurrentCachedMessages(chatRoomId: String): LiveData<List<Message>> {
        return messagesRepository.getCurrentMessages(chatRoomId).asLiveData()

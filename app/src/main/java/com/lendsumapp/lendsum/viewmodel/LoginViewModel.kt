@@ -10,16 +10,19 @@ import com.lendsumapp.lendsum.data.model.LendsumError
 import com.lendsumapp.lendsum.data.model.Response
 import com.lendsumapp.lendsum.data.model.Status
 import com.lendsumapp.lendsum.repository.LoginRepository
+import com.lendsumapp.lendsum.repository.NumberVerificationRepository
 import com.lendsumapp.lendsum.util.AndroidUtils
 import com.lendsumapp.lendsum.util.NetworkUtils
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
 class LoginViewModel @Inject constructor(
     private val loginRepository: LoginRepository,
+    private val numberVerificationRepository: NumberVerificationRepository,
     @ApplicationContext val context: Context
 ): ViewModel(){
 
@@ -90,6 +93,14 @@ class LoginViewModel @Inject constructor(
         }
     }
     //End of Email and Pass functions
+
+    //Sync functions
+    fun syncUserData(uid: String){
+        viewModelScope.launch(Dispatchers.IO) {
+            numberVerificationRepository.syncUserData(uid, viewModelScope)
+        }
+    }
+    //End of sync functions
 
     fun resetLoginState(){
         _loginState.value = Response()
