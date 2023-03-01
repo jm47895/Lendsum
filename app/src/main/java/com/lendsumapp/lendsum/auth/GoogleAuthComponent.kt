@@ -15,12 +15,6 @@ import javax.inject.Inject
 
 class GoogleAuthComponent @Inject constructor(){
 
-    private val firebaseAuth : FirebaseAuth = FirebaseAuth.getInstance()
-
-    fun signOutOfGoogle(){
-        firebaseAuth.signOut()
-    }
-
     fun handleGoogleSignInIntent(intent: Intent) = callbackFlow<Response<Unit>>{
 
         send(Response(status = Status.LOADING))

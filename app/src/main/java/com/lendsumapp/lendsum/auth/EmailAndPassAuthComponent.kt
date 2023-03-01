@@ -124,10 +124,6 @@ class EmailAndPassAuthComponent @Inject constructor(){
         return updateAuthPassStatus
     }
 
-    fun signOutOfEmailAndPass(){
-        firebaseAuth.signOut()
-    }
-
     fun sendPasswordResetEmail(email: String) = callbackFlow<Response<Unit>>{
 
         send(Response(status = Status.LOADING))

@@ -14,15 +14,9 @@ import javax.inject.Inject
 class SettingsViewModel @Inject constructor(
     private val loginRepository: LoginRepository,
 ): ViewModel() {
-    fun logOutOfGoogle(){
-        viewModelScope.launch(Dispatchers.IO) {
-            loginRepository.logOutOfGoogle()
-        }
-    }
-
-    fun logOutOfEmailAndPass(){
-        viewModelScope.launch(Dispatchers.IO) {
-            loginRepository.logOutOfEmailAndPass()
+    fun logOut(){
+        viewModelScope.launch {
+            loginRepository.logOut()
         }
     }
 }

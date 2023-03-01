@@ -23,6 +23,7 @@ import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.navigation.NavController
 import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
 import com.bumptech.glide.integration.compose.GlideImage
 import com.lendsumapp.lendsum.R
@@ -32,18 +33,24 @@ import com.lendsumapp.lendsum.ui.theme.ColorPrimary
 import com.lendsumapp.lendsum.viewmodel.ProfileViewModel
 
 @Composable
-fun ProfileScreen() {
+fun ProfileScreen(
+    onSettingsClicked: () -> Unit
+) {
 
     val profileViewModel = hiltViewModel<ProfileViewModel>()
 
     ProfileContent(
-        profileViewModel.user
+        profileViewModel.user,
+        onSettingsClicked = {
+            onSettingsClicked.invoke()
+        }
     )
 }
 
 @Composable
 fun ProfileContent(
-    user: User
+    user: User,
+    onSettingsClicked: () -> Unit
 ){
     Box(modifier = Modifier
         .fillMaxWidth()
@@ -56,6 +63,7 @@ fun ProfileContent(
         )
 
         ProfileInfo(
+            onSettingsClicked = onSettingsClicked,
             modifier = Modifier.align(Alignment.TopEnd),
             user = user
         )
@@ -69,7 +77,8 @@ fun ProfileContent(
 @Composable
 fun ProfileInfo(
     modifier: Modifier = Modifier,
-    user: User
+    user: User,
+    onSettingsClicked:() -> Unit
 ){
     Column(
         modifier = modifier
@@ -87,7 +96,12 @@ fun ProfileInfo(
         ){
             Icon(painter = painterResource(id = R.drawable.ic_qr_code_scanner_32), contentDescription = "Settings Icon", tint = Color.White)
             Spacer(modifier = Modifier.width(8.dp))
-            Icon(painter = painterResource(id = R.drawable.ic_settings_32), contentDescription = "Settings Icon", tint = Color.White)
+            Icon(
+                modifier = Modifier.clickable {
+                    onSettingsClicked.invoke()
+                },
+                painter = painterResource(id = R.drawable.ic_settings_32), contentDescription = "Settings Icon", tint = Color.White
+            )
         }
         Text(style = MaterialTheme.typography.bodyLarge, text = user.name, color = Color.White, fontWeight = FontWeight.Bold)
         Text(style = MaterialTheme.typography.bodyLarge, text = user.username, color = Color.White)
@@ -182,6 +196,7 @@ fun ProfilePic(
 @Composable
 fun ProfileContentPreview() {
     ProfileContent(
-        user = User()
+        user = User(),
+        onSettingsClicked = {}
     )
 }

@@ -55,8 +55,7 @@ fun CreateAccountScreen(
         pulledEmail = firebaseUser?.email,
         createAccountStatus = createAccountViewModel.createAccountState,
         onBackButtonPressed = {
-            createAccountViewModel.logOutOfEmailAndPass()
-            createAccountViewModel.logOutOfGoogle()
+            createAccountViewModel.logOut()
             navController.navigateUp()
         },
         onNextPressed = {

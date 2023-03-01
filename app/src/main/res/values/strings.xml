@@ -100,5 +100,7 @@
     <string name="exceeded_code_attempts">You have exceeded the amount of codes that can be sent. Please try again later.</string>
     <string name="code_timeout">This code has timed out. Please send new code.</string>
     <string name="friends">friends</string>
+    <string name="account">account</string>
+    <string name="account_settings_desc">Change your name, username, password, email</string>
 
 </resources>

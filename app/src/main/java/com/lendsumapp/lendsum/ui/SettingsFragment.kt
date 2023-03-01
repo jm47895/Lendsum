@@ -55,13 +55,13 @@ class SettingsFragment : Fragment(), View.OnClickListener {
 
                 when(sharedPrefs?.getInt(NAV_SIGN_UP_TYPE, NavSignUpType.EMAIL_LOGIN.ordinal)){
                     NavSignUpType.EMAIL_LOGIN.ordinal ->{
-                        settingsViewModel.logOutOfEmailAndPass()
+                        settingsViewModel.logOut()
                         view.findNavController().navigate(R.id.action_settingsFragment_to_loginFragment)
                     }
                     NavSignUpType.GOOGLE_LOGIN.ordinal ->{
                         context?.let {
                             //settingsViewModel.configureGoogleAuth(it)
-                            settingsViewModel.logOutOfGoogle()
+                            settingsViewModel.logOut()
                             view.findNavController().navigate(R.id.action_settingsFragment_to_loginFragment)
                         }
                     }

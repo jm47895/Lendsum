@@ -20,11 +20,15 @@ import com.lendsumapp.lendsum.ui.theme.ColorPrimary
 fun HomeScreen(
     navController: NavController
 ){
-    HomeScreenContent()
+    HomeScreenContent(
+        onSettingsClicked = { navController.navigate(NavDestination.SETTINGS.key) }
+    )
 }
 
 @Composable
-fun HomeScreenContent(){
+fun HomeScreenContent(
+    onSettingsClicked:() -> Unit
+){
     Box(modifier = Modifier
         .fillMaxSize()
         .background(Color.Black)){
@@ -34,7 +38,9 @@ fun HomeScreenContent(){
         when(currentScreen){
             BottomNavOption.MESSAGES -> MessagesScreen()
             BottomNavOption.BUNDLES -> BundlesScreen()
-            BottomNavOption.PROFILE -> ProfileScreen()
+            BottomNavOption.PROFILE -> ProfileScreen(
+                onSettingsClicked = onSettingsClicked
+            )
             BottomNavOption.SERVICES -> ServicesScreen()
             BottomNavOption.NOTIFICATIONS -> NotificationsScreen()
         }
@@ -90,5 +96,7 @@ enum class BottomNavOption(val drawableRes: Int){
 @Preview
 @Composable
 fun HomeScreenContentPreview(){
-    HomeScreenContent()
+    HomeScreenContent(
+        onSettingsClicked = {}
+    )
 }

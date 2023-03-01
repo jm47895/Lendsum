@@ -30,6 +30,10 @@ class LoginRepository @Inject constructor(
         return firebaseAuth?.currentUser
     }
 
+    fun logOut(){
+        firebaseAuth?.signOut()
+    }
+
     fun deleteFirebaseUser(){
         getFirebaseUser()?.delete()
     }
@@ -37,10 +41,6 @@ class LoginRepository @Inject constructor(
     //Start of Google Auth functions
     fun handleGoogleSignInIntent(data: Intent): Flow<Response<Unit>>{
         return googleAuthComponent.handleGoogleSignInIntent(data)
-    }
-
-    fun logOutOfGoogle(){
-        googleAuthComponent.signOutOfGoogle()
     }
     //End of Google Auth functions
 
@@ -69,10 +69,6 @@ class LoginRepository @Inject constructor(
 
     fun signInWithEmailAndPass(email: String, password: String): Flow<Response<Unit>> {
         return emailAndPassAuthComponent.signInWithEmailAndPass(email, password)
-    }
-
-    fun logOutOfEmailAndPass(){
-        emailAndPassAuthComponent.signOutOfEmailAndPass()
     }
 
     fun sendPasswordResetEmail(email: String): Flow<Response<Unit>>{

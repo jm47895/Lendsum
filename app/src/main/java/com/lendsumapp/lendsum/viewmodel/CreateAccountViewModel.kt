@@ -35,14 +35,14 @@ class CreateAccountViewModel @Inject constructor(
         getFirebaseUser()
     }
 
-    fun logOutOfGoogle(){
-        viewModelScope.launch(Dispatchers.IO) {
-            loginRepository.logOutOfGoogle()
-        }
-    }
-
     private fun getFirebaseUser(){
         _firebaseUser.value = loginRepository.getFirebaseUser()
+    }
+
+    fun logOut(){
+        viewModelScope.launch {
+            loginRepository.logOut()
+        }
     }
 
     fun createUserAccount(email: String, password: String){
@@ -61,12 +61,6 @@ class CreateAccountViewModel @Inject constructor(
 
     fun updateFirebaseAuthProfile(key: String, value: String){
         loginRepository.launchUpdateFirebaseAuthProfileWorker(key, value)
-    }
-
-    fun logOutOfEmailAndPass(){
-        viewModelScope.launch(Dispatchers.IO) {
-            loginRepository.logOutOfEmailAndPass()
-        }
     }
 
     fun deleteFirebaseUser(){
