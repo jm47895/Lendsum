@@ -20,6 +20,7 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import javax.inject.Inject
+import kotlin.math.log
 
 @HiltViewModel
 class NumberVerificationViewModel @Inject constructor(
@@ -109,21 +110,6 @@ class NumberVerificationViewModel @Inject constructor(
 
         return "@$firstName-$firstFiveUidDigits"
     }
-
-    //Sync data functions
-    /*fun checkIfUserExistsInLendsumDbCache(): LiveData<User>{
-        val firebaseUser = firebaseAuth.currentUser!!
-
-        return numberVerificationRepository.doesUserExistInLendsumDbCache(firebaseUser).asLiveData()
-
-    }*/
-
-    fun syncUserData(uid: String){
-        viewModelScope.launch(Dispatchers.IO) {
-            numberVerificationRepository.syncUserData(uid, viewModelScope)
-        }
-    }
-    //End sync data functions
 
     fun resetLinkState(){
         _phoneLinkState.value = Response()

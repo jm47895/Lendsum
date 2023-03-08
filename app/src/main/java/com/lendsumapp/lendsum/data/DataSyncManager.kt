@@ -5,9 +5,7 @@ import androidx.lifecycle.MutableLiveData
 import com.google.firebase.database.*
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.ktx.toObject
-import com.lendsumapp.lendsum.data.model.ChatRoom
-import com.lendsumapp.lendsum.data.model.Message
-import com.lendsumapp.lendsum.data.model.User
+import com.lendsumapp.lendsum.data.model.*
 import com.lendsumapp.lendsum.data.persistence.LendsumDatabase
 import com.lendsumapp.lendsum.util.GlobalConstants.FIREBASE_USER_COLLECTION_PATH
 import com.lendsumapp.lendsum.util.GlobalConstants.REALTIME_DB_CHAT_ROOM_PATH
@@ -15,6 +13,9 @@ import com.lendsumapp.lendsum.util.GlobalConstants.REALTIME_DB_MESSAGES_PATH
 import com.lendsumapp.lendsum.util.GlobalConstants.REALTIME_DB_USER_PATH
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.channels.awaitClose
+import kotlinx.coroutines.flow.callbackFlow
+import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -51,35 +52,32 @@ class DataSyncManager @Inject constructor(
     }
 
     //Sync user data
-    fun syncUserData(uid: String, scope: CoroutineScope){
-        syncAllUserDataFromFirestore(uid, scope)
-    }
+    fun syncAllUserDataFromFirestore(uid: String) = callbackFlow<Response<User>> {
 
-    private fun syncAllUserDataFromFirestore(uid: String, viewModelScope: CoroutineScope){
+        send(Response(status = Status.LOADING))
 
         firestoreDb.collection(FIREBASE_USER_COLLECTION_PATH)
             .document(uid)
             .get().addOnSuccessListener { document ->
                 if(document != null){
-                    Log.d(TAG, "Retrieved Existing User Firestore Document")
-                    viewModelScope.launch(Dispatchers.IO) {
-                        syncUserDataInLocalCache(document.toObject<User>()!!)
-                    }
+                    Log.i(TAG, "Retrieved Existing User Firestore Document ${document.toObject(User::class.java)}")
+                    trySend(Response(status = Status.SUCCESS, data = document.toObject(User::class.java)))
                 }else{
                     /*This will only be hit if we lose all of our remote user data, which in this case
                     * we should have back up data to look at*/
-                    Log.d(TAG, "Existing User Document Does not exist")
+                    Log.e(TAG, "Existing User Document Does not exist")
+                    trySend(Response(status = Status.ERROR))
                 }
             }
             .addOnFailureListener { exception ->
-                Log.d(TAG, exception.toString())
+                trySend(Response(status = Status.ERROR))
+                Log.e(TAG, exception.toString())
             }
-    }
 
-    private suspend fun syncUserDataInLocalCache(user: User){
-        lendsumDatabase.getUserDao().insertUser(user)
+        awaitClose {
+
+        }
     }
-    //End sync user data
 
     //Sync chat data
     fun syncChatRoomList(listOfChatIds: List<String>, viewModelScope: CoroutineScope){
@@ -106,7 +104,7 @@ class DataSyncManager @Inject constructor(
     suspend fun syncChatRoomDataInLocalCache(chatRoom: ChatRoom){
         lendsumDatabase.getChatRoomDao().insertChatRoom(chatRoom)
     }
-    //End sync chat data
+
 
     //Sync message data
     fun syncMessagesData(chatId: String, viewModelScope: CoroutineScope){
@@ -146,7 +144,6 @@ class DataSyncManager @Inject constructor(
     suspend fun syncMessagesDataInLocalCache(message: Message){
         lendsumDatabase.getChatMessageDao().insertChatMessage(message)
     }
-    //End sync message data
 
     companion object{
         private val TAG = DataSyncManager::class.java.simpleName

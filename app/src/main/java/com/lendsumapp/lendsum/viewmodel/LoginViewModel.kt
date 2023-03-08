@@ -2,6 +2,7 @@ package com.lendsumapp.lendsum.viewmodel
 
 import android.content.Context
 import android.content.Intent
+import android.util.Log
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -10,6 +11,7 @@ import com.google.firebase.auth.FirebaseUser
 import com.lendsumapp.lendsum.data.model.LendsumError
 import com.lendsumapp.lendsum.data.model.Response
 import com.lendsumapp.lendsum.data.model.Status
+import com.lendsumapp.lendsum.data.model.User
 import com.lendsumapp.lendsum.repository.LoginRepository
 import com.lendsumapp.lendsum.repository.NumberVerificationRepository
 import com.lendsumapp.lendsum.util.AndroidUtils
@@ -17,13 +19,13 @@ import com.lendsumapp.lendsum.util.NetworkUtils
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
 class LoginViewModel @Inject constructor(
     private val loginRepository: LoginRepository,
-    private val numberVerificationRepository: NumberVerificationRepository,
     @ApplicationContext val context: Context
 ): ViewModel(){
 
@@ -31,9 +33,12 @@ class LoginViewModel @Inject constructor(
     private val _resetPassState = mutableStateOf(Response<Unit>())
     private val _firebaseUser = mutableStateOf<FirebaseUser?>(null)
     private val _googleSignInState = mutableStateOf(Response<Unit>())
+    private val _syncDataState = mutableStateOf(Response<User>())
 
     val loginState: Response<Unit>
         get() = _loginState.value
+    val syncState: Response<User>
+        get() = _syncDataState.value
     val firebaseUser: FirebaseUser?
         get() = _firebaseUser.value
     val resetPassState: Response<Unit>
@@ -71,6 +76,7 @@ class LoginViewModel @Inject constructor(
         viewModelScope.launch {
             loginRepository.signInWithEmailAndPass(email, password).collect{
                 _loginState.value = it
+                syncUserData()
             }
         }
     }
@@ -98,11 +104,16 @@ class LoginViewModel @Inject constructor(
     //Sync functions
     fun syncUserData(){
 
-        val currentUser = FirebaseAuth.getInstance().currentUser
+        getFirebaseUser()
 
-        currentUser?.let {
+        firebaseUser?.let {
             viewModelScope.launch(Dispatchers.IO) {
-                numberVerificationRepository.syncUserData(it.uid, viewModelScope)
+                loginRepository.syncAllUserData().collect{
+                    it.data?.let { user ->
+                        loginRepository.cacheExistingUser(user)
+                    }
+                    _syncDataState.value = it
+                }
             }
         }
     }
@@ -114,6 +125,10 @@ class LoginViewModel @Inject constructor(
 
     fun resetGoogleSigInState(){
         _googleSignInState.value = Response()
+    }
+
+    fun resetSyncState(){
+        _syncDataState.value = Response()
     }
 
     companion object{

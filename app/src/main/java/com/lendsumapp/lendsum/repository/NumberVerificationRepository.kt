@@ -15,7 +15,6 @@ import javax.inject.Inject
 class NumberVerificationRepository @Inject constructor(
     private val cacheDb: LendsumDatabase,
     private val firestoreDb: FirebaseFirestore,
-    private val dataSyncManager: DataSyncManager
 ) {
 
     //Cache functions
@@ -42,10 +41,6 @@ class NumberVerificationRepository @Inject constructor(
     //Sync user data function
     fun doesUserExistInLendsumDbCache(firebaseUser: FirebaseUser): Flow<User?>{
         return cacheDb.getUserDao().getUser(firebaseUser.uid)
-    }
-
-    fun syncUserData(uid: String, scope: CoroutineScope){
-        dataSyncManager.syncUserData(uid, scope)
     }
     //End Sync data functions
 

@@ -11,7 +11,10 @@ import com.google.firebase.auth.PhoneAuthCredential
 import com.lendsumapp.lendsum.auth.EmailAndPassAuthComponent
 import com.lendsumapp.lendsum.auth.GoogleAuthComponent
 import com.lendsumapp.lendsum.auth.PhoneAuthComponent
+import com.lendsumapp.lendsum.data.DataSyncManager
 import com.lendsumapp.lendsum.data.model.Response
+import com.lendsumapp.lendsum.data.model.User
+import com.lendsumapp.lendsum.data.persistence.LendsumDatabase
 import com.lendsumapp.lendsum.util.GlobalConstants.FIREBASE_AUTH_UPDATE_MAP_KEY
 import com.lendsumapp.lendsum.util.GlobalConstants.FIREBASE_AUTH_UPDATE_MAP_VALUE
 import com.lendsumapp.lendsum.workers.UpdateFirebaseAuthProfileWorker
@@ -22,16 +25,18 @@ class LoginRepository @Inject constructor(
     private val googleAuthComponent: GoogleAuthComponent,
     private val emailAndPassAuthComponent: EmailAndPassAuthComponent,
     private val phoneAuthComponent: PhoneAuthComponent,
-    private var firebaseAuth: FirebaseAuth?
+    private val dataSyncManager: DataSyncManager,
+    private var firebaseAuth: FirebaseAuth,
+    private val cacheDb: LendsumDatabase
 ){
 
     //Firebase
     fun getFirebaseUser(): FirebaseUser? {
-        return firebaseAuth?.currentUser
+        return firebaseAuth.currentUser
     }
 
     fun logOut(){
-        firebaseAuth?.signOut()
+        firebaseAuth.signOut()
     }
 
     fun deleteFirebaseUser(){
@@ -42,7 +47,6 @@ class LoginRepository @Inject constructor(
     fun handleGoogleSignInIntent(data: Intent): Flow<Response<Unit>>{
         return googleAuthComponent.handleGoogleSignInIntent(data)
     }
-    //End of Google Auth functions
 
     //Start of Email and Pass functions
     fun registerWithEmailAndPassword(email: String, password: String): Flow<Response<Unit>>{
@@ -75,8 +79,6 @@ class LoginRepository @Inject constructor(
         return emailAndPassAuthComponent.sendPasswordResetEmail(email)
     }
 
-    //End of Email and Pass functions
-
     //Phone Auth functions
     fun requestSMSCode(phoneNumber: String, activity: Activity): Flow<Response<String>>{
         return phoneAuthComponent.requestSMSCode(phoneNumber, activity)
@@ -85,7 +87,18 @@ class LoginRepository @Inject constructor(
     fun linkPhoneNumWithLoginCredential(credential: PhoneAuthCredential): Flow<Response<Unit>>{
        return phoneAuthComponent.linkPhoneNumWithLoginCredential(credential)
     }
-    //End phone auth functions
+
+    //Sync functions
+    fun syncAllUserData(): Flow<Response<User>>{
+
+        val uid = firebaseAuth.currentUser?.uid
+
+        return dataSyncManager.syncAllUserDataFromFirestore(uid.toString())
+    }
+
+    suspend fun cacheExistingUser(user: User){
+        cacheDb.getUserDao().insertUser(user)
+    }
 
     companion object{
         private val TAG = LoginRepository::class.simpleName

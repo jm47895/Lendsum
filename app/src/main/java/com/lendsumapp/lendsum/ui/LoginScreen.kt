@@ -25,7 +25,6 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
-import com.google.firebase.auth.FirebaseAuth
 import com.lendsumapp.lendsum.R
 import com.lendsumapp.lendsum.data.model.LendsumError
 import com.lendsumapp.lendsum.data.model.Response
@@ -58,9 +57,8 @@ fun LoginScreen(
             }
     }
 
-    if(loginViewModel.loginState.status == Status.SUCCESS){
-        loginViewModel.resetLoginState()
-        loginViewModel.syncUserData()
+    if(loginViewModel.syncState.status == Status.SUCCESS){
+        loginViewModel.resetSyncState()
         navController.navigate(NavDestination.HOME.key){
             popUpTo(NavDestination.LOGIN.key){
                 inclusive = true
