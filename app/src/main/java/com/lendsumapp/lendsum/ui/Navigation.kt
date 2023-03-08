@@ -49,6 +49,11 @@ fun LendsumNavHost(
                 navController = navController
             )
         }
+        composable(route = NavDestination.ACCOUNT.key){
+            AccountScreen(
+                navController = navController
+            )
+        }
     }
 }
 
@@ -59,5 +64,6 @@ enum class NavDestination(val key: String){
     PASSWORD_RESET("password_reset"),
     NUMBER_VERIFICATION("number_verification"),
     HOME("home"),
-    SETTINGS("settings")
+    SETTINGS("settings"),
+    ACCOUNT("account")
 }

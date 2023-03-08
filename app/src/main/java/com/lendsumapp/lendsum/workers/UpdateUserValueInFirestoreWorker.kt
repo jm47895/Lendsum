@@ -23,7 +23,7 @@ class UpdateUserValueInFirestoreWorker(context: Context, params: WorkerParameter
         val booleanValue = inputData.getBoolean(FIRESTORE_USER_WORKER_MAP_VALUE, true)
         val value = inputData.getString(FIRESTORE_USER_WORKER_MAP_VALUE) ?: booleanValue
 
-        val userDoc = firestoreDb.collection(GlobalConstants.FIRESTORE_USER_COLLECTION_PATH)
+        val userDoc = firestoreDb.collection(GlobalConstants.FIREBASE_USER_COLLECTION_PATH)
             .document(firebaseAuth.currentUser?.uid.toString())
 
         userDoc.update(key.toString(), value).addOnCompleteListener { task->

@@ -22,12 +22,12 @@ import com.lendsumapp.lendsum.data.model.User
 import com.lendsumapp.lendsum.databinding.FragmentEditProfileBinding
 import com.lendsumapp.lendsum.util.AndroidUtils
 import com.lendsumapp.lendsum.util.EditProfileInfoType
-import com.lendsumapp.lendsum.util.GlobalConstants.FIRESTORE_EMAIL_KEY
-import com.lendsumapp.lendsum.util.GlobalConstants.FIRESTORE_IS_PROFILE_PUBLIC_KEY
-import com.lendsumapp.lendsum.util.GlobalConstants.FIRESTORE_PROFILE_NAME_KEY
-import com.lendsumapp.lendsum.util.GlobalConstants.FIRESTORE_USERNAME_KEY
+import com.lendsumapp.lendsum.util.GlobalConstants.FIREBASE_EMAIL_KEY
+import com.lendsumapp.lendsum.util.GlobalConstants.FIREBASE_IS_PROFILE_PUBLIC_KEY
+import com.lendsumapp.lendsum.util.GlobalConstants.FIREBASE_PROFILE_NAME_KEY
+import com.lendsumapp.lendsum.util.GlobalConstants.FIREBASE_USERNAME_KEY
 import com.lendsumapp.lendsum.util.NetworkUtils
-import com.lendsumapp.lendsum.viewmodel.EditProfileViewModel
+import com.lendsumapp.lendsum.viewmodel.AccountViewModel
 import dagger.hilt.android.AndroidEntryPoint
 
 
@@ -36,7 +36,7 @@ class EditProfileFragment : Fragment(), View.OnClickListener, CompoundButton.OnC
 
     private var _binding: FragmentEditProfileBinding? = null
     private val binding get() = _binding!!
-    private val editProfileViewModel: EditProfileViewModel by viewModels()
+    private val accountViewModel: AccountViewModel by viewModels()
     private lateinit var updateUserStatusObserver: Observer<Int>
     private lateinit var updateAuthEmailStatusObserver: Observer<Boolean>
     private lateinit var updateAuthPassStatusObserver: Observer<Boolean>
@@ -74,8 +74,8 @@ class EditProfileFragment : Fragment(), View.OnClickListener, CompoundButton.OnC
 
         updateAuthEmailStatusObserver = Observer { isAuthEmailUpdated ->
             if(isAuthEmailUpdated){
-                editProfileViewModel.updateLocalCachedUser(user)
-                editProfileViewModel.updateUserValueInFirestore(FIRESTORE_EMAIL_KEY, user.email)
+                //accountViewModel.updateLocalCachedUser(user)
+                accountViewModel.updateUserValueInFirestore(FIREBASE_EMAIL_KEY, user.email)
             }else{
                 AndroidUtils.showSnackBar(requireActivity(), getString(R.string.sign_in_again_msg))
             }
@@ -100,7 +100,7 @@ class EditProfileFragment : Fragment(), View.OnClickListener, CompoundButton.OnC
                 Log.d(TAG, "User object not updated in room cache")
             }
         }
-        editProfileViewModel.getUpdateCacheUserStatus().observe(viewLifecycleOwner, updateUserStatusObserver)
+        accountViewModel.getUpdateCacheUserStatus().observe(viewLifecycleOwner, updateUserStatusObserver)
     }
 
     private fun loadCachedUserProfile(user: User?) {
@@ -180,9 +180,9 @@ class EditProfileFragment : Fragment(), View.OnClickListener, CompoundButton.OnC
 
                 if(NetworkUtils.isNetworkAvailable(requireContext())) {
                     if (isPasswordValidated(password, passwordMatch)) {
-                        editProfileViewModel.getUpdateAuthPassStatus()
+                        accountViewModel.getUpdateAuthPassStatus()
                             .observe(viewLifecycleOwner, updateAuthPassStatusObserver)
-                        editProfileViewModel.updateAuthPass(password)
+                        accountViewModel.updateAuthPass(password)
                     }
                 }else{
                     AndroidUtils.showSnackBar(requireActivity(), getString(R.string.not_connected_internet))
@@ -234,11 +234,11 @@ class EditProfileFragment : Fragment(), View.OnClickListener, CompoundButton.OnC
         uploadProfilePicToFirebaseStorage(it)
 
         user.profilePicUri = it.toString()
-        editProfileViewModel.updateLocalCachedUser(user)
+        //accountViewModel.updateLocalCachedUser(user)
     }
 
     private fun uploadProfilePicToFirebaseStorage(uri: Uri) {
-        editProfileViewModel.uploadProfilePhoto(uri)
+        //accountViewModel.uploadProfilePhoto(uri)
     }
 
     private fun handleUpdateInfoUI(isChecked: Boolean, textView: TextView?, editText: EditText?, toggleButton: ToggleButton) {
@@ -272,9 +272,9 @@ class EditProfileFragment : Fragment(), View.OnClickListener, CompoundButton.OnC
                         }
                         else -> {
                             user.name = textView.text.toString().trim()
-                            editProfileViewModel.updateLocalCachedUser(user)
-                            editProfileViewModel.updateUserValueInFirestore(FIRESTORE_PROFILE_NAME_KEY, user.name)
-                            editProfileViewModel.updateFirebaseAuthProfile(FIRESTORE_PROFILE_NAME_KEY, user.name)
+                            //accountViewModel.updateLocalCachedUser(user)
+                            accountViewModel.updateUserValueInFirestore(FIREBASE_PROFILE_NAME_KEY, user.name)
+                            //accountViewModel.updateFirebaseAuthProfile(FIREBASE_PROFILE_NAME_KEY, user.name)
                         }
                     }
                 }
@@ -291,8 +291,8 @@ class EditProfileFragment : Fragment(), View.OnClickListener, CompoundButton.OnC
                         }
                         else -> {
                             user.username = textView.text.toString().trim()
-                            editProfileViewModel.updateLocalCachedUser(user)
-                            editProfileViewModel.updateUserValueInFirestore(FIRESTORE_USERNAME_KEY, user.username)
+                            //accountViewModel.updateLocalCachedUser(user)
+                            accountViewModel.updateUserValueInFirestore(FIREBASE_USERNAME_KEY, user.username)
                         }
                     }
                 }
@@ -300,8 +300,8 @@ class EditProfileFragment : Fragment(), View.OnClickListener, CompoundButton.OnC
                     when {
                         AndroidUtils.isValidEmail(textView.text.toString().trim()) && !TextUtils.isEmpty(textView.text) -> {
                             user.email = textView.text.toString().trim()
-                            editProfileViewModel.getUpdateAuthEmailStatus().observe(viewLifecycleOwner, updateAuthEmailStatusObserver)
-                            editProfileViewModel.updateAuthEmail(user.email)
+                            accountViewModel.getUpdateAuthEmailStatus().observe(viewLifecycleOwner, updateAuthEmailStatusObserver)
+                            accountViewModel.updateAuthEmail(user.email)
                         }
                         else -> {
                             AndroidUtils.showSnackBar(requireActivity(), getString(R.string.invalid_email_data_not_saved))
@@ -310,16 +310,16 @@ class EditProfileFragment : Fragment(), View.OnClickListener, CompoundButton.OnC
                 }
                 EditProfileInfoType.PROFILE_VISIBILITY.ordinal -> {
                     user.isProfilePublic = true
-                    editProfileViewModel.updateLocalCachedUser(user)
-                    editProfileViewModel.updateUserValueInFirestore(FIRESTORE_IS_PROFILE_PUBLIC_KEY, true)
+                    //accountViewModel.updateLocalCachedUser(user)
+                    accountViewModel.updateUserValueInFirestore(FIREBASE_IS_PROFILE_PUBLIC_KEY, true)
                 }
             }
         }else{
             when(infoType){
                 EditProfileInfoType.PROFILE_VISIBILITY.ordinal -> {
                     user.isProfilePublic = false
-                    editProfileViewModel.updateLocalCachedUser(user)
-                    editProfileViewModel.updateUserValueInFirestore(FIRESTORE_IS_PROFILE_PUBLIC_KEY, false)
+                    //accountViewModel.updateLocalCachedUser(user)
+                    accountViewModel.updateUserValueInFirestore(FIREBASE_IS_PROFILE_PUBLIC_KEY, false)
                 }
             }
         }

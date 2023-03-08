@@ -5,6 +5,7 @@ import android.content.Intent
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import com.lendsumapp.lendsum.data.model.LendsumError
 import com.lendsumapp.lendsum.data.model.Response
@@ -95,9 +96,14 @@ class LoginViewModel @Inject constructor(
     //End of Email and Pass functions
 
     //Sync functions
-    fun syncUserData(uid: String){
-        viewModelScope.launch(Dispatchers.IO) {
-            numberVerificationRepository.syncUserData(uid, viewModelScope)
+    fun syncUserData(){
+
+        val currentUser = FirebaseAuth.getInstance().currentUser
+
+        currentUser?.let {
+            viewModelScope.launch(Dispatchers.IO) {
+                numberVerificationRepository.syncUserData(it.uid, viewModelScope)
+            }
         }
     }
     //End of sync functions

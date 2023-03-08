@@ -1,17 +1,13 @@
 package com.lendsumapp.lendsum.repository
 
 import android.net.Uri
-import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import androidx.work.*
-import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.firestore.FirebaseFirestore
 import com.lendsumapp.lendsum.auth.EmailAndPassAuthComponent
 import com.lendsumapp.lendsum.data.model.User
 import com.lendsumapp.lendsum.data.persistence.LendsumDatabase
 import com.lendsumapp.lendsum.util.GlobalConstants.FIREBASE_AUTH_UPDATE_MAP_KEY
 import com.lendsumapp.lendsum.util.GlobalConstants.FIREBASE_AUTH_UPDATE_MAP_VALUE
-import com.lendsumapp.lendsum.util.GlobalConstants.FIRESTORE_USER_COLLECTION_PATH
 import com.lendsumapp.lendsum.util.GlobalConstants.FIRESTORE_USER_WORKER_MAP_KEY
 import com.lendsumapp.lendsum.util.GlobalConstants.FIRESTORE_USER_WORKER_MAP_VALUE
 import com.lendsumapp.lendsum.util.GlobalConstants.PROF_IMAGE_STORAGE_WORK_NAME
@@ -21,7 +17,7 @@ import com.lendsumapp.lendsum.workers.*
 import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 
-class EditProfileRepository @Inject constructor(
+class AccountRepository @Inject constructor(
     private val lendsumDatabase: LendsumDatabase,
     private val emailAndPassAuthComponent: EmailAndPassAuthComponent
 ){
@@ -122,6 +118,6 @@ class EditProfileRepository @Inject constructor(
     }
 
     companion object {
-        private val TAG = EditProfileRepository::class.simpleName
+        private val TAG = AccountRepository::class.simpleName
     }
 }

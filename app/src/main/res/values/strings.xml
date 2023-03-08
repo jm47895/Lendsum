@@ -54,7 +54,7 @@
     <string name="database_name">lendsum.db</string>
     <string name="karma_score">Karma Score: "</string>
     <string name="profile_name_place_holder">Profile name place holder</string>
-    <string name="username_placeholder">Username placeholder</string>
+    <string name="username">Username</string>
     <string name="email_placeholder">email placeholder</string>
     <string name="edit">edit</string>
     <string name="save">save</string>
@@ -102,5 +102,7 @@
     <string name="friends">friends</string>
     <string name="account">account</string>
     <string name="account_settings_desc">Change your name, username, password, email</string>
+    <string name="name">Name</string>
+    <string name="edit_profile">Edit profile</string>
 
 </resources>

@@ -128,6 +128,8 @@ fun NumberVerificationContent(
                     .onFocusChanged { if (it.hasFocus) expandDropdown = false },
                 keyBoardType = KeyboardType.Number,
                 supportingLabel = stringResource(id = R.string.enter_phone_number),
+                supportingLabelColor = Color.Black,
+                textColor = Color.Black,
                 errorLabel = when(phoneCodeState.error)
                 {
                     LendsumError.INVALID_PHONE_CREDENTIAL -> stringResource(id = R.string.phone_number_invalid)
@@ -152,6 +154,8 @@ fun NumberVerificationContent(
         LendsumField(
             keyBoardType = KeyboardType.Number,
             supportingLabel = stringResource(id = R.string.enter_code),
+            supportingLabelColor = Color.Black,
+            textColor = Color.Black,
             errorLabel = when
             {
                 phoneLinkState.error == LendsumError.INVALID_PHONE_CREDENTIAL -> stringResource(id = R.string.code_not_match)

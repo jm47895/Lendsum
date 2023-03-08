@@ -65,6 +65,8 @@ fun ForgotPasswordScreenContent(
         LendsumField(
             keyBoardType = KeyboardType.Email,
             supportingLabel = stringResource(id = R.string.email),
+            supportingLabelColor = Color.Black,
+            textColor = Color.Black,
             errorLabel = when(resetPassState.error){
                 LendsumError.NO_INTERNET-> stringResource(id = R.string.not_connected_internet)
                 LendsumError.INVALID_EMAIL -> stringResource(id = R.string.invalid_email_err_msg)

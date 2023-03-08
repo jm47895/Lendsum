@@ -38,7 +38,7 @@ class GoogleAuthComponent @Inject constructor(){
             }
         }else{
             trySend(Response(status = Status.ERROR, error = LendsumError.FAILED_TO_GET_GOOGLE_INFO))
-            Log.d("ASDF", "Get google account failed: ${task.exception}")
+            Log.e(TAG, "Get google account failed: ${task.exception}")
             channel.close()
         }
 

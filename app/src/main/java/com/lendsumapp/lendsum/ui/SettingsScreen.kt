@@ -33,7 +33,9 @@ fun SettingsScreen(
 
     SettingsScreenContent(
         onBackClicked = { navController.navigateUp() },
-        onAccountClicked = {},
+        onAccountClicked = {
+            navController.navigate(NavDestination.ACCOUNT.key)
+        },
         onLogoutClicked = {
             settingsViewModel.logOut()
             navController.navigate(NavDestination.LOGIN.key)

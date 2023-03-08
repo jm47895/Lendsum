@@ -9,8 +9,8 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.UserProfileChangeRequest
 import com.lendsumapp.lendsum.util.GlobalConstants.FIREBASE_AUTH_UPDATE_MAP_KEY
 import com.lendsumapp.lendsum.util.GlobalConstants.FIREBASE_AUTH_UPDATE_MAP_VALUE
-import com.lendsumapp.lendsum.util.GlobalConstants.FIRESTORE_PROFILE_NAME_KEY
-import com.lendsumapp.lendsum.util.GlobalConstants.FIRESTORE_PROFILE_PIC_URI_KEY
+import com.lendsumapp.lendsum.util.GlobalConstants.FIREBASE_PROFILE_NAME_KEY
+import com.lendsumapp.lendsum.util.GlobalConstants.FIREBASE_PROFILE_PIC_URI_KEY
 import java.util.concurrent.CountDownLatch
 
 class UpdateFirebaseAuthProfileWorker(context: Context, params: WorkerParameters) : Worker(context, params) {
@@ -23,10 +23,10 @@ class UpdateFirebaseAuthProfileWorker(context: Context, params: WorkerParameters
         val value = inputData.getString(FIREBASE_AUTH_UPDATE_MAP_VALUE)
 
         when(key){
-            FIRESTORE_PROFILE_NAME_KEY -> {
+            FIREBASE_PROFILE_NAME_KEY -> {
                 UserProfileChangeRequest.Builder().setDisplayName(value).build()
             }
-            FIRESTORE_PROFILE_PIC_URI_KEY -> {
+            FIREBASE_PROFILE_PIC_URI_KEY -> {
                 UserProfileChangeRequest.Builder().setPhotoUri(value?.toUri()).build()
             }
             else -> null

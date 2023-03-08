@@ -25,6 +25,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
+import com.google.firebase.auth.FirebaseAuth
 import com.lendsumapp.lendsum.R
 import com.lendsumapp.lendsum.data.model.LendsumError
 import com.lendsumapp.lendsum.data.model.Response
@@ -59,6 +60,7 @@ fun LoginScreen(
 
     if(loginViewModel.loginState.status == Status.SUCCESS){
         loginViewModel.resetLoginState()
+        loginViewModel.syncUserData()
         navController.navigate(NavDestination.HOME.key){
             popUpTo(NavDestination.LOGIN.key){
                 inclusive = true
@@ -125,6 +127,8 @@ fun LoginScreenContent(
         LendsumField(
             keyBoardType = KeyboardType.Email,
             supportingLabel = stringResource(id = R.string.email),
+            supportingLabelColor = Color.Black,
+            textColor = Color.Black,
             errorLabel = if (loginState.error == LendsumError.INVALID_LOGIN) stringResource(id = R.string.email_or_pass_wrong) else null,
             onTextChanged = {
                 logInEmail = it
@@ -133,6 +137,8 @@ fun LoginScreenContent(
         LendsumField(
             keyBoardType = KeyboardType.Password,
             supportingLabel = stringResource(id = R.string.password),
+            supportingLabelColor = Color.Black,
+            textColor = Color.Black,
             errorLabel = if (loginState.error == LendsumError.INVALID_LOGIN) stringResource(id = R.string.email_or_pass_wrong) else null,
             onTextChanged = {
                 logInPass = it

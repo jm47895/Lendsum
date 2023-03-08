@@ -28,9 +28,8 @@ fun SplashScreen(
 
     LaunchedEffect(Unit){
 
-        loginViewModel.firebaseUser?.let {
-            loginViewModel.syncUserData(it.uid)
-        }
+        loginViewModel.syncUserData()
+
 
         delay(1500)
         val destination = loginViewModel.firebaseUser?.let { NavDestination.HOME } ?: NavDestination.LOGIN

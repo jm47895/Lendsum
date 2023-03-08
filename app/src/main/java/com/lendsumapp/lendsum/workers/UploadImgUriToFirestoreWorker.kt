@@ -7,8 +7,8 @@ import androidx.work.WorkerParameters
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
-import com.lendsumapp.lendsum.util.GlobalConstants.FIRESTORE_PROFILE_PIC_URI_KEY
-import com.lendsumapp.lendsum.util.GlobalConstants.FIRESTORE_USER_COLLECTION_PATH
+import com.lendsumapp.lendsum.util.GlobalConstants.FIREBASE_PROFILE_PIC_URI_KEY
+import com.lendsumapp.lendsum.util.GlobalConstants.FIREBASE_USER_COLLECTION_PATH
 import com.lendsumapp.lendsum.util.GlobalConstants.UPLOAD_PROF_PIC_URI_KEY
 import java.util.concurrent.CountDownLatch
 
@@ -21,10 +21,10 @@ class UploadImgUriToFirestoreWorker(context: Context, params: WorkerParameters) 
         val firebaseAuth = FirebaseAuth.getInstance()
         val uri = inputData.getString(UPLOAD_PROF_PIC_URI_KEY)
 
-        val userDoc = firestoreDb.collection(FIRESTORE_USER_COLLECTION_PATH)
+        val userDoc = firestoreDb.collection(FIREBASE_USER_COLLECTION_PATH)
             .document(firebaseAuth.currentUser?.uid.toString())
 
-        userDoc.update(FIRESTORE_PROFILE_PIC_URI_KEY, uri).addOnCompleteListener { task->
+        userDoc.update(FIREBASE_PROFILE_PIC_URI_KEY, uri).addOnCompleteListener { task->
             if(task.isSuccessful){
                 Log.d(TAG, "Profile pic uri update success")
                 result = Result.success()

@@ -1,6 +1,5 @@
 package com.lendsumapp.lendsum.ui
 
-import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.*
@@ -29,7 +28,6 @@ import com.lendsumapp.lendsum.ui.components.LendsumField
 import com.lendsumapp.lendsum.ui.components.LoadingAnimation
 import com.lendsumapp.lendsum.util.GlobalConstants
 import com.lendsumapp.lendsum.viewmodel.CreateAccountViewModel
-import kotlin.coroutines.coroutineContext
 
 @Composable
 fun CreateAccountScreen(
@@ -45,7 +43,7 @@ fun CreateAccountScreen(
     }
 
     if(createAccountViewModel.createAccountState.status == Status.SUCCESS){
-        accountForm?.let{ createAccountViewModel.updateFirebaseAuthProfile(GlobalConstants.FIRESTORE_PROFILE_NAME_KEY, "${it.firstName} ${it.lastName}") }
+        accountForm?.let{ createAccountViewModel.updateFirebaseAuthProfile(GlobalConstants.FIREBASE_PROFILE_NAME_KEY, "${it.firstName} ${it.lastName}") }
         createAccountViewModel.resetCreateAccountState()
         navController.navigate(NavDestination.NUMBER_VERIFICATION.key)
     }
@@ -106,6 +104,8 @@ fun CreateAccountContent(
             keyBoardType = KeyboardType.Text,
             defaultValue = pulledName?.first,
             supportingLabel = stringResource(id = R.string.first_name),
+            supportingLabelColor = Color.Black,
+            textColor = Color.Black,
             errorLabel = if (createAccountStatus.error == LendsumError.EMPTY_FIRST_NAME) stringResource(id = R.string.first_name_error_msg) else null,
             onTextChanged ={
                 onFieldChanged.invoke()
@@ -116,6 +116,8 @@ fun CreateAccountContent(
             keyBoardType = KeyboardType.Text,
             defaultValue = pulledName?.second,
             supportingLabel = stringResource(id = R.string.last_name),
+            supportingLabelColor = Color.Black,
+            textColor = Color.Black,
             errorLabel = if(createAccountStatus.error == LendsumError.EMPTY_LAST_NAME) stringResource(id = R.string.last_name_err_msg) else null,
             onTextChanged ={
                 onFieldChanged.invoke()
@@ -125,6 +127,8 @@ fun CreateAccountContent(
             keyBoardType = KeyboardType.Email,
             defaultValue = pulledEmail,
             supportingLabel = stringResource(id = R.string.email),
+            supportingLabelColor = Color.Black,
+            textColor = Color.Black,
             errorLabel = when (createAccountStatus.error) {
                 LendsumError.INVALID_EMAIL -> stringResource(id = R.string.invalid_email_err_msg)
                 LendsumError.USER_EMAIL_ALREADY_EXISTS -> stringResource(id = R.string.account_already_exists)
@@ -138,6 +142,8 @@ fun CreateAccountContent(
         LendsumField(
             keyBoardType = KeyboardType.Password,
             supportingLabel = stringResource(id = R.string.password),
+            supportingLabelColor = Color.Black,
+            textColor = Color.Black,
             errorLabel = if(createAccountStatus.error == LendsumError.INVALID_PASS) stringResource(id = R.string.password_param_err_msg) else null,
             onTextChanged ={
                 onFieldChanged.invoke()
@@ -146,6 +152,8 @@ fun CreateAccountContent(
         LendsumField(
             keyBoardType = KeyboardType.Password,
             supportingLabel = stringResource(id = R.string.re_enter_password),
+            supportingLabelColor = Color.Black,
+            textColor = Color.Black,
             errorLabel = if(createAccountStatus.error == LendsumError.PASS_NO_MATCH) stringResource(id = R.string.pass_dont_match_err_msg) else null,
             onTextChanged ={
                 onFieldChanged.invoke()

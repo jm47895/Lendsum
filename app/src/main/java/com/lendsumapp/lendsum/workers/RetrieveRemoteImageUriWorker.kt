@@ -8,7 +8,6 @@ import androidx.work.WorkerParameters
 import androidx.work.workDataOf
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.storage.ktx.storage
-import com.lendsumapp.lendsum.repository.EditProfileRepository
 import com.lendsumapp.lendsum.util.GlobalConstants
 import com.lendsumapp.lendsum.util.GlobalConstants.UPLOAD_PROF_PIC_NAME_KEY
 import com.lendsumapp.lendsum.util.GlobalConstants.UPLOAD_PROF_PIC_URI_KEY

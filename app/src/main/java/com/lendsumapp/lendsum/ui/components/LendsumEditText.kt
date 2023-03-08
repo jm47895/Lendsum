@@ -24,6 +24,8 @@ fun LendsumField(
     defaultValue: String? = null,
     keyBoardType: KeyboardType,
     supportingLabel: String,
+    supportingLabelColor: Color,
+    textColor: Color,
     errorLabel: String? = null,
     regEx: Regex? = null,
     onTextChanged :(String) -> Unit,
@@ -52,10 +54,12 @@ fun LendsumField(
         colors = TextFieldDefaults.textFieldColors(
             cursorColor = Color.Black,
             focusedIndicatorColor = ColorPrimary,
-            unfocusedIndicatorColor = Color.Black
+            unfocusedIndicatorColor = Color.LightGray,
+            containerColor = Color.Transparent,
+            textColor = textColor
         ),
         supportingText = {
-            Text(text = errorLabel?.let{ errorLabel } ?: supportingLabel, color = errorLabel?.let{ Color.Red } ?: Color.Black)
+            Text(text = errorLabel?.let{ errorLabel } ?: supportingLabel, color = errorLabel?.let{ Color.Red } ?: supportingLabelColor)
         },
         keyboardOptions = KeyboardOptions(keyboardType = keyBoardType),
         visualTransformation =

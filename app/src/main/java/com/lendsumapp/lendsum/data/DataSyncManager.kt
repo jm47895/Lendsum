@@ -1,6 +1,5 @@
 package com.lendsumapp.lendsum.data
 
-import android.content.Context
 import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import com.google.firebase.database.*
@@ -10,9 +9,7 @@ import com.lendsumapp.lendsum.data.model.ChatRoom
 import com.lendsumapp.lendsum.data.model.Message
 import com.lendsumapp.lendsum.data.model.User
 import com.lendsumapp.lendsum.data.persistence.LendsumDatabase
-import com.lendsumapp.lendsum.util.AndroidUtils
-import com.lendsumapp.lendsum.util.DatabaseUtils
-import com.lendsumapp.lendsum.util.GlobalConstants.FIRESTORE_USER_COLLECTION_PATH
+import com.lendsumapp.lendsum.util.GlobalConstants.FIREBASE_USER_COLLECTION_PATH
 import com.lendsumapp.lendsum.util.GlobalConstants.REALTIME_DB_CHAT_ROOM_PATH
 import com.lendsumapp.lendsum.util.GlobalConstants.REALTIME_DB_MESSAGES_PATH
 import com.lendsumapp.lendsum.util.GlobalConstants.REALTIME_DB_USER_PATH
@@ -60,7 +57,7 @@ class DataSyncManager @Inject constructor(
 
     private fun syncAllUserDataFromFirestore(uid: String, viewModelScope: CoroutineScope){
 
-        firestoreDb.collection(FIRESTORE_USER_COLLECTION_PATH)
+        firestoreDb.collection(FIREBASE_USER_COLLECTION_PATH)
             .document(uid)
             .get().addOnSuccessListener { document ->
                 if(document != null){
