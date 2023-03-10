@@ -1,13 +1,19 @@
 package com.lendsumapp.lendsum.repository
 
 import android.net.Uri
+import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.MutableLiveData
 import androidx.work.*
 import com.lendsumapp.lendsum.auth.EmailAndPassAuthComponent
 import com.lendsumapp.lendsum.data.model.User
 import com.lendsumapp.lendsum.data.persistence.LendsumDatabase
+import com.lendsumapp.lendsum.util.GlobalConstants
 import com.lendsumapp.lendsum.util.GlobalConstants.FIREBASE_AUTH_UPDATE_MAP_KEY
 import com.lendsumapp.lendsum.util.GlobalConstants.FIREBASE_AUTH_UPDATE_MAP_VALUE
+import com.lendsumapp.lendsum.util.GlobalConstants.FIREBASE_EMAIL_KEY
+import com.lendsumapp.lendsum.util.GlobalConstants.FIREBASE_PROFILE_NAME_KEY
+import com.lendsumapp.lendsum.util.GlobalConstants.FIREBASE_PROFILE_PIC_URI_KEY
+import com.lendsumapp.lendsum.util.GlobalConstants.FIREBASE_USERNAME_KEY
 import com.lendsumapp.lendsum.util.GlobalConstants.FIRESTORE_USER_WORKER_MAP_KEY
 import com.lendsumapp.lendsum.util.GlobalConstants.FIRESTORE_USER_WORKER_MAP_VALUE
 import com.lendsumapp.lendsum.util.GlobalConstants.PROF_IMAGE_STORAGE_WORK_NAME
@@ -15,13 +21,15 @@ import com.lendsumapp.lendsum.util.GlobalConstants.UPLOAD_PROF_PIC_NAME_KEY
 import com.lendsumapp.lendsum.util.GlobalConstants.UPLOAD_PROF_PIC_URI_KEY
 import com.lendsumapp.lendsum.workers.*
 import kotlinx.coroutines.flow.Flow
+import java.util.UUID
 import javax.inject.Inject
 
 class AccountRepository @Inject constructor(
     private val lendsumDatabase: LendsumDatabase,
-    private val emailAndPassAuthComponent: EmailAndPassAuthComponent
+    private val emailAndPassAuthComponent: EmailAndPassAuthComponent,
+    private val workManager: WorkManager
 ){
-    val constraints = Constraints.Builder().setRequiredNetworkType(NetworkType.CONNECTED).build()
+    private val constraints = Constraints.Builder().setRequiredNetworkType(NetworkType.CONNECTED).build()
 
     fun getCachedUser(userId:String): Flow<User?> {
         return lendsumDatabase.getUserDao().getUser(userId)
@@ -47,43 +55,39 @@ class AccountRepository @Inject constructor(
         return emailAndPassAuthComponent.getUpdateAuthPassStatus()
     }
 
-    fun updateFirebaseAuthProfile(key: String, value: String){
-        val updateFirebaseAuthProfile = OneTimeWorkRequestBuilder<UpdateFirebaseAuthProfileWorker>()
+    fun updateFirebaseAuthProfile(user: User): UUID{
+
+        val updateFirebaseAuthProfileRequest = OneTimeWorkRequestBuilder<UpdateFirebaseAuthProfileWorker>()
             .setConstraints(constraints)
-            .setInputData(createFirebaseAuthData(key, value))
+            .setInputData(
+                Data.Builder()
+                    .putString(FIREBASE_PROFILE_NAME_KEY, user.name)
+                    .putString(FIREBASE_PROFILE_PIC_URI_KEY, user.profilePicUri)
+                    .build()
+            )
             .build()
 
-        WorkManager.getInstance().enqueue(updateFirebaseAuthProfile)
+        workManager.enqueue(updateFirebaseAuthProfileRequest)
+
+        return updateFirebaseAuthProfileRequest.id
     }
 
-    private fun createFirebaseAuthData(key: String, value: String): Data {
-        return Data.Builder()
-            .putString(FIREBASE_AUTH_UPDATE_MAP_KEY,key)
-            .putString(FIREBASE_AUTH_UPDATE_MAP_VALUE, value)
-            .build()
-    }
+    fun launchUpdateFirestoreUserValueWorker(user: User): UUID{
 
-    fun launchUpdateFirestoreUserValueWorker(key: String, value: Any){
-
-        val updateUserValueInFirestore = OneTimeWorkRequestBuilder<UpdateUserValueInFirestoreWorker>()
+        val updateUserInFirestore = OneTimeWorkRequestBuilder<UpdateUserValueInFirestoreWorker>()
             .setConstraints(constraints)
-            .setInputData(createUpdateUserFirestoreData(key, value))
+            .setInputData(
+                Data.Builder()
+                    .putString(FIREBASE_PROFILE_NAME_KEY, user.name)
+                    .putString(FIREBASE_EMAIL_KEY, user.email)
+                    .putString(FIREBASE_USERNAME_KEY, user.username)
+                    .build()
+            )
             .build()
 
-        WorkManager.getInstance().enqueue(updateUserValueInFirestore)
-    }
+        workManager.enqueue(updateUserInFirestore)
 
-    private fun createUpdateUserFirestoreData(key: String, value: Any): Data {
-
-        val dataBuilder = Data.Builder().putString(FIRESTORE_USER_WORKER_MAP_KEY, key)
-
-        if (value is Boolean){
-            dataBuilder.putBoolean(FIRESTORE_USER_WORKER_MAP_VALUE, value)
-        }else if(value is String){
-            dataBuilder.putString(FIRESTORE_USER_WORKER_MAP_VALUE, value)
-        }
-
-        return dataBuilder.build()
+        return updateUserInFirestore.id
     }
 
     fun launchUploadImageWorkers(fileName: String, uri: Uri){
@@ -106,7 +110,7 @@ class AccountRepository @Inject constructor(
             .setConstraints(constraints)
             .build()
 
-        WorkManager.getInstance().beginUniqueWork(PROF_IMAGE_STORAGE_WORK_NAME, ExistingWorkPolicy.REPLACE,
+        workManager.beginUniqueWork(PROF_IMAGE_STORAGE_WORK_NAME, ExistingWorkPolicy.REPLACE,
             uploadImgToLocalData).then(uploadImgToFirebaseStorage).then(retrieveRemoteImgUri).then(uploadImgToFirestore).enqueue()
     }
 

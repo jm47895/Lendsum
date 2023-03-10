@@ -28,11 +28,11 @@ class UploadImageToFirebaseStorageWorker(context: Context, params: WorkerParamet
         val uploadTask = profileImageRef?.putFile(Uri.parse(imageUri))
         uploadTask?.addOnCompleteListener{ task->
             if(task.isSuccessful){
-                Log.d(TAG, "Profile pic uploaded to storage")
+                Log.i(TAG, "Profile pic uploaded to storage")
                 result = Result.success()
                 latch.countDown()
             }else{
-                Log.d(TAG, "Profile pic failed to upload to storage ${task.exception}")
+                Log.e(TAG, "Profile pic failed to upload to storage ${task.exception}")
                 result = Result.failure()
                 latch.countDown()
             }

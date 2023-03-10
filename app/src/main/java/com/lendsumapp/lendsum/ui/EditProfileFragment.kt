@@ -75,7 +75,7 @@ class EditProfileFragment : Fragment(), View.OnClickListener, CompoundButton.OnC
         updateAuthEmailStatusObserver = Observer { isAuthEmailUpdated ->
             if(isAuthEmailUpdated){
                 //accountViewModel.updateLocalCachedUser(user)
-                accountViewModel.updateUserValueInFirestore(FIREBASE_EMAIL_KEY, user.email)
+                //accountViewModel.updateUserValueInFirestore(FIREBASE_EMAIL_KEY, user.email)
             }else{
                 AndroidUtils.showSnackBar(requireActivity(), getString(R.string.sign_in_again_msg))
             }
@@ -273,7 +273,7 @@ class EditProfileFragment : Fragment(), View.OnClickListener, CompoundButton.OnC
                         else -> {
                             user.name = textView.text.toString().trim()
                             //accountViewModel.updateLocalCachedUser(user)
-                            accountViewModel.updateUserValueInFirestore(FIREBASE_PROFILE_NAME_KEY, user.name)
+                            //accountViewModel.updateUserValueInFirestore(FIREBASE_PROFILE_NAME_KEY, user.name)
                             //accountViewModel.updateFirebaseAuthProfile(FIREBASE_PROFILE_NAME_KEY, user.name)
                         }
                     }
@@ -292,7 +292,7 @@ class EditProfileFragment : Fragment(), View.OnClickListener, CompoundButton.OnC
                         else -> {
                             user.username = textView.text.toString().trim()
                             //accountViewModel.updateLocalCachedUser(user)
-                            accountViewModel.updateUserValueInFirestore(FIREBASE_USERNAME_KEY, user.username)
+                            //accountViewModel.updateUserValueInFirestore(FIREBASE_USERNAME_KEY, user.username)
                         }
                     }
                 }
@@ -311,7 +311,7 @@ class EditProfileFragment : Fragment(), View.OnClickListener, CompoundButton.OnC
                 EditProfileInfoType.PROFILE_VISIBILITY.ordinal -> {
                     user.isProfilePublic = true
                     //accountViewModel.updateLocalCachedUser(user)
-                    accountViewModel.updateUserValueInFirestore(FIREBASE_IS_PROFILE_PUBLIC_KEY, true)
+                    //accountViewModel.updateUserValueInFirestore(FIREBASE_IS_PROFILE_PUBLIC_KEY, true)
                 }
             }
         }else{
@@ -319,7 +319,7 @@ class EditProfileFragment : Fragment(), View.OnClickListener, CompoundButton.OnC
                 EditProfileInfoType.PROFILE_VISIBILITY.ordinal -> {
                     user.isProfilePublic = false
                     //accountViewModel.updateLocalCachedUser(user)
-                    accountViewModel.updateUserValueInFirestore(FIREBASE_IS_PROFILE_PUBLIC_KEY, false)
+                    //accountViewModel.updateUserValueInFirestore(FIREBASE_IS_PROFILE_PUBLIC_KEY, false)
                 }
             }
         }

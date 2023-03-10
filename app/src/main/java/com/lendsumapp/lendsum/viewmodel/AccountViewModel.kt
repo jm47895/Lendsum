@@ -2,9 +2,15 @@ package com.lendsumapp.lendsum.viewmodel
 
 import android.content.Context
 import android.net.Uri
+import android.util.Log
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.*
+import androidx.work.WorkInfo
+import androidx.work.WorkManager
+import androidx.work.await
 import com.google.firebase.auth.FirebaseAuth
+import com.lendsumapp.lendsum.data.model.Response
+import com.lendsumapp.lendsum.data.model.Status
 import com.lendsumapp.lendsum.data.model.User
 import com.lendsumapp.lendsum.repository.AccountRepository
 import com.lendsumapp.lendsum.util.DatabaseUtils
@@ -22,13 +28,17 @@ import javax.inject.Inject
 class AccountViewModel @Inject constructor(
     private val accountRepository: AccountRepository,
     private var firebaseAuth: FirebaseAuth?,
+    private val workManager: WorkManager,
     @ApplicationContext private val context: Context
 ) :ViewModel(){
 
     private val _currentUser = mutableStateOf<User?>(null)
+    private val _updateProfileState = mutableStateOf(Response<Unit>())
 
     val currentUser: User?
         get() = _currentUser.value
+    val updateProfileState: Response<Unit>
+        get() = _updateProfileState.value
 
     private val updateUserStatus: MutableLiveData<Int> = MutableLiveData()
 
@@ -56,17 +66,13 @@ class AccountViewModel @Inject constructor(
         }
     }
 
-    fun updateProfile(user: User){
+    fun updateProfile(lifecycleOwner: LifecycleOwner, user: User){
         //update cache
         updateLocalCachedUser(user)
-        //update firebase auth
-        updateFirebaseAuthProfile(FIREBASE_PROFILE_NAME_KEY, user.name)
-        updateFirebaseAuthProfile(FIREBASE_USERNAME_KEY, user.username)
-        updateFirebaseAuthProfile(FIREBASE_EMAIL_KEY, user.email)
+        //update firebase auth profile
+        updateFirebaseAuthProfile(lifecycleOwner, user)
         //update firebase firestore
-        updateUserValueInFirestore(FIREBASE_PROFILE_NAME_KEY, user.name)
-        updateUserValueInFirestore(FIREBASE_USERNAME_KEY, user.username)
-        updateUserValueInFirestore(FIREBASE_EMAIL_KEY, user.email)
+        updateUserFirestore(lifecycleOwner, user)
 
 
     }
@@ -74,7 +80,6 @@ class AccountViewModel @Inject constructor(
     fun getUpdateCacheUserStatus(): MutableLiveData<Int>{
         return updateUserStatus
     }
-    //End of room cache sql functions
 
     //Firebase auth functions
     fun updateAuthEmail(email: String){
@@ -87,9 +92,23 @@ class AccountViewModel @Inject constructor(
         return accountRepository.getUpdateAuthEmailStatus()
     }
 
-    private fun updateFirebaseAuthProfile(key: String, value: String){
-        viewModelScope.launch(Dispatchers.IO) {
-            accountRepository.updateFirebaseAuthProfile(key, value)
+    private fun updateFirebaseAuthProfile(lifecycleOwner: LifecycleOwner, user : User){
+        viewModelScope.launch {
+
+            val workerId = accountRepository.updateFirebaseAuthProfile(user)
+
+            workManager.getWorkInfoByIdLiveData(workerId).observe(lifecycleOwner, Observer { workInfo ->
+                when(workInfo.state){
+                    WorkInfo.State.ENQUEUED -> { _updateProfileState.value = Response(status = Status.LOADING) }
+                    WorkInfo.State.RUNNING -> { _updateProfileState.value = Response(status = Status.LOADING) }
+                    WorkInfo.State.SUCCEEDED -> {
+                        _updateProfileState.value = Response(status = Status.SUCCESS)
+                    }
+                    WorkInfo.State.FAILED -> { _updateProfileState.value = Response(status = Status.ERROR) }
+                    WorkInfo.State.BLOCKED -> { _updateProfileState.value = Response(status = Status.ERROR) }
+                    WorkInfo.State.CANCELLED -> { Log.i(TAG, "Work was cancelled.")}
+                }
+            })
         }
     }
 
@@ -102,27 +121,38 @@ class AccountViewModel @Inject constructor(
     fun getUpdateAuthPassStatus():MutableLiveData<Boolean>{
         return accountRepository.getUpdateAuthPassStatus()
     }
-    //End of firebase auth functions
 
     //Firestore functions
-    fun updateUserValueInFirestore(key: String, value: Any){
-        viewModelScope.launch(Dispatchers.IO) {
-            accountRepository.launchUpdateFirestoreUserValueWorker(key, value)
-        }
+    fun updateUserFirestore(lifecycleOwner: LifecycleOwner, user: User){
+
+        val workerId = accountRepository.launchUpdateFirestoreUserValueWorker(user)
+
+        workManager.getWorkInfoByIdLiveData(workerId).observe(lifecycleOwner, Observer { workInfo ->
+            Log.d(TAG, "Firestore worker state: ${workInfo.state}")
+            /*when(workInfo.state){
+                WorkInfo.State.ENQUEUED -> { _updateProfileState.value = Response(status = Status.LOADING) }
+                WorkInfo.State.RUNNING -> { _updateProfileState.value = Response(status = Status.LOADING) }
+                WorkInfo.State.SUCCEEDED -> {
+                    //_updateProfileState.value = Response(status = Status.SUCCESS)
+                }
+                WorkInfo.State.FAILED -> { _updateProfileState.value = Response(status = Status.ERROR) }
+                WorkInfo.State.BLOCKED -> { _updateProfileState.value = Response(status = Status.ERROR) }
+                WorkInfo.State.CANCELLED -> { Log.i(TAG, "Work was cancelled.")}
+            }*/
+        })
     }
-    //End of firestore functions
 
     //Firebase storage functions
     fun uploadProfilePhoto(uri: Uri) {
-        viewModelScope.launch(Dispatchers.IO){
-            val user = firebaseAuth?.currentUser
-            val fileName = user?.uid + "." + DatabaseUtils.getFileExtension(context, uri)
+        val user = firebaseAuth?.currentUser
+        val fileName = user?.uid + "." + DatabaseUtils.getFileExtension(context, uri)
 
-            accountRepository.launchUploadImageWorkers(fileName, uri)
-        }
+        accountRepository.launchUploadImageWorkers(fileName, uri)
     }
-    //End firebase storage functions
 
+    fun resetUpdateProfileState(){
+        _updateProfileState.value = Response()
+    }
 
     companion object {
         private val TAG = AccountViewModel::class.simpleName
