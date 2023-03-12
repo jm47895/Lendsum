@@ -71,6 +71,9 @@ fun AccountScreen(
         },
         onSaveProfileInfo = {
             accountViewModel.updateProfile(lifecycleOwner,it)
+        },
+        resetUpdateProfileState = {
+            accountViewModel.resetUpdateProfileState()
         }
     )
 }
@@ -81,7 +84,8 @@ fun AccountScreenContent(
     updateProfileState: Response<Unit>,
     onBackClicked:() -> Unit,
     onChangeProfilePic: () -> Unit,
-    onSaveProfileInfo: (User) -> Unit
+    onSaveProfileInfo: (User) -> Unit,
+    resetUpdateProfileState: () -> Unit,
 ) {
 
     val focusManager = LocalFocusManager.current
@@ -94,12 +98,14 @@ fun AccountScreenContent(
             LoadingAnimation()
         }
         Status.SUCCESS -> {
-            Toast.makeText(context, "Profile has been updated.", Toast.LENGTH_SHORT).show()
+            Toast.makeText(context, context.getString(R.string.user_profile_updated), Toast.LENGTH_SHORT).show()
+            resetUpdateProfileState.invoke()
         }
         Status.ERROR -> {
-            Toast.makeText(context, "There was an error editing the info please try again.", Toast.LENGTH_SHORT).show()
+            Toast.makeText(context, stringResource(R.string.profile_update_err), Toast.LENGTH_SHORT).show()
+            resetUpdateProfileState.invoke()
         }
-        null -> {}
+        else -> {}
     }
 
     Box(
@@ -252,6 +258,7 @@ fun AccountScreenPreview() {
         updateProfileState = Response(),
         onBackClicked = {},
         onChangeProfilePic = {},
-        onSaveProfileInfo = {}
+        onSaveProfileInfo = {},
+        resetUpdateProfileState = {}
     )
 }

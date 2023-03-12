@@ -1,22 +1,16 @@
 package com.lendsumapp.lendsum.repository
 
 import android.net.Uri
-import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.MutableLiveData
 import androidx.work.*
 import com.lendsumapp.lendsum.auth.EmailAndPassAuthComponent
 import com.lendsumapp.lendsum.data.model.User
 import com.lendsumapp.lendsum.data.persistence.LendsumDatabase
-import com.lendsumapp.lendsum.util.GlobalConstants
-import com.lendsumapp.lendsum.util.GlobalConstants.FIREBASE_AUTH_UPDATE_MAP_KEY
-import com.lendsumapp.lendsum.util.GlobalConstants.FIREBASE_AUTH_UPDATE_MAP_VALUE
-import com.lendsumapp.lendsum.util.GlobalConstants.FIREBASE_EMAIL_KEY
 import com.lendsumapp.lendsum.util.GlobalConstants.FIREBASE_PROFILE_NAME_KEY
 import com.lendsumapp.lendsum.util.GlobalConstants.FIREBASE_PROFILE_PIC_URI_KEY
 import com.lendsumapp.lendsum.util.GlobalConstants.FIREBASE_USERNAME_KEY
-import com.lendsumapp.lendsum.util.GlobalConstants.FIRESTORE_USER_WORKER_MAP_KEY
-import com.lendsumapp.lendsum.util.GlobalConstants.FIRESTORE_USER_WORKER_MAP_VALUE
 import com.lendsumapp.lendsum.util.GlobalConstants.PROF_IMAGE_STORAGE_WORK_NAME
+import com.lendsumapp.lendsum.util.GlobalConstants.UPDATE_USER_PROF_KEY
 import com.lendsumapp.lendsum.util.GlobalConstants.UPLOAD_PROF_PIC_NAME_KEY
 import com.lendsumapp.lendsum.util.GlobalConstants.UPLOAD_PROF_PIC_URI_KEY
 import com.lendsumapp.lendsum.workers.*
@@ -55,7 +49,7 @@ class AccountRepository @Inject constructor(
         return emailAndPassAuthComponent.getUpdateAuthPassStatus()
     }
 
-    fun updateFirebaseAuthProfile(user: User): UUID{
+    fun launchUpdateProfileWorker(user: User): UUID{
 
         val updateFirebaseAuthProfileRequest = OneTimeWorkRequestBuilder<UpdateFirebaseAuthProfileWorker>()
             .setConstraints(constraints)
@@ -67,25 +61,19 @@ class AccountRepository @Inject constructor(
             )
             .build()
 
-        workManager.enqueue(updateFirebaseAuthProfileRequest)
-
-        return updateFirebaseAuthProfileRequest.id
-    }
-
-    fun launchUpdateFirestoreUserValueWorker(user: User): UUID{
-
-        val updateUserInFirestore = OneTimeWorkRequestBuilder<UpdateUserValueInFirestoreWorker>()
+        val updateUserInFirestore = OneTimeWorkRequestBuilder<UpdateUserFirestoreWorker>()
             .setConstraints(constraints)
             .setInputData(
                 Data.Builder()
                     .putString(FIREBASE_PROFILE_NAME_KEY, user.name)
-                    .putString(FIREBASE_EMAIL_KEY, user.email)
                     .putString(FIREBASE_USERNAME_KEY, user.username)
                     .build()
             )
             .build()
 
-        workManager.enqueue(updateUserInFirestore)
+        workManager.beginUniqueWork(UPDATE_USER_PROF_KEY, ExistingWorkPolicy.REPLACE, updateFirebaseAuthProfileRequest)
+            .then(updateUserInFirestore)
+            .enqueue()
 
         return updateUserInFirestore.id
     }

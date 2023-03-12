@@ -7,17 +7,12 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.*
 import androidx.work.WorkInfo
 import androidx.work.WorkManager
-import androidx.work.await
 import com.google.firebase.auth.FirebaseAuth
 import com.lendsumapp.lendsum.data.model.Response
 import com.lendsumapp.lendsum.data.model.Status
 import com.lendsumapp.lendsum.data.model.User
 import com.lendsumapp.lendsum.repository.AccountRepository
 import com.lendsumapp.lendsum.util.DatabaseUtils
-import com.lendsumapp.lendsum.util.GlobalConstants
-import com.lendsumapp.lendsum.util.GlobalConstants.FIREBASE_EMAIL_KEY
-import com.lendsumapp.lendsum.util.GlobalConstants.FIREBASE_PROFILE_NAME_KEY
-import com.lendsumapp.lendsum.util.GlobalConstants.FIREBASE_USERNAME_KEY
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers
@@ -40,8 +35,6 @@ class AccountViewModel @Inject constructor(
     val updateProfileState: Response<Unit>
         get() = _updateProfileState.value
 
-    private val updateUserStatus: MutableLiveData<Int> = MutableLiveData()
-
     init {
         getCachedUser()
     }
@@ -60,25 +53,34 @@ class AccountViewModel @Inject constructor(
 
     private fun updateLocalCachedUser(userObject: User){
         viewModelScope.launch(Dispatchers.IO) {
-            val userStatus = accountRepository.updateLocalCachedUser(userObject)
-
-            updateUserStatus.postValue(userStatus)
+            accountRepository.updateLocalCachedUser(userObject)
         }
     }
 
     fun updateProfile(lifecycleOwner: LifecycleOwner, user: User){
-        //update cache
-        updateLocalCachedUser(user)
-        //update firebase auth profile
-        updateFirebaseAuthProfile(lifecycleOwner, user)
-        //update firebase firestore
-        updateUserFirestore(lifecycleOwner, user)
 
+        val workerId = accountRepository.launchUpdateProfileWorker(user)
 
-    }
+        workManager.getWorkInfoByIdLiveData(workerId).observe(lifecycleOwner, Observer { workInfo ->
+            workInfo?.let {
+                Log.d(TAG, "Profile worker state ${workInfo.state}")
 
-    fun getUpdateCacheUserStatus(): MutableLiveData<Int>{
-        return updateUserStatus
+                when(workInfo.state){
+                    WorkInfo.State.ENQUEUED -> { }
+                    WorkInfo.State.RUNNING -> {
+                        _updateProfileState.value = Response(status = Status.LOADING)
+                    }
+                    WorkInfo.State.SUCCEEDED -> {
+                        _updateProfileState.value = Response(status = Status.SUCCESS)
+                        updateLocalCachedUser(user)
+                    }
+                    WorkInfo.State.FAILED -> { _updateProfileState.value = Response(status = Status.ERROR) }
+                    WorkInfo.State.BLOCKED -> { Log.i(TAG, "Work is blocked.") }
+                    WorkInfo.State.CANCELLED -> { Log.i(TAG, "Work was cancelled.")}
+                }
+            }
+        })
+
     }
 
     //Firebase auth functions
@@ -92,26 +94,6 @@ class AccountViewModel @Inject constructor(
         return accountRepository.getUpdateAuthEmailStatus()
     }
 
-    private fun updateFirebaseAuthProfile(lifecycleOwner: LifecycleOwner, user : User){
-        viewModelScope.launch {
-
-            val workerId = accountRepository.updateFirebaseAuthProfile(user)
-
-            workManager.getWorkInfoByIdLiveData(workerId).observe(lifecycleOwner, Observer { workInfo ->
-                when(workInfo.state){
-                    WorkInfo.State.ENQUEUED -> { _updateProfileState.value = Response(status = Status.LOADING) }
-                    WorkInfo.State.RUNNING -> { _updateProfileState.value = Response(status = Status.LOADING) }
-                    WorkInfo.State.SUCCEEDED -> {
-                        _updateProfileState.value = Response(status = Status.SUCCESS)
-                    }
-                    WorkInfo.State.FAILED -> { _updateProfileState.value = Response(status = Status.ERROR) }
-                    WorkInfo.State.BLOCKED -> { _updateProfileState.value = Response(status = Status.ERROR) }
-                    WorkInfo.State.CANCELLED -> { Log.i(TAG, "Work was cancelled.")}
-                }
-            })
-        }
-    }
-
     fun updateAuthPass(password: String){
         viewModelScope.launch {
             accountRepository.updateAuthPass(password)
@@ -122,27 +104,6 @@ class AccountViewModel @Inject constructor(
         return accountRepository.getUpdateAuthPassStatus()
     }
 
-    //Firestore functions
-    fun updateUserFirestore(lifecycleOwner: LifecycleOwner, user: User){
-
-        val workerId = accountRepository.launchUpdateFirestoreUserValueWorker(user)
-
-        workManager.getWorkInfoByIdLiveData(workerId).observe(lifecycleOwner, Observer { workInfo ->
-            Log.d(TAG, "Firestore worker state: ${workInfo.state}")
-            /*when(workInfo.state){
-                WorkInfo.State.ENQUEUED -> { _updateProfileState.value = Response(status = Status.LOADING) }
-                WorkInfo.State.RUNNING -> { _updateProfileState.value = Response(status = Status.LOADING) }
-                WorkInfo.State.SUCCEEDED -> {
-                    //_updateProfileState.value = Response(status = Status.SUCCESS)
-                }
-                WorkInfo.State.FAILED -> { _updateProfileState.value = Response(status = Status.ERROR) }
-                WorkInfo.State.BLOCKED -> { _updateProfileState.value = Response(status = Status.ERROR) }
-                WorkInfo.State.CANCELLED -> { Log.i(TAG, "Work was cancelled.")}
-            }*/
-        })
-    }
-
-    //Firebase storage functions
     fun uploadProfilePhoto(uri: Uri) {
         val user = firebaseAuth?.currentUser
         val fileName = user?.uid + "." + DatabaseUtils.getFileExtension(context, uri)

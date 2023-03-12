@@ -100,7 +100,7 @@ class EditProfileFragment : Fragment(), View.OnClickListener, CompoundButton.OnC
                 Log.d(TAG, "User object not updated in room cache")
             }
         }
-        accountViewModel.getUpdateCacheUserStatus().observe(viewLifecycleOwner, updateUserStatusObserver)
+        //accountViewModel.getUpdateCacheUserStatus().observe(viewLifecycleOwner, updateUserStatusObserver)
     }
 
     private fun loadCachedUserProfile(user: User?) {

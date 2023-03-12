@@ -3,18 +3,14 @@ package com.lendsumapp.lendsum.workers
 import android.content.Context
 import android.util.Log
 import androidx.work.CoroutineWorker
-import androidx.work.Worker
 import androidx.work.WorkerParameters
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 import com.lendsumapp.lendsum.util.GlobalConstants
-import com.lendsumapp.lendsum.util.GlobalConstants.FIRESTORE_USER_WORKER_MAP_KEY
-import com.lendsumapp.lendsum.util.GlobalConstants.FIRESTORE_USER_WORKER_MAP_VALUE
 import kotlinx.coroutines.delay
-import java.util.concurrent.CountDownLatch
 
-class UpdateUserValueInFirestoreWorker(context: Context, params: WorkerParameters) : CoroutineWorker(context, params){
+class UpdateUserFirestoreWorker(context: Context, params: WorkerParameters) : CoroutineWorker(context, params){
 
     override suspend fun doWork(): Result {
 
@@ -44,6 +40,6 @@ class UpdateUserValueInFirestoreWorker(context: Context, params: WorkerParameter
     }
 
     companion object{
-        private val TAG = UpdateUserValueInFirestoreWorker::class.java.simpleName
+        private val TAG = UpdateUserFirestoreWorker::class.java.simpleName
     }
 }
