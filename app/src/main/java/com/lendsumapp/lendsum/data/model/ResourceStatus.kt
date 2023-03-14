@@ -13,12 +13,13 @@ enum class Status {
 }
 
 enum class LendsumError{
-    NONE,
     NO_INTERNET,
     INVALID_LOGIN,
     INVALID_EMAIL,
     FAILED_TO_SEND,
     EMPTY_FIRST_NAME,
+    EMPTY_NAME,
+    EMPTY_USERNAME,
     EMPTY_LAST_NAME,
     INVALID_PASS,
     PASS_NO_MATCH,

@@ -233,7 +233,7 @@ class EditProfileFragment : Fragment(), View.OnClickListener, CompoundButton.OnC
 
         uploadProfilePicToFirebaseStorage(it)
 
-        user.profilePicUri = it.toString()
+        //user.profilePicUri = it.toString()
         //accountViewModel.updateLocalCachedUser(user)
     }
 
@@ -271,7 +271,7 @@ class EditProfileFragment : Fragment(), View.OnClickListener, CompoundButton.OnC
                             AndroidUtils.showSnackBar(requireActivity(), getString(R.string.username_too_short_err))
                         }
                         else -> {
-                            user.name = textView.text.toString().trim()
+                            //user.name = textView.text.toString().trim()
                             //accountViewModel.updateLocalCachedUser(user)
                             //accountViewModel.updateUserValueInFirestore(FIREBASE_PROFILE_NAME_KEY, user.name)
                             //accountViewModel.updateFirebaseAuthProfile(FIREBASE_PROFILE_NAME_KEY, user.name)
@@ -290,7 +290,7 @@ class EditProfileFragment : Fragment(), View.OnClickListener, CompoundButton.OnC
                             AndroidUtils.showSnackBar(requireActivity(), getString(R.string.username_too_short_err))
                         }
                         else -> {
-                            user.username = textView.text.toString().trim()
+                            //user.username = textView.text.toString().trim()
                             //accountViewModel.updateLocalCachedUser(user)
                             //accountViewModel.updateUserValueInFirestore(FIREBASE_USERNAME_KEY, user.username)
                         }
@@ -299,7 +299,7 @@ class EditProfileFragment : Fragment(), View.OnClickListener, CompoundButton.OnC
                 EditProfileInfoType.PROFILE_EMAIL.ordinal -> {
                     when {
                         AndroidUtils.isValidEmail(textView.text.toString().trim()) && !TextUtils.isEmpty(textView.text) -> {
-                            user.email = textView.text.toString().trim()
+                            //user.email = textView.text.toString().trim()
                             accountViewModel.getUpdateAuthEmailStatus().observe(viewLifecycleOwner, updateAuthEmailStatusObserver)
                             accountViewModel.updateAuthEmail(user.email)
                         }
@@ -309,7 +309,7 @@ class EditProfileFragment : Fragment(), View.OnClickListener, CompoundButton.OnC
                     }
                 }
                 EditProfileInfoType.PROFILE_VISIBILITY.ordinal -> {
-                    user.isProfilePublic = true
+                    //user.isProfilePublic = true
                     //accountViewModel.updateLocalCachedUser(user)
                     //accountViewModel.updateUserValueInFirestore(FIREBASE_IS_PROFILE_PUBLIC_KEY, true)
                 }
@@ -317,7 +317,7 @@ class EditProfileFragment : Fragment(), View.OnClickListener, CompoundButton.OnC
         }else{
             when(infoType){
                 EditProfileInfoType.PROFILE_VISIBILITY.ordinal -> {
-                    user.isProfilePublic = false
+                    //user.isProfilePublic = false
                     //accountViewModel.updateLocalCachedUser(user)
                     //accountViewModel.updateUserValueInFirestore(FIREBASE_IS_PROFILE_PUBLIC_KEY, false)
                 }

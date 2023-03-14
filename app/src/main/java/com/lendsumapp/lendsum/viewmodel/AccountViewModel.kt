@@ -8,6 +8,7 @@ import androidx.lifecycle.*
 import androidx.work.WorkInfo
 import androidx.work.WorkManager
 import com.google.firebase.auth.FirebaseAuth
+import com.lendsumapp.lendsum.data.model.LendsumError
 import com.lendsumapp.lendsum.data.model.Response
 import com.lendsumapp.lendsum.data.model.Status
 import com.lendsumapp.lendsum.data.model.User
@@ -57,30 +58,56 @@ class AccountViewModel @Inject constructor(
         }
     }
 
-    fun updateProfile(lifecycleOwner: LifecycleOwner, user: User){
+    fun updateProfile(lifecycleOwner: LifecycleOwner, name: String, username: String){
 
-        val workerId = accountRepository.launchUpdateProfileWorker(user)
+        _updateProfileState.value = Response(status = Status.LOADING)
 
-        workManager.getWorkInfoByIdLiveData(workerId).observe(lifecycleOwner, Observer { workInfo ->
-            workInfo?.let {
-                Log.d(TAG, "Profile worker state ${workInfo.state}")
+        currentUser?.let { currentUser ->
 
-                when(workInfo.state){
-                    WorkInfo.State.ENQUEUED -> { }
-                    WorkInfo.State.RUNNING -> {
-                        _updateProfileState.value = Response(status = Status.LOADING)
-                    }
-                    WorkInfo.State.SUCCEEDED -> {
-                        _updateProfileState.value = Response(status = Status.SUCCESS)
-                        updateLocalCachedUser(user)
-                    }
-                    WorkInfo.State.FAILED -> { _updateProfileState.value = Response(status = Status.ERROR) }
-                    WorkInfo.State.BLOCKED -> { Log.i(TAG, "Work is blocked.") }
-                    WorkInfo.State.CANCELLED -> { Log.i(TAG, "Work was cancelled.")}
+            val user = User(
+                userId = currentUser.userId,
+                name = name,
+                username = if(!username.startsWith("@")) "@$username" else username,
+                email = currentUser.email,
+                phoneNumber = currentUser.phoneNumber,
+                profilePicUri = currentUser.profilePicUri,
+                karmaScore = currentUser.karmaScore,
+                friendList = currentUser.friendList,
+                isProfilePublic = currentUser.isProfilePublic
+            )
+
+            when{
+                user.name.isEmpty() -> {
+                    _updateProfileState.value = Response(status = Status.ERROR, error = LendsumError.EMPTY_NAME)
+                    return
+                }
+                //This also means isEmpty but accounts for the added @ symbol if user does not include it
+                user.username.length < 2-> {
+                    _updateProfileState.value = Response(status = Status.ERROR, error = LendsumError.EMPTY_USERNAME)
+                    return
                 }
             }
-        })
 
+            val workerId = accountRepository.launchUpdateProfileWorker(user)
+
+            workManager.getWorkInfoByIdLiveData(workerId).observe(lifecycleOwner, Observer { workInfo ->
+                workInfo?.let {
+                    Log.d(TAG, "Profile worker state ${workInfo.state}")
+
+                    when(workInfo.state){
+                        WorkInfo.State.ENQUEUED -> {}
+                        WorkInfo.State.RUNNING -> {}
+                        WorkInfo.State.SUCCEEDED -> {
+                            _updateProfileState.value = Response(status = Status.SUCCESS)
+                            updateLocalCachedUser(user)
+                        }
+                        WorkInfo.State.FAILED -> { _updateProfileState.value = Response(status = Status.ERROR) }
+                        WorkInfo.State.BLOCKED -> { Log.i(TAG, "Work is blocked.") }
+                        WorkInfo.State.CANCELLED -> { Log.i(TAG, "Work was cancelled.")}
+                    }
+                }
+            })
+        } ?: return
     }
 
     //Firebase auth functions

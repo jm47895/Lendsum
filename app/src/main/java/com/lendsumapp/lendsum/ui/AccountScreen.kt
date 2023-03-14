@@ -34,6 +34,7 @@ import androidx.navigation.NavController
 import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
 import com.bumptech.glide.integration.compose.GlideImage
 import com.lendsumapp.lendsum.R
+import com.lendsumapp.lendsum.data.model.LendsumError
 import com.lendsumapp.lendsum.data.model.Response
 import com.lendsumapp.lendsum.data.model.Status
 import com.lendsumapp.lendsum.data.model.User
@@ -69,8 +70,8 @@ fun AccountScreen(
         onChangeProfilePic = {
             galleryLauncher.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly))
         },
-        onSaveProfileInfo = {
-            accountViewModel.updateProfile(lifecycleOwner,it)
+        onSaveProfileInfo = { name, username ->
+            accountViewModel.updateProfile(lifecycleOwner, name, username)
         },
         resetUpdateProfileState = {
             accountViewModel.resetUpdateProfileState()
@@ -84,28 +85,31 @@ fun AccountScreenContent(
     updateProfileState: Response<Unit>,
     onBackClicked:() -> Unit,
     onChangeProfilePic: () -> Unit,
-    onSaveProfileInfo: (User) -> Unit,
+    onSaveProfileInfo: (String, String) -> Unit,
     resetUpdateProfileState: () -> Unit,
 ) {
 
     val focusManager = LocalFocusManager.current
     val context = LocalContext.current
 
-    var updatedUser by remember { mutableStateOf(user) }
+    var name by remember { mutableStateOf("") }
+    var username by remember { mutableStateOf("") }
 
-    when(updateProfileState.status){
-        Status.LOADING -> {
-            LoadingAnimation()
+    user?.let {
+        name = it.name
+        username = it.username
+    }
+
+    LaunchedEffect(updateProfileState.status){
+        when(updateProfileState.status){
+            Status.SUCCESS -> {
+                Toast.makeText(context, context.getString(R.string.user_profile_updated), Toast.LENGTH_SHORT).show()
+            }
+            Status.ERROR -> {
+                Toast.makeText(context, context.getString(R.string.profile_update_err), Toast.LENGTH_SHORT).show()
+            }
+            else -> {}
         }
-        Status.SUCCESS -> {
-            Toast.makeText(context, context.getString(R.string.user_profile_updated), Toast.LENGTH_SHORT).show()
-            resetUpdateProfileState.invoke()
-        }
-        Status.ERROR -> {
-            Toast.makeText(context, stringResource(R.string.profile_update_err), Toast.LENGTH_SHORT).show()
-            resetUpdateProfileState.invoke()
-        }
-        else -> {}
     }
 
     Box(
@@ -113,6 +117,11 @@ fun AccountScreenContent(
             .fillMaxSize()
             .background(Color.Black)
     ){
+
+        if(updateProfileState.status == Status.LOADING){
+            LoadingAnimation()
+        }
+
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -138,34 +147,38 @@ fun AccountScreenContent(
             )
             Text(text = stringResource(R.string.edit_profile).uppercase(), color = Color.White)
             user?.let {
-                EditOptions(
+                EditProfileOptions(
+                    updateProfileState = updateProfileState,
                     user = user,
-                    onUserInfoChanged = {
-                        updatedUser = it
-                    }
+                    onNameChanged = {
+                        name = it
+                        resetUpdateProfileState.invoke()
+                    },
+                    onUsernameChanged = {
+                        username = it
+                        resetUpdateProfileState.invoke()
+                    },
                 )
             }
             LendsumButton(
                 modifier = Modifier.fillMaxWidth(),
                 text = stringResource(id = R.string.save)
             ) {
-                updatedUser?.let { onSaveProfileInfo(it) }
+                onSaveProfileInfo(name, username)
             }
         }
     }
 }
 
 @Composable
-fun EditOptions(
+fun EditProfileOptions(
+    updateProfileState: Response<Unit>,
     user: User,
-    onUserInfoChanged:(User) ->  Unit
+    onNameChanged:(String) ->  Unit,
+    onUsernameChanged:(String) ->  Unit
 ) {
 
-    var name by remember { mutableStateOf(user.name) }
-    var username by remember { mutableStateOf(user.username) }
-    var email by remember { mutableStateOf(user.email) }
-
-    EditOption.values().forEach { editOption ->
+    EditProfileOption.values().forEach { editOption ->
 
         LendsumField(
             modifier = Modifier.fillMaxWidth(),
@@ -173,33 +186,29 @@ fun EditOptions(
             supportingLabel = stringResource(editOption.supportingLabel),
             supportingLabelColor = Color.White,
             textColor = Color.White,
+            errorLabel = when(editOption){
+                EditProfileOption.ACCOUNT_NAME -> if(updateProfileState.error == LendsumError.EMPTY_NAME) stringResource(id = R.string.empty_profile_name) else null
+                EditProfileOption.ACCOUNT_USERNAME -> if(updateProfileState.error == LendsumError.EMPTY_USERNAME) stringResource(id = R.string.empty_username) else null
+            },
             defaultValue = when(editOption){
-                EditOption.ACCOUNT_NAME -> user.name
-                EditOption.ACCOUNT_USERNAME -> user.username
-                EditOption.ACCOUNT_EMAIL -> user.email
+                EditProfileOption.ACCOUNT_NAME -> user.name
+                EditProfileOption.ACCOUNT_USERNAME -> user.username
             },
             onTextChanged = {
+
                 when(editOption){
-                    EditOption.ACCOUNT_NAME -> {
-                        name = it
-                    }
-                    EditOption.ACCOUNT_USERNAME -> username = it
-                    EditOption.ACCOUNT_EMAIL -> email = it
+                    EditProfileOption.ACCOUNT_NAME -> onNameChanged(it)
+                    EditProfileOption.ACCOUNT_USERNAME ->  onUsernameChanged(it)
                 }
-                user.name = name
-                user.username = username
-                user.email = email
-                onUserInfoChanged(user)
             }
         )
 
     }
 }
 
-enum class EditOption(val keyboardType: KeyboardType, @StringRes val supportingLabel: Int){
+enum class EditProfileOption(val keyboardType: KeyboardType, @StringRes val supportingLabel: Int){
     ACCOUNT_NAME(KeyboardType.Text, R.string.name),
-    ACCOUNT_USERNAME(KeyboardType.Text, R.string.username),
-    ACCOUNT_EMAIL(KeyboardType.Email, R.string.email)
+    ACCOUNT_USERNAME(KeyboardType.Text, R.string.username)
 }
 
 @OptIn(ExperimentalGlideComposeApi::class)
@@ -258,7 +267,7 @@ fun AccountScreenPreview() {
         updateProfileState = Response(),
         onBackClicked = {},
         onChangeProfilePic = {},
-        onSaveProfileInfo = {},
+        onSaveProfileInfo = { name, username->},
         resetUpdateProfileState = {}
     )
 }
