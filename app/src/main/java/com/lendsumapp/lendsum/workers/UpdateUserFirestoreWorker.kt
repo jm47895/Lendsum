@@ -20,6 +20,7 @@ class UpdateUserFirestoreWorker(context: Context, params: WorkerParameters) : Co
          return suspendCoroutine{ continuation ->
 
             try {
+
                 val firestoreDb = Firebase.firestore
                 val firebaseUser = FirebaseAuth.getInstance().currentUser
 
@@ -38,6 +39,7 @@ class UpdateUserFirestoreWorker(context: Context, params: WorkerParameters) : Co
                         }
                     }
                 } ?: continuation.resumeWith(kotlin.Result.success(Result.retry()))
+
             }catch (e: Exception){
                 continuation.resumeWith(kotlin.Result.success(Result.retry()))
             }

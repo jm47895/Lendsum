@@ -78,7 +78,7 @@ class AccountRepository @Inject constructor(
         return updateUserInFirestore.id
     }
 
-    fun launchUploadImageWorkers(fileName: String, uri: Uri){
+    fun launchUploadImageWorkers(fileName: String, uri: Uri): UUID{
 
         val uploadImgToLocalData = OneTimeWorkRequestBuilder<UploadImageToDataDirectoryWorker>()
             .setInputData(createFileNameAndUriData(fileName, uri))
@@ -100,6 +100,8 @@ class AccountRepository @Inject constructor(
 
         workManager.beginUniqueWork(PROF_IMAGE_STORAGE_WORK_NAME, ExistingWorkPolicy.REPLACE,
             uploadImgToLocalData).then(uploadImgUriToFirebaseStorage).then(retrieveRemoteImgUri).then(uploadImgUriToFirestore).enqueue()
+
+        return uploadImgUriToFirestore.id
     }
 
     private fun createFileNameAndUriData(fileName: String, uri: Uri): Data {

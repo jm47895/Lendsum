@@ -13,33 +13,43 @@ import com.lendsumapp.lendsum.util.GlobalConstants.UPLOAD_PROF_PIC_NAME_KEY
 import com.lendsumapp.lendsum.util.GlobalConstants.UPLOAD_PROF_PIC_URI_KEY
 import kotlinx.coroutines.delay
 import java.util.concurrent.CountDownLatch
+import kotlin.coroutines.suspendCoroutine
 
 class UploadImageToFirebaseStorageWorker(context: Context, params: WorkerParameters) : CoroutineWorker(context, params){
     override suspend fun doWork(): Result {
 
-        var result = Result.failure()
-        val firebaseStorageReference = Firebase.storage.reference
-        val fileName = inputData.getString(UPLOAD_PROF_PIC_NAME_KEY)
-        val imageUri = inputData.getString(UPLOAD_PROF_PIC_URI_KEY)
-
-        val profileImageRef = fileName?.let {
-            firebaseStorageReference.child(FIREBASE_STORAGE_PROFILE_PIC_PATH).child(it)
-            }
-
-        val uploadTask = profileImageRef?.putFile(Uri.parse(imageUri))
-        uploadTask?.addOnCompleteListener{ task->
-            result = if(task.isSuccessful){
-                Log.i(TAG, "Profile pic uploaded to storage")
-                Result.success()
-            }else{
-                Log.e(TAG, "Profile pic failed to upload to storage ${task.exception}")
-                Result.failure()
-            }
+        if (runAttemptCount == 3){
+            return Result.failure()
         }
 
-        delay(1000)
+        return suspendCoroutine { continuation ->
 
-        return result
+            try {
+
+                val firebaseStorageReference = Firebase.storage.reference
+                val fileName = inputData.getString(UPLOAD_PROF_PIC_NAME_KEY)
+                val imageUri = inputData.getString(UPLOAD_PROF_PIC_URI_KEY)
+
+                val profileImageRef = fileName?.let {
+                    firebaseStorageReference.child(FIREBASE_STORAGE_PROFILE_PIC_PATH).child(it)
+                }
+
+                val uploadTask = profileImageRef?.putFile(Uri.parse(imageUri))
+                uploadTask?.addOnCompleteListener { task ->
+                    if (task.isSuccessful) {
+                        Log.i(TAG, "Profile pic uploaded to storage")
+                        continuation.resumeWith(kotlin.Result.success(Result.success()))
+                    } else {
+                        Log.e(TAG, "Profile pic failed to upload to storage ${task.exception}")
+                        continuation.resumeWith(kotlin.Result.success(Result.retry()))
+                    }
+                } ?: continuation.resumeWith(kotlin.Result.success(Result.retry()))
+
+            }catch (e: Exception){
+                continuation.resumeWith(kotlin.Result.success(Result.retry()))
+            }
+
+        }
     }
 
     companion object{

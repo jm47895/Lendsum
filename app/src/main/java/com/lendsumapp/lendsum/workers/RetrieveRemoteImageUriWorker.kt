@@ -10,29 +10,41 @@ import com.lendsumapp.lendsum.util.GlobalConstants.UPLOAD_PROF_PIC_NAME_KEY
 import com.lendsumapp.lendsum.util.GlobalConstants.UPLOAD_PROF_PIC_URI_KEY
 import kotlinx.coroutines.delay
 import java.util.concurrent.CountDownLatch
+import kotlin.coroutines.suspendCoroutine
 
 class RetrieveRemoteImageUriWorker(context: Context, params: WorkerParameters) : CoroutineWorker(context, params){
     override suspend fun doWork(): Result {
 
-        var result = Result.failure()
-        val firebaseStorageReference = Firebase.storage.reference
-        val fileName = inputData.getString(UPLOAD_PROF_PIC_NAME_KEY)
-        val profileImageRef = fileName?.let { firebaseStorageReference.child(GlobalConstants.FIREBASE_STORAGE_PROFILE_PIC_PATH).child(it) }
-
-        profileImageRef?.downloadUrl?.addOnSuccessListener {
-            Log.d(TAG, "Prof pic url success: $it")
-            val data: Data = workDataOf(UPLOAD_PROF_PIC_URI_KEY to it.toString())
-            result = Result.success(data)
-
-        }?.addOnFailureListener {
-            Log.d(TAG, "Prof pic url failed to download: $it")
-            result = Result.failure()
-
+        if (runAttemptCount == 3){
+            return Result.failure()
         }
 
-        delay(1000)
+        return suspendCoroutine { continuation ->
 
-        return result
+            try {
+
+                val firebaseStorageReference = Firebase.storage.reference
+                val fileName = inputData.getString(UPLOAD_PROF_PIC_NAME_KEY)
+                val profileImageRef = fileName?.let {
+                    firebaseStorageReference.child(GlobalConstants.FIREBASE_STORAGE_PROFILE_PIC_PATH)
+                        .child(it)
+                }
+
+                profileImageRef?.downloadUrl?.addOnCompleteListener {
+                    if (it.isSuccessful){
+                        Log.d(TAG, "Prof pic url success: ${it.result}")
+                        val data: Data = workDataOf(UPLOAD_PROF_PIC_URI_KEY to it.result.toString())
+                        continuation.resumeWith(kotlin.Result.success(Result.success(data)))
+                    }else{
+                        Log.d(TAG, "Prof pic url failed to download: ${it.exception}")
+                        continuation.resumeWith(kotlin.Result.success(Result.retry()))
+                    }
+                } ?: continuation.resumeWith(kotlin.Result.success(Result.retry()))
+
+            }catch (e: Exception){
+                continuation.resumeWith(kotlin.Result.success(Result.retry()))
+            }
+        }
     }
 
     companion object {

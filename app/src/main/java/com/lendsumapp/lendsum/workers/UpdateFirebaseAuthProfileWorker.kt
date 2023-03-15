@@ -27,6 +27,7 @@ class UpdateFirebaseAuthProfileWorker(context: Context, params: WorkerParameters
         return suspendCoroutine { continuation ->
 
             try{
+
                 val currentUser = FirebaseAuth.getInstance().currentUser
                 val displayName = inputData.getString(FIREBASE_PROFILE_NAME_KEY)
                 val profilePicUri = inputData.getString(FIREBASE_PROFILE_PIC_URI_KEY)
@@ -44,6 +45,7 @@ class UpdateFirebaseAuthProfileWorker(context: Context, params: WorkerParameters
                         continuation.resumeWith(kotlin.Result.success(Result.retry()))
                     }
                 } ?: continuation.resumeWith(kotlin.Result.success(Result.retry()))
+
             }catch (e: Exception){
                 continuation.resumeWith(kotlin.Result.success(Result.retry()))
             }

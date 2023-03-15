@@ -7,10 +7,7 @@ import android.net.Uri
 import android.util.Log
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.core.net.toUri
-import androidx.work.Data
-import androidx.work.Worker
-import androidx.work.WorkerParameters
-import androidx.work.workDataOf
+import androidx.work.*
 import com.lendsumapp.lendsum.util.GlobalConstants
 import com.lendsumapp.lendsum.util.GlobalConstants.LENDSUM_PROFILE_PIC_DIR_PATH
 import com.lendsumapp.lendsum.util.GlobalConstants.UPLOAD_PROF_PIC_NAME_KEY
@@ -18,34 +15,45 @@ import com.lendsumapp.lendsum.util.GlobalConstants.UPLOAD_PROF_PIC_URI_KEY
 import java.io.File
 import java.io.FileOutputStream
 import java.lang.Exception
+import kotlin.coroutines.suspendCoroutine
 
-class UploadImageToDataDirectoryWorker (context: Context, params: WorkerParameters) : Worker(context, params){
+class UploadImageToDataDirectoryWorker (context: Context, params: WorkerParameters) : CoroutineWorker(context, params){
 
-    override fun doWork(): Result {
-        return try{
-            val fileName = inputData.getString(UPLOAD_PROF_PIC_NAME_KEY)
-            val imageUri = inputData.getString(UPLOAD_PROF_PIC_URI_KEY)
-            val resolver = applicationContext.contentResolver
-            val bitmap = BitmapFactory.decodeStream(resolver.openInputStream(Uri.parse(imageUri)))
-            val outputDir = File(applicationContext.filesDir, LENDSUM_PROFILE_PIC_DIR_PATH)
+    override suspend fun doWork(): Result {
 
-            if (!outputDir.exists()) {
-                outputDir.mkdirs()
-            } // should succeed
+        if (runAttemptCount == 3){
+            return Result.failure()
+        }
 
-            val outputFile = File(outputDir, fileName!!)
-            val output = FileOutputStream(outputFile)
+        return suspendCoroutine { continuation ->
 
-            bitmap.compress(Bitmap.CompressFormat.JPEG, 30, output)
+            try {
+                val fileName = inputData.getString(UPLOAD_PROF_PIC_NAME_KEY)
+                val imageUri = inputData.getString(UPLOAD_PROF_PIC_URI_KEY)
+                val resolver = applicationContext.contentResolver
+                val bitmap =
+                    BitmapFactory.decodeStream(resolver.openInputStream(Uri.parse(imageUri)))
+                val outputDir = File(applicationContext.filesDir, LENDSUM_PROFILE_PIC_DIR_PATH)
 
-            val uri: Uri = outputFile.toUri()
+                if (!outputDir.exists()) {
+                    outputDir.mkdirs()
+                } // should succeed
 
-            val data: Data = workDataOf(UPLOAD_PROF_PIC_URI_KEY to uri.toString())
+                val outputFile = File(outputDir, fileName!!)
+                val output = FileOutputStream(outputFile)
 
-            Result.success(data)
-        }catch (e: Exception){
-            Log.d(TAG, e.toString())
-            Result.failure()
+                bitmap.compress(Bitmap.CompressFormat.JPEG, 30, output)
+
+                val uri: Uri = outputFile.toUri()
+
+                val data: Data = workDataOf(UPLOAD_PROF_PIC_URI_KEY to uri.toString())
+
+                continuation.resumeWith(kotlin.Result.success(Result.success(data)))
+
+            } catch (e: Exception) {
+                Log.d(TAG, e.toString())
+                continuation.resumeWith(kotlin.Result.success(Result.retry()))
+            }
         }
     }
 

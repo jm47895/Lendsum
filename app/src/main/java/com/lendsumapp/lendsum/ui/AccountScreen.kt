@@ -57,7 +57,7 @@ fun AccountScreen(
         contract = ActivityResultContracts.PickVisualMedia(),
         onResult = { uri ->
             uri?.let {
-                accountViewModel.uploadProfilePhoto(uri)
+                accountViewModel.uploadProfilePhoto(context, lifecycleOwner, uri)
             }
         }
     )

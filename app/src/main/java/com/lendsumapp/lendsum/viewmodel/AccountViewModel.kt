@@ -137,11 +137,26 @@ class AccountViewModel @Inject constructor(
         return accountRepository.getUpdateAuthPassStatus()
     }
 
-    fun uploadProfilePhoto(uri: Uri) {
+    fun uploadProfilePhoto(context: Context, lifecycleOwner: LifecycleOwner, uri: Uri) {
         val user = firebaseAuth?.currentUser
         val fileName = user?.uid + "." + DatabaseUtils.getFileExtension(context, uri)
 
-        accountRepository.launchUploadImageWorkers(fileName, uri)
+        val workerId = accountRepository.launchUploadImageWorkers(fileName, uri)
+
+        workManager.getWorkInfoByIdLiveData(workerId).observe(lifecycleOwner, Observer { workInfo ->
+            workInfo?.let {
+                Log.d(TAG, "Uri worker state ${workInfo.state}")
+
+                when(workInfo.state){
+                    WorkInfo.State.ENQUEUED -> {}
+                    WorkInfo.State.RUNNING -> {}
+                    WorkInfo.State.SUCCEEDED -> { _updateProfileState.value = Response(status = Status.SUCCESS) }
+                    WorkInfo.State.FAILED -> { _updateProfileState.value = Response(status = Status.ERROR, error = LendsumError.FAILED_TO_UPDATE_PROFILE) }
+                    WorkInfo.State.BLOCKED -> { Log.i(TAG, "Work is blocked.") }
+                    WorkInfo.State.CANCELLED -> { Log.i(TAG, "Work was cancelled.")}
+                }
+            }
+        })
     }
 
     fun resetUpdateProfileState(){
