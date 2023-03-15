@@ -3,6 +3,7 @@ package com.lendsumapp.lendsum.workers
 import android.content.Context
 import android.net.Uri
 import android.util.Log
+import androidx.work.CoroutineWorker
 import androidx.work.Worker
 import androidx.work.WorkerParameters
 import com.google.firebase.ktx.Firebase
@@ -10,12 +11,12 @@ import com.google.firebase.storage.ktx.storage
 import com.lendsumapp.lendsum.util.GlobalConstants.FIREBASE_STORAGE_PROFILE_PIC_PATH
 import com.lendsumapp.lendsum.util.GlobalConstants.UPLOAD_PROF_PIC_NAME_KEY
 import com.lendsumapp.lendsum.util.GlobalConstants.UPLOAD_PROF_PIC_URI_KEY
+import kotlinx.coroutines.delay
 import java.util.concurrent.CountDownLatch
 
-class UploadImageToFirebaseStorageWorker(context: Context, params: WorkerParameters) : Worker(context, params){
-    override fun doWork(): Result {
-        //This makes sure on complete listener finishes before triggering UploadImageWorker Result.success callback
-        val latch = CountDownLatch(1)
+class UploadImageToFirebaseStorageWorker(context: Context, params: WorkerParameters) : CoroutineWorker(context, params){
+    override suspend fun doWork(): Result {
+
         var result = Result.failure()
         val firebaseStorageReference = Firebase.storage.reference
         val fileName = inputData.getString(UPLOAD_PROF_PIC_NAME_KEY)
@@ -27,17 +28,17 @@ class UploadImageToFirebaseStorageWorker(context: Context, params: WorkerParamet
 
         val uploadTask = profileImageRef?.putFile(Uri.parse(imageUri))
         uploadTask?.addOnCompleteListener{ task->
-            if(task.isSuccessful){
+            result = if(task.isSuccessful){
                 Log.i(TAG, "Profile pic uploaded to storage")
-                result = Result.success()
-                latch.countDown()
+                Result.success()
             }else{
                 Log.e(TAG, "Profile pic failed to upload to storage ${task.exception}")
-                result = Result.failure()
-                latch.countDown()
+                Result.failure()
             }
         }
-        latch.await()
+
+        delay(1000)
+
         return result
     }
 

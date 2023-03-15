@@ -84,7 +84,7 @@ class AccountRepository @Inject constructor(
             .setInputData(createFileNameAndUriData(fileName, uri))
             .build()
 
-        val uploadImgToFirebaseStorage = OneTimeWorkRequestBuilder<UploadImageToFirebaseStorageWorker>()
+        val uploadImgUriToFirebaseStorage = OneTimeWorkRequestBuilder<UploadImageToFirebaseStorageWorker>()
             .setInputData(createFileNameAndUriData(fileName, uri))
             .setConstraints(constraints)
             .build()
@@ -94,12 +94,12 @@ class AccountRepository @Inject constructor(
             .setConstraints(constraints)
             .build()
 
-        val uploadImgToFirestore = OneTimeWorkRequestBuilder<UploadImgUriToFirestoreWorker>()
+        val uploadImgUriToFirestore = OneTimeWorkRequestBuilder<UploadImgUriToFirestoreWorker>()
             .setConstraints(constraints)
             .build()
 
         workManager.beginUniqueWork(PROF_IMAGE_STORAGE_WORK_NAME, ExistingWorkPolicy.REPLACE,
-            uploadImgToLocalData).then(uploadImgToFirebaseStorage).then(retrieveRemoteImgUri).then(uploadImgToFirestore).enqueue()
+            uploadImgToLocalData).then(uploadImgUriToFirebaseStorage).then(retrieveRemoteImgUri).then(uploadImgUriToFirestore).enqueue()
     }
 
     private fun createFileNameAndUriData(fileName: String, uri: Uri): Data {
