@@ -14,31 +14,40 @@ import com.lendsumapp.lendsum.util.GlobalConstants.FIREBASE_PROFILE_NAME_KEY
 import com.lendsumapp.lendsum.util.GlobalConstants.FIREBASE_PROFILE_PIC_URI_KEY
 import kotlinx.coroutines.delay
 import java.util.concurrent.CountDownLatch
+import kotlin.coroutines.suspendCoroutine
 
 class UpdateFirebaseAuthProfileWorker(context: Context, params: WorkerParameters) : CoroutineWorker(context, params) {
 
     override suspend fun doWork(): Result {
 
-        var result = Result.failure()
-        val currentUser = FirebaseAuth.getInstance().currentUser
-        val displayName = inputData.getString(FIREBASE_PROFILE_NAME_KEY)
-        val profilePicUri = inputData.getString(FIREBASE_PROFILE_PIC_URI_KEY)
+        if (runAttemptCount == 3){
+            return Result.failure()
+        }
 
-        val changeRequest = UserProfileChangeRequest.Builder().setPhotoUri(profilePicUri?.toUri()).setDisplayName(displayName).build()
+        return suspendCoroutine { continuation ->
 
-        currentUser?.updateProfile(changeRequest)?.addOnCompleteListener { task ->
-            result = if(task.isSuccessful){
-                Log.i(TAG, "Firebase auth profile updated DisplayName:${currentUser.displayName} $profilePicUri")
-                Result.success()
-            }else{
-                Log.e(TAG, "Firebase auth failed to update. ${task.exception}")
-                Result.failure()
+            try{
+                val currentUser = FirebaseAuth.getInstance().currentUser
+                val displayName = inputData.getString(FIREBASE_PROFILE_NAME_KEY)
+                val profilePicUri = inputData.getString(FIREBASE_PROFILE_PIC_URI_KEY)
+
+                val changeRequest =
+                    UserProfileChangeRequest.Builder().setPhotoUri(profilePicUri?.toUri())
+                        .setDisplayName(displayName).build()
+
+                currentUser?.updateProfile(changeRequest)?.addOnCompleteListener { task ->
+                    if (task.isSuccessful) {
+                        Log.i(TAG, "Firebase auth profile updated DisplayName:${currentUser.displayName} $profilePicUri")
+                        continuation.resumeWith(kotlin.Result.success(Result.success()))
+                    } else {
+                        Log.e(TAG, "Firebase auth failed to update. ${task.exception}")
+                        continuation.resumeWith(kotlin.Result.success(Result.retry()))
+                    }
+                } ?: continuation.resumeWith(kotlin.Result.success(Result.retry()))
+            }catch (e: Exception){
+                continuation.resumeWith(kotlin.Result.success(Result.retry()))
             }
-        } ?: return Result.failure()
-
-        delay(1000)
-
-        return result
+        }
     }
 
     companion object{

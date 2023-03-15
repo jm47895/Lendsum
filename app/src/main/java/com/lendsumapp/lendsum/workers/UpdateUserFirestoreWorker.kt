@@ -8,35 +8,40 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 import com.lendsumapp.lendsum.util.GlobalConstants
-import kotlinx.coroutines.delay
+import kotlin.coroutines.suspendCoroutine
 
 class UpdateUserFirestoreWorker(context: Context, params: WorkerParameters) : CoroutineWorker(context, params){
-
     override suspend fun doWork(): Result {
 
-        var result = Result.failure()
-        val firestoreDb = Firebase.firestore
-        val firebaseUser = FirebaseAuth.getInstance().currentUser
+        if (runAttemptCount == 3){
+            return Result.failure()
+        }
 
-        firebaseUser?.let { user ->
-            val userDoc = firestoreDb.collection(GlobalConstants.FIREBASE_USER_COLLECTION_PATH)
-                .document(user.uid)
+         return suspendCoroutine{ continuation ->
 
-            userDoc.update(inputData.keyValueMap).addOnCompleteListener { task->
-                result = if(task.isSuccessful){
-                    Log.i(TAG, "User document updated in firestore")
-                    Result.success()
-                }else{
-                    Log.e(TAG, "User document failed to update in firestore")
-                    Result.failure()
+            try {
+                val firestoreDb = Firebase.firestore
+                val firebaseUser = FirebaseAuth.getInstance().currentUser
 
-                }
+
+                firebaseUser?.let { user ->
+                    val userDoc = firestoreDb.collection(GlobalConstants.FIREBASE_USER_COLLECTION_PATH)
+                        .document(user.uid)
+
+                    userDoc.update(inputData.keyValueMap).addOnCompleteListener { task->
+                        if(task.isSuccessful){
+                            Log.i(TAG, "User document updated in firestore")
+                            continuation.resumeWith(kotlin.Result.success(Result.success()))
+                        }else{
+                            Log.e(TAG, "User document failed to update in firestore")
+                            continuation.resumeWith(kotlin.Result.success(Result.retry()))
+                        }
+                    }
+                } ?: continuation.resumeWith(kotlin.Result.success(Result.retry()))
+            }catch (e: Exception){
+                continuation.resumeWith(kotlin.Result.success(Result.retry()))
             }
-        } ?: return Result.failure()
-
-        delay(1000)
-
-        return result
+        }
     }
 
     companion object{

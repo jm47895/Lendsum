@@ -51,6 +51,7 @@ fun AccountScreen(
 ) {
 
     val lifecycleOwner = LocalLifecycleOwner.current
+    val context = LocalContext.current
     val accountViewModel = hiltViewModel<AccountViewModel>()
     val galleryLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.PickVisualMedia(),
@@ -71,7 +72,7 @@ fun AccountScreen(
             galleryLauncher.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly))
         },
         onSaveProfileInfo = { name, username ->
-            accountViewModel.updateProfile(lifecycleOwner, name, username)
+            accountViewModel.updateProfile(context, lifecycleOwner, name, username)
         },
         resetUpdateProfileState = {
             accountViewModel.resetUpdateProfileState()
@@ -106,7 +107,11 @@ fun AccountScreenContent(
                 Toast.makeText(context, context.getString(R.string.user_profile_updated), Toast.LENGTH_SHORT).show()
             }
             Status.ERROR -> {
-                Toast.makeText(context, context.getString(R.string.profile_update_err), Toast.LENGTH_SHORT).show()
+                when(updateProfileState.error){
+                    LendsumError.OFFLINE_MODE -> Toast.makeText(context, context.getString(R.string.offline_edit_msg), Toast.LENGTH_SHORT).show()
+                    LendsumError.FAILED_TO_UPDATE_PROFILE -> Toast.makeText(context, context.getString(R.string.profile_update_err), Toast.LENGTH_SHORT).show()
+                    else->{}
+                }
             }
             else -> {}
         }

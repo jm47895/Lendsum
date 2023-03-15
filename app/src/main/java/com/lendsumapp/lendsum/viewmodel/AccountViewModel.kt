@@ -13,7 +13,9 @@ import com.lendsumapp.lendsum.data.model.Response
 import com.lendsumapp.lendsum.data.model.Status
 import com.lendsumapp.lendsum.data.model.User
 import com.lendsumapp.lendsum.repository.AccountRepository
+import com.lendsumapp.lendsum.util.AndroidUtils
 import com.lendsumapp.lendsum.util.DatabaseUtils
+import com.lendsumapp.lendsum.util.NetworkUtils
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers
@@ -58,7 +60,7 @@ class AccountViewModel @Inject constructor(
         }
     }
 
-    fun updateProfile(lifecycleOwner: LifecycleOwner, name: String, username: String){
+    fun updateProfile(context: Context, lifecycleOwner: LifecycleOwner, name: String, username: String){
 
         _updateProfileState.value = Response(status = Status.LOADING)
 
@@ -86,6 +88,10 @@ class AccountViewModel @Inject constructor(
                     _updateProfileState.value = Response(status = Status.ERROR, error = LendsumError.EMPTY_USERNAME)
                     return
                 }
+                !NetworkUtils.isNetworkAvailable(context) -> {
+                    _updateProfileState.value = Response(status = Status.ERROR, error = LendsumError.OFFLINE_MODE)
+                    //We don't want to return because we use WorkManager to defer the work when the user comes back online.
+                }
             }
 
             val workerId = accountRepository.launchUpdateProfileWorker(user)
@@ -101,7 +107,7 @@ class AccountViewModel @Inject constructor(
                             _updateProfileState.value = Response(status = Status.SUCCESS)
                             updateLocalCachedUser(user)
                         }
-                        WorkInfo.State.FAILED -> { _updateProfileState.value = Response(status = Status.ERROR) }
+                        WorkInfo.State.FAILED -> { _updateProfileState.value = Response(status = Status.ERROR, error = LendsumError.FAILED_TO_UPDATE_PROFILE) }
                         WorkInfo.State.BLOCKED -> { Log.i(TAG, "Work is blocked.") }
                         WorkInfo.State.CANCELLED -> { Log.i(TAG, "Work was cancelled.")}
                     }
