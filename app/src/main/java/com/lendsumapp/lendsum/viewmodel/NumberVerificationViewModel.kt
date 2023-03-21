@@ -2,6 +2,7 @@ package com.lendsumapp.lendsum.viewmodel
 
 import android.app.Activity
 import android.content.Context
+import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.*
 import com.google.firebase.auth.FirebaseAuth
@@ -33,10 +34,10 @@ class NumberVerificationViewModel @Inject constructor(
     private val _phoneCodeState = mutableStateOf( Response<String>())
     private val _phoneLinkState = mutableStateOf( Response<Unit>())
 
-    val phoneCodeState: Response<String>
-        get() = _phoneCodeState.value
-    val phoneLinkState: Response<Unit>
-        get() = _phoneLinkState.value
+    val phoneCodeState: State<Response<String>>
+        get() = _phoneCodeState
+    val phoneLinkState: State<Response<Unit>>
+        get() = _phoneLinkState
 
     fun sendSMSCode(phoneNumber: String, activity: Activity){
 

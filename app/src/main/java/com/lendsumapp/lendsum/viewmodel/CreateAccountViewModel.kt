@@ -1,6 +1,7 @@
 package com.lendsumapp.lendsum.viewmodel
 
 import android.content.Context
+import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -20,16 +21,16 @@ import javax.inject.Inject
 @HiltViewModel
 class CreateAccountViewModel @Inject constructor(
     private val loginRepository: LoginRepository,
-    @ApplicationContext val context: Context
+    @ApplicationContext private val context: Context
 ): ViewModel(){
 
     private val _createAccountState = mutableStateOf<Response<Unit>>(Response())
     private val _firebaseUser = mutableStateOf<FirebaseUser?>(null)
 
-    val createAccountState: Response<Unit>
-        get() = _createAccountState.value
-    val firebaseUser: FirebaseUser?
-        get() = _firebaseUser.value
+    val createAccountState: State<Response<Unit>>
+        get() = _createAccountState
+    val firebaseUser: State<FirebaseUser?>
+        get() = _firebaseUser
 
     init {
         getFirebaseUser()

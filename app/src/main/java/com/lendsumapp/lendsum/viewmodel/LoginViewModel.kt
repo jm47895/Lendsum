@@ -3,6 +3,7 @@ package com.lendsumapp.lendsum.viewmodel
 import android.content.Context
 import android.content.Intent
 import android.util.Log
+import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -35,16 +36,16 @@ class LoginViewModel @Inject constructor(
     private val _googleSignInState = mutableStateOf(Response<Unit>())
     private val _syncDataState = mutableStateOf(Response<User>())
 
-    val loginState: Response<Unit>
-        get() = _loginState.value
-    val syncState: Response<User>
-        get() = _syncDataState.value
-    val firebaseUser: FirebaseUser?
-        get() = _firebaseUser.value
-    val resetPassState: Response<Unit>
-        get() = _resetPassState.value
-    val googleSignInState: Response<Unit>
-        get() = _googleSignInState.value
+    val loginState: State<Response<Unit>>
+        get() = _loginState
+    val syncState: State<Response<User>>
+        get() = _syncDataState
+    val firebaseUser: State<FirebaseUser?>
+        get() = _firebaseUser
+    val resetPassState: State<Response<Unit>>
+        get() = _resetPassState
+    val googleSignInState: State<Response<Unit>>
+        get() = _googleSignInState
 
     init {
         getFirebaseUser()

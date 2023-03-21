@@ -3,6 +3,7 @@ package com.lendsumapp.lendsum.viewmodel
 import android.content.Context
 import android.net.Uri
 import android.util.Log
+import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.*
 import androidx.work.WorkInfo
@@ -27,16 +28,15 @@ class AccountViewModel @Inject constructor(
     private val accountRepository: AccountRepository,
     private var firebaseAuth: FirebaseAuth?,
     private val workManager: WorkManager,
-    @ApplicationContext private val context: Context
 ) :ViewModel(){
 
     private val _currentUser = mutableStateOf<User?>(null)
     private val _updateProfileState = mutableStateOf(Response<Unit>())
 
-    val currentUser: User?
-        get() = _currentUser.value
-    val updateProfileState: Response<Unit>
-        get() = _updateProfileState.value
+    val currentUser: State<User?>
+        get() = _currentUser
+    val updateProfileState: State<Response<Unit>>
+        get() = _updateProfileState
 
     init {
         getCachedUser()
@@ -64,7 +64,7 @@ class AccountViewModel @Inject constructor(
 
         _updateProfileState.value = Response(status = Status.LOADING)
 
-        currentUser?.let { currentUser ->
+        currentUser.value?.let { currentUser ->
 
             val user = User(
                 userId = currentUser.userId,

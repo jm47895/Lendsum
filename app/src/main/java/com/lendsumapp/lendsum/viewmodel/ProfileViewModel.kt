@@ -1,5 +1,6 @@
 package com.lendsumapp.lendsum.viewmodel
 
+import androidx.compose.runtime.State
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.*
@@ -21,13 +22,13 @@ class ProfileViewModel @Inject constructor(
 
     private val _user = mutableStateOf(User())
 
-    val user: User
-        get() = _user.value
+    val user: State<User>
+        get() = _user
 
     init {
         getCachedUser()
     }
-    fun getCachedUser(){
+    private fun getCachedUser(){
 
         val uid = firebaseAuth?.currentUser?.uid.toString()
 

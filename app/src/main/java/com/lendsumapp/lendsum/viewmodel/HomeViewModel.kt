@@ -1,6 +1,7 @@
 package com.lendsumapp.lendsum.viewmodel
 
 import android.util.Log
+import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -17,8 +18,8 @@ class HomeViewModel @Inject constructor(
 
     private val _networkState = mutableStateOf(NetworkObserver.NetworkState.UNAVAILABLE)
 
-    val networkState: NetworkObserver.NetworkState
-        get() = _networkState.value
+    val networkState: State<NetworkObserver.NetworkState>
+        get() = _networkState
 
     fun observeNetwork(){
         viewModelScope.launch{
