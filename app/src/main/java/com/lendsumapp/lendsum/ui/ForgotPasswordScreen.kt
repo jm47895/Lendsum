@@ -32,14 +32,14 @@ fun ForgotPasswordScreen(
     val loginViewModel = hiltViewModel<LoginViewModel>()
     val forgotPassResponse = loginViewModel.resetPassState
 
-    if (forgotPassResponse.status == Status.SUCCESS){
+    if (forgotPassResponse.value.status == Status.SUCCESS){
         LaunchedEffect(Unit){
             Toast.makeText(context, R.string.reset_email_sent, Toast.LENGTH_SHORT).show()
             navController.navigateUp()
         }
     }else{
         ForgotPasswordScreenContent(
-            resetPassState = loginViewModel.resetPassState,
+            resetPassState = loginViewModel.resetPassState.value,
             onSendResetClicked = { email ->
                 loginViewModel.sendPasswordResetEmail(email)
             },

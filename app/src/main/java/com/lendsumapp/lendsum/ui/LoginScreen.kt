@@ -49,7 +49,7 @@ fun LoginScreen(
         }
     )
     
-    if(loginViewModel.loginState.error == LendsumError.NO_INTERNET){
+    if(loginViewModel.loginState.value.error == LendsumError.NO_INTERNET){
         Toast.makeText(context, context.getString(R.string.not_connected_internet).uppercase() , Toast.LENGTH_SHORT).show()
             .also { 
                 loginViewModel.resetLoginState() 
@@ -57,7 +57,7 @@ fun LoginScreen(
             }
     }
 
-    if(loginViewModel.syncState.status == Status.SUCCESS){
+    if(loginViewModel.syncState.value.status == Status.SUCCESS){
         loginViewModel.resetSyncState()
         navController.navigate(NavDestination.HOME.key){
             popUpTo(NavDestination.LOGIN.key){
@@ -66,14 +66,14 @@ fun LoginScreen(
         }
     }
 
-    if(loginViewModel.googleSignInState.status == Status.SUCCESS){
+    if(loginViewModel.googleSignInState.value.status == Status.SUCCESS){
         loginViewModel.resetGoogleSigInState()
         navController.navigate(NavDestination.CREATE_ACCOUNT.key)
     }
 
     LoginScreenContent(
-        loginState = loginViewModel.loginState,
-        googleSignInState = loginViewModel.googleSignInState,
+        loginState = loginViewModel.loginState.value,
+        googleSignInState = loginViewModel.googleSignInState.value,
         onSignInClicked = { email, pass ->
             loginViewModel.signInWithEmailAndPass(email, pass)
         },

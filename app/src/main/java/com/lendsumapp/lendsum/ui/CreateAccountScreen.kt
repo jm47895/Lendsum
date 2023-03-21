@@ -38,20 +38,20 @@ fun CreateAccountScreen(
     var accountForm: AccountForm? by remember { mutableStateOf(null) }
     val context = LocalContext.current
 
-    if(createAccountViewModel.createAccountState.error == LendsumError.NO_INTERNET){
+    if(createAccountViewModel.createAccountState.value.error == LendsumError.NO_INTERNET){
         Toast.makeText(context, context.getString(R.string.not_connected_internet).uppercase(), Toast.LENGTH_SHORT).show().also { createAccountViewModel.resetCreateAccountState() }
     }
 
-    if(createAccountViewModel.createAccountState.status == Status.SUCCESS){
+    if(createAccountViewModel.createAccountState.value.status == Status.SUCCESS){
         accountForm?.let{ createAccountViewModel.updateFirebaseAuthProfile(GlobalConstants.FIREBASE_PROFILE_NAME_KEY, "${it.firstName} ${it.lastName}") }
         createAccountViewModel.resetCreateAccountState()
         navController.navigate(NavDestination.NUMBER_VERIFICATION.key)
     }
 
     CreateAccountContent(
-        pulledName = firebaseUser?.displayName?.let { createAccountViewModel.splitName(it) },
-        pulledEmail = firebaseUser?.email,
-        createAccountStatus = createAccountViewModel.createAccountState,
+        pulledName = firebaseUser.value?.displayName?.let { createAccountViewModel.splitName(it) },
+        pulledEmail = firebaseUser.value?.email,
+        createAccountStatus = createAccountViewModel.createAccountState.value,
         onBackButtonPressed = {
             createAccountViewModel.logOut()
             navController.navigateUp()

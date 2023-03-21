@@ -40,7 +40,7 @@ fun ProfileScreen(
     val profileViewModel = hiltViewModel<ProfileViewModel>()
 
     ProfileContent(
-        profileViewModel.user,
+        profileViewModel.user.value,
         onSettingsClicked = {
             onSettingsClicked.invoke()
         }

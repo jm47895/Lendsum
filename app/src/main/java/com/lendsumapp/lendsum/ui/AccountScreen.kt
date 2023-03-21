@@ -63,8 +63,8 @@ fun AccountScreen(
     )
 
     AccountScreenContent(
-        user = accountViewModel.currentUser,
-        updateProfileState = accountViewModel.updateProfileState,
+        user = accountViewModel.currentUser.value,
+        updateProfileState = accountViewModel.updateProfileState.value,
         onBackClicked = {
             navController.navigateUp()
         },

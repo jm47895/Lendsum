@@ -25,8 +25,8 @@ class HomeActivity: AppCompatActivity(){
 
         setContent {
             Surface {
-                LaunchedEffect(homeViewModel.networkState){
-                    when (homeViewModel.networkState) {
+                LaunchedEffect(homeViewModel.networkState.value){
+                    when (homeViewModel.networkState.value) {
                         NetworkObserver.NetworkState.AVAILABLE -> {
                             Toast.makeText(this@HomeActivity, resources.getText(R.string.connected_internet), Toast.LENGTH_SHORT).show()
                         }

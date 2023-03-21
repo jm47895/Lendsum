@@ -34,14 +34,14 @@ fun NumberVerificationScreen(
     val numberVerificationViewModel = hiltViewModel<NumberVerificationViewModel>()
     val context = LocalContext.current as Activity
 
-    if(numberVerificationViewModel.phoneCodeState.error == LendsumError.NO_INTERNET || numberVerificationViewModel.phoneLinkState.error == LendsumError.NO_INTERNET){
+    if(numberVerificationViewModel.phoneCodeState.value.error == LendsumError.NO_INTERNET || numberVerificationViewModel.phoneLinkState.value.error == LendsumError.NO_INTERNET){
         Toast.makeText(context, context.getString(R.string.not_connected_internet).uppercase(), Toast.LENGTH_SHORT).show().also {
             numberVerificationViewModel.resetLinkState()
             numberVerificationViewModel.resetPhoneCodeState()
         }
     }
 
-    if(numberVerificationViewModel.phoneLinkState.status == Status.SUCCESS){
+    if(numberVerificationViewModel.phoneLinkState.value.status == Status.SUCCESS){
         numberVerificationViewModel.resetLinkState()
         numberVerificationViewModel.insertNewUserIntoSqlCache()
         numberVerificationViewModel.insertNewUserIntoFirestoreDb()
@@ -49,8 +49,8 @@ fun NumberVerificationScreen(
     }
 
     NumberVerificationContent(
-        phoneCodeState = numberVerificationViewModel.phoneCodeState,
-        phoneLinkState = numberVerificationViewModel.phoneLinkState,
+        phoneCodeState = numberVerificationViewModel.phoneCodeState.value,
+        phoneLinkState = numberVerificationViewModel.phoneLinkState.value,
         onBackButtonPressed = { navController.navigateUp() },
         onSendCodeClicked = { number ->
             numberVerificationViewModel.sendSMSCode(number, context)
