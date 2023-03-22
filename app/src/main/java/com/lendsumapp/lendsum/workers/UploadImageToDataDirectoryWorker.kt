@@ -7,17 +7,23 @@ import android.net.Uri
 import android.util.Log
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.core.net.toUri
+import androidx.hilt.work.HiltWorker
 import androidx.work.*
 import com.lendsumapp.lendsum.util.GlobalConstants
 import com.lendsumapp.lendsum.util.GlobalConstants.LENDSUM_PROFILE_PIC_DIR_PATH
 import com.lendsumapp.lendsum.util.GlobalConstants.UPLOAD_PROF_PIC_NAME_KEY
 import com.lendsumapp.lendsum.util.GlobalConstants.UPLOAD_PROF_PIC_URI_KEY
+import dagger.assisted.Assisted
+import dagger.assisted.AssistedInject
 import java.io.File
 import java.io.FileOutputStream
 import java.lang.Exception
 import kotlin.coroutines.suspendCoroutine
-
-class UploadImageToDataDirectoryWorker (context: Context, params: WorkerParameters) : CoroutineWorker(context, params){
+@HiltWorker
+class UploadImageToDataDirectoryWorker @AssistedInject constructor (
+    @Assisted context: Context,
+    @Assisted params: WorkerParameters
+) : CoroutineWorker(context, params){
 
     override suspend fun doWork(): Result {
 

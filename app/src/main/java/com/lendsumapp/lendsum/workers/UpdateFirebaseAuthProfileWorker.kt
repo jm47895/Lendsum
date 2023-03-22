@@ -3,6 +3,7 @@ package com.lendsumapp.lendsum.workers
 import android.content.Context
 import android.util.Log
 import androidx.core.net.toUri
+import androidx.hilt.work.HiltWorker
 import androidx.work.CoroutineWorker
 import androidx.work.Worker
 import androidx.work.WorkerParameters
@@ -12,11 +13,17 @@ import com.lendsumapp.lendsum.util.GlobalConstants.FIREBASE_AUTH_UPDATE_MAP_KEY
 import com.lendsumapp.lendsum.util.GlobalConstants.FIREBASE_AUTH_UPDATE_MAP_VALUE
 import com.lendsumapp.lendsum.util.GlobalConstants.FIREBASE_PROFILE_NAME_KEY
 import com.lendsumapp.lendsum.util.GlobalConstants.FIREBASE_PROFILE_PIC_URI_KEY
+import dagger.assisted.Assisted
+import dagger.assisted.AssistedInject
 import kotlinx.coroutines.delay
 import java.util.concurrent.CountDownLatch
 import kotlin.coroutines.suspendCoroutine
-
-class UpdateFirebaseAuthProfileWorker(context: Context, params: WorkerParameters) : CoroutineWorker(context, params) {
+@HiltWorker
+class UpdateFirebaseAuthProfileWorker @AssistedInject constructor(
+    @Assisted context: Context,
+    @Assisted params: WorkerParameters,
+    private val firebaseAuth: FirebaseAuth
+) : CoroutineWorker(context, params) {
 
     override suspend fun doWork(): Result {
 
@@ -28,7 +35,7 @@ class UpdateFirebaseAuthProfileWorker(context: Context, params: WorkerParameters
 
             try{
 
-                val currentUser = FirebaseAuth.getInstance().currentUser
+                val currentUser = firebaseAuth.currentUser
                 val displayName = inputData.getString(FIREBASE_PROFILE_NAME_KEY)
                 val profilePicUri = inputData.getString(FIREBASE_PROFILE_PIC_URI_KEY)
 

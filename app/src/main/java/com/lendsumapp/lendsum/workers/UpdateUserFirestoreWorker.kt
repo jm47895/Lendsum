@@ -2,15 +2,24 @@ package com.lendsumapp.lendsum.workers
 
 import android.content.Context
 import android.util.Log
+import androidx.hilt.work.HiltWorker
 import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 import com.lendsumapp.lendsum.util.GlobalConstants
+import dagger.assisted.Assisted
+import dagger.assisted.AssistedInject
 import kotlin.coroutines.suspendCoroutine
-
-class UpdateUserFirestoreWorker(context: Context, params: WorkerParameters) : CoroutineWorker(context, params){
+@HiltWorker
+class UpdateUserFirestoreWorker @AssistedInject constructor(
+    @Assisted context: Context,
+    @Assisted params: WorkerParameters,
+    private val firestoreDb: FirebaseFirestore,
+    private val firebaseAuth: FirebaseAuth
+) : CoroutineWorker(context, params){
     override suspend fun doWork(): Result {
 
         if (runAttemptCount == 3){
@@ -21,8 +30,7 @@ class UpdateUserFirestoreWorker(context: Context, params: WorkerParameters) : Co
 
             try {
 
-                val firestoreDb = Firebase.firestore
-                val firebaseUser = FirebaseAuth.getInstance().currentUser
+                val firebaseUser = firebaseAuth.currentUser
 
 
                 firebaseUser?.let { user ->
