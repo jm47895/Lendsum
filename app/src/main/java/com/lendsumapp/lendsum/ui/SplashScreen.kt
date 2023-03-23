@@ -32,7 +32,7 @@ fun SplashScreen(
 
 
         delay(1500)
-        val destination = loginViewModel.firebaseUser?.let { NavDestination.HOME } ?: NavDestination.LOGIN
+        val destination = loginViewModel.firebaseUser.value?.let { NavDestination.HOME } ?: NavDestination.LOGIN
 
         navController.navigate(destination.key){
             popUpTo(NavDestination.SPLASH_SCREEN.key){
