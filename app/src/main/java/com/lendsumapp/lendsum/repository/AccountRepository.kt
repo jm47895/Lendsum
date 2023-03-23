@@ -5,12 +5,14 @@ import androidx.lifecycle.MutableLiveData
 import androidx.work.*
 import com.lendsumapp.lendsum.auth.EmailAndPassAuthComponent
 import com.lendsumapp.lendsum.data.model.User
+import com.lendsumapp.lendsum.data.persistence.Converters.toJson
 import com.lendsumapp.lendsum.data.persistence.LendsumDatabase
 import com.lendsumapp.lendsum.util.GlobalConstants.FIREBASE_PROFILE_NAME_KEY
 import com.lendsumapp.lendsum.util.GlobalConstants.FIREBASE_PROFILE_PIC_URI_KEY
 import com.lendsumapp.lendsum.util.GlobalConstants.FIREBASE_USERNAME_KEY
 import com.lendsumapp.lendsum.util.GlobalConstants.PROF_IMAGE_STORAGE_WORK_NAME
-import com.lendsumapp.lendsum.util.GlobalConstants.UPDATE_USER_PROF_KEY
+import com.lendsumapp.lendsum.util.GlobalConstants.UPDATE_USER_CACHE_WORKER_KEY
+import com.lendsumapp.lendsum.util.GlobalConstants.UPDATE_USER_PROF_WORKER_KEY
 import com.lendsumapp.lendsum.util.GlobalConstants.UPLOAD_PROF_PIC_NAME_KEY
 import com.lendsumapp.lendsum.util.GlobalConstants.UPLOAD_PROF_PIC_URI_KEY
 import com.lendsumapp.lendsum.workers.*
@@ -71,11 +73,20 @@ class AccountRepository @Inject constructor(
             )
             .build()
 
-        workManager.beginUniqueWork(UPDATE_USER_PROF_KEY, ExistingWorkPolicy.REPLACE, updateFirebaseAuthProfileRequest)
+        val updateUserInCache = OneTimeWorkRequestBuilder<UpdateUserCacheWorker>()
+            .setInputData(
+                Data.Builder()
+                    .putString(UPDATE_USER_CACHE_WORKER_KEY, user.toJson())
+                    .build()
+            )
+            .build()
+
+        workManager.beginUniqueWork(UPDATE_USER_PROF_WORKER_KEY, ExistingWorkPolicy.REPLACE, updateFirebaseAuthProfileRequest)
             .then(updateUserInFirestore)
+            .then(updateUserInCache)
             .enqueue()
 
-        return updateUserInFirestore.id
+        return updateUserInCache.id
     }
 
     fun launchUploadImageWorkers(fileName: String, uri: Uri): UUID{

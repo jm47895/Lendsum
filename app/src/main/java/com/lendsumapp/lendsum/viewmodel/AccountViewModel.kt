@@ -105,7 +105,6 @@ class AccountViewModel @Inject constructor(
                         WorkInfo.State.RUNNING -> {}
                         WorkInfo.State.SUCCEEDED -> {
                             _updateProfileState.value = Response(status = Status.SUCCESS)
-                            updateLocalCachedUser(user)
                         }
                         WorkInfo.State.FAILED -> { _updateProfileState.value = Response(status = Status.ERROR, error = LendsumError.FAILED_TO_UPDATE_PROFILE) }
                         WorkInfo.State.BLOCKED -> { Log.i(TAG, "Work is blocked.") }

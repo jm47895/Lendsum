@@ -6,7 +6,7 @@ import com.google.gson.reflect.TypeToken
 import com.lendsumapp.lendsum.data.model.Message
 import com.lendsumapp.lendsum.data.model.User
 
-class Converters {
+object Converters {
 
     @TypeConverter
     fun fromString(stringListString: String): List<String> {
@@ -44,6 +44,18 @@ class Converters {
         val gson = Gson()
         val type = object : TypeToken<List<Message>>() {}.type
         return gson.fromJson(value, type)
+    }
+
+    fun User.toJson(): String {
+        val gson = Gson()
+        val type = object : TypeToken<User>() {}.type
+        return  gson.toJson(this, type)
+    }
+
+    fun String.toUserObject(): User {
+        val gson = Gson()
+        val type = object : TypeToken<User>() {}.type
+        return gson.fromJson(this, type)
     }
 
 }
