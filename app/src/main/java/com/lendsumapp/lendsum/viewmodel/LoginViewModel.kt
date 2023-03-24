@@ -107,7 +107,7 @@ class LoginViewModel @Inject constructor(
 
         getFirebaseUser()
 
-        firebaseUser?.let {
+        firebaseUser.value?.let {
             viewModelScope.launch(Dispatchers.IO) {
                 loginRepository.syncAllUserData().collect{
                     it.data?.let { user ->

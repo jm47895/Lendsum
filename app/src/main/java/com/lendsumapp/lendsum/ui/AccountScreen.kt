@@ -58,6 +58,7 @@ fun AccountScreen(
         onResult = { uri ->
             uri?.let {
                 accountViewModel.uploadProfilePhoto(context, lifecycleOwner, uri)
+                accountViewModel.updateProfile(context, lifecycleOwner, profilePicUri = it.toString())
             }
         }
     )
@@ -72,7 +73,7 @@ fun AccountScreen(
             galleryLauncher.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly))
         },
         onSaveProfileInfo = { name, username ->
-            accountViewModel.updateProfile(context, lifecycleOwner, name, username)
+            accountViewModel.updateProfile(context, lifecycleOwner, name = name, username = username)
         },
         resetUpdateProfileState = {
             accountViewModel.resetUpdateProfileState()
@@ -232,11 +233,11 @@ fun EditProfPic(
         GlideImage(
             modifier = Modifier
                 .clip(RoundedCornerShape(100))
-                .fillMaxWidth(.50f)
-                .fillMaxHeight(),
+                .width(175.dp)
+                .height(175.dp),
             model = uri,
             contentDescription = "Profile Pic",
-            contentScale = ContentScale.FillBounds,
+            contentScale = ContentScale.Inside,
         )
         Box(
             modifier = Modifier

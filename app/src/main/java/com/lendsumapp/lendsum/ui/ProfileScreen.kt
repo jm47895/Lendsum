@@ -184,10 +184,13 @@ fun ProfilePic(
         contentAlignment = Alignment.Center
     ){
         GlideImage(
-            modifier = Modifier.clip(RoundedCornerShape(100)),
+            modifier = Modifier
+                .width(150.dp)
+                .height(150.dp)
+                .clip(RoundedCornerShape(100)),
             model = user.profilePicUri,
             contentDescription = "Profile Pic",
-            contentScale = ContentScale.FillBounds
+            contentScale = ContentScale.Inside
         )
     }
 }

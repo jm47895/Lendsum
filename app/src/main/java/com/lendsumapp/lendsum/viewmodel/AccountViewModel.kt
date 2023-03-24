@@ -60,7 +60,13 @@ class AccountViewModel @Inject constructor(
         }
     }
 
-    fun updateProfile(context: Context, lifecycleOwner: LifecycleOwner, name: String, username: String){
+    fun updateProfile(
+        context: Context,
+        lifecycleOwner: LifecycleOwner,
+        name: String? = null,
+        username: String? = null,
+        profilePicUri: String? = null
+    ){
 
         _updateProfileState.value = Response(status = Status.LOADING)
 
@@ -68,11 +74,14 @@ class AccountViewModel @Inject constructor(
 
             val user = User(
                 userId = currentUser.userId,
-                name = name,
-                username = if(!username.startsWith("@")) "@$username" else username,
+                name = name ?: currentUser.name,
+                username = username?.let {
+                    //Add on @ symbol if not present
+                    if(!username.startsWith("@")) "@$username" else username
+                } ?: currentUser.username,
                 email = currentUser.email,
                 phoneNumber = currentUser.phoneNumber,
-                profilePicUri = currentUser.profilePicUri,
+                profilePicUri = profilePicUri ?: currentUser.profilePicUri,
                 karmaScore = currentUser.karmaScore,
                 friendList = currentUser.friendList,
                 isProfilePublic = currentUser.isProfilePublic
@@ -83,7 +92,7 @@ class AccountViewModel @Inject constructor(
                     _updateProfileState.value = Response(status = Status.ERROR, error = LendsumError.EMPTY_NAME)
                     return
                 }
-                //This also means isEmpty but accounts for the added @ symbol if user does not include it
+                //This accounts for the added @ symbol if user does not include characters after.
                 user.username.length < 2-> {
                     _updateProfileState.value = Response(status = Status.ERROR, error = LendsumError.EMPTY_USERNAME)
                     return
@@ -94,25 +103,30 @@ class AccountViewModel @Inject constructor(
                 }
             }
 
-            val workerId = accountRepository.launchUpdateProfileWorker(user)
+            launchUpdateProfileWorker(lifecycleOwner, user)
 
-            workManager.getWorkInfoByIdLiveData(workerId).observe(lifecycleOwner, Observer { workInfo ->
-                workInfo?.let {
-                    Log.d(TAG, "Profile worker state ${workInfo.state}")
-
-                    when(workInfo.state){
-                        WorkInfo.State.ENQUEUED -> {}
-                        WorkInfo.State.RUNNING -> {}
-                        WorkInfo.State.SUCCEEDED -> {
-                            _updateProfileState.value = Response(status = Status.SUCCESS)
-                        }
-                        WorkInfo.State.FAILED -> { _updateProfileState.value = Response(status = Status.ERROR, error = LendsumError.FAILED_TO_UPDATE_PROFILE) }
-                        WorkInfo.State.BLOCKED -> { Log.i(TAG, "Work is blocked.") }
-                        WorkInfo.State.CANCELLED -> { Log.i(TAG, "Work was cancelled.")}
-                    }
-                }
-            })
         } ?: return
+    }
+
+    private fun launchUpdateProfileWorker(lifecycleOwner: LifecycleOwner, user: User){
+        val workerId = accountRepository.launchUpdateProfileWorker(user)
+
+        workManager.getWorkInfoByIdLiveData(workerId).observe(lifecycleOwner, Observer { workInfo ->
+            workInfo?.let {
+                Log.d(TAG, "Profile worker state ${workInfo.state}")
+
+                when(workInfo.state){
+                    WorkInfo.State.ENQUEUED -> {}
+                    WorkInfo.State.RUNNING -> {}
+                    WorkInfo.State.SUCCEEDED -> {
+                        _updateProfileState.value = Response(status = Status.SUCCESS)
+                    }
+                    WorkInfo.State.FAILED -> { _updateProfileState.value = Response(status = Status.ERROR, error = LendsumError.FAILED_TO_UPDATE_PROFILE) }
+                    WorkInfo.State.BLOCKED -> { Log.i(TAG, "Work is blocked.") }
+                    WorkInfo.State.CANCELLED -> { Log.i(TAG, "Work was cancelled.")}
+                }
+            }
+        })
     }
 
     //Firebase auth functions
@@ -137,6 +151,7 @@ class AccountViewModel @Inject constructor(
     }
 
     fun uploadProfilePhoto(context: Context, lifecycleOwner: LifecycleOwner, uri: Uri) {
+
         val user = firebaseAuth?.currentUser
         val fileName = user?.uid + "." + DatabaseUtils.getFileExtension(context, uri)
 
@@ -151,7 +166,7 @@ class AccountViewModel @Inject constructor(
                     WorkInfo.State.RUNNING -> {}
                     WorkInfo.State.SUCCEEDED -> { _updateProfileState.value = Response(status = Status.SUCCESS) }
                     WorkInfo.State.FAILED -> { _updateProfileState.value = Response(status = Status.ERROR, error = LendsumError.FAILED_TO_UPDATE_PROFILE) }
-                    WorkInfo.State.BLOCKED -> { Log.i(TAG, "Work is blocked.") }
+                    WorkInfo.State.BLOCKED -> { Log.i(TAG, "Uri Work is blocked.") }
                     WorkInfo.State.CANCELLED -> { Log.i(TAG, "Work was cancelled.")}
                 }
             }

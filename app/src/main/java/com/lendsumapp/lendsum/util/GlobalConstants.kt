@@ -33,8 +33,8 @@ object GlobalConstants {
     /*Work manager constants*/
     const val UPLOAD_PROF_PIC_NAME_KEY = "profile_pic_file_name"
     const val UPLOAD_PROF_PIC_URI_KEY = "profile_pic_uri"
-    const val PROF_IMAGE_STORAGE_WORK_NAME = "upload_profile_image_worker"
-    const val UPDATE_USER_PROF_WORKER_KEY = "upload_profile_image_worker"
+    const val UPLOAD_PROFILE_PIC_WORKER = "upload_profile_image_worker"
+    const val UPDATE_USER_PROF_WORKER = "update_user_profile_worker"
     const val UPDATE_USER_CACHE_WORKER_KEY = "update_user_cache_worker"
     const val FIRESTORE_USER_WORKER_MAP_KEY = "firestore_user_key"
     const val FIRESTORE_USER_WORKER_MAP_VALUE = "firestore_user_value"

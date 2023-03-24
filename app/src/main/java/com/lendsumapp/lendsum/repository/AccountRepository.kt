@@ -10,9 +10,9 @@ import com.lendsumapp.lendsum.data.persistence.LendsumDatabase
 import com.lendsumapp.lendsum.util.GlobalConstants.FIREBASE_PROFILE_NAME_KEY
 import com.lendsumapp.lendsum.util.GlobalConstants.FIREBASE_PROFILE_PIC_URI_KEY
 import com.lendsumapp.lendsum.util.GlobalConstants.FIREBASE_USERNAME_KEY
-import com.lendsumapp.lendsum.util.GlobalConstants.PROF_IMAGE_STORAGE_WORK_NAME
+import com.lendsumapp.lendsum.util.GlobalConstants.UPLOAD_PROFILE_PIC_WORKER
 import com.lendsumapp.lendsum.util.GlobalConstants.UPDATE_USER_CACHE_WORKER_KEY
-import com.lendsumapp.lendsum.util.GlobalConstants.UPDATE_USER_PROF_WORKER_KEY
+import com.lendsumapp.lendsum.util.GlobalConstants.UPDATE_USER_PROF_WORKER
 import com.lendsumapp.lendsum.util.GlobalConstants.UPLOAD_PROF_PIC_NAME_KEY
 import com.lendsumapp.lendsum.util.GlobalConstants.UPLOAD_PROF_PIC_URI_KEY
 import com.lendsumapp.lendsum.workers.*
@@ -81,7 +81,7 @@ class AccountRepository @Inject constructor(
             )
             .build()
 
-        workManager.beginUniqueWork(UPDATE_USER_PROF_WORKER_KEY, ExistingWorkPolicy.REPLACE, updateFirebaseAuthProfileRequest)
+        workManager.beginUniqueWork(UPDATE_USER_PROF_WORKER, ExistingWorkPolicy.REPLACE, updateFirebaseAuthProfileRequest)
             .then(updateUserInFirestore)
             .then(updateUserInCache)
             .enqueue()
@@ -109,7 +109,7 @@ class AccountRepository @Inject constructor(
             .setConstraints(constraints)
             .build()
 
-        workManager.beginUniqueWork(PROF_IMAGE_STORAGE_WORK_NAME, ExistingWorkPolicy.REPLACE,
+        workManager.beginUniqueWork(UPLOAD_PROFILE_PIC_WORKER, ExistingWorkPolicy.REPLACE,
             uploadImgToLocalData).then(uploadImgUriToFirebaseStorage).then(retrieveRemoteImgUri).then(uploadImgUriToFirestore).enqueue()
 
         return uploadImgUriToFirestore.id
