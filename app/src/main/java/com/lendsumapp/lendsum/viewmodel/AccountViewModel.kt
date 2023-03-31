@@ -4,6 +4,7 @@ import android.content.Context
 import android.net.Uri
 import android.util.Log
 import androidx.compose.runtime.State
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.*
 import androidx.work.WorkInfo
@@ -14,10 +15,12 @@ import com.lendsumapp.lendsum.data.model.Response
 import com.lendsumapp.lendsum.data.model.Status
 import com.lendsumapp.lendsum.data.model.User
 import com.lendsumapp.lendsum.repository.AccountRepository
+import com.lendsumapp.lendsum.util.AndroidUtils
 import com.lendsumapp.lendsum.util.DatabaseUtils
 import com.lendsumapp.lendsum.util.NetworkUtils
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -30,11 +33,17 @@ class AccountViewModel @Inject constructor(
 
     private val _currentUser = mutableStateOf<User?>(null)
     private val _updateProfileState = mutableStateOf(Response<Unit>())
+    private val _updateEmailState = mutableStateOf(Response<Unit>())
+    private val _updatePassState = mutableStateOf(Response<Unit>())
 
     val currentUser: State<User?>
         get() = _currentUser
     val updateProfileState: State<Response<Unit>>
         get() = _updateProfileState
+    val updateEmailState: State<Response<Unit>>
+        get() = _updateEmailState
+    val updatePassState: State<Response<Unit>>
+        get() = _updatePassState
 
     init {
         getCachedUser()
@@ -63,7 +72,8 @@ class AccountViewModel @Inject constructor(
         lifecycleOwner: LifecycleOwner,
         name: String? = null,
         username: String? = null,
-        profilePicUri: String? = null
+        profilePicUri: String? = null,
+        email: String? = null
     ){
 
         _updateProfileState.value = Response(status = Status.LOADING)
@@ -77,7 +87,7 @@ class AccountViewModel @Inject constructor(
                     //Add on @ symbol if not present
                     if(!username.startsWith("@")) "@$username" else username
                 } ?: currentUser.username,
-                email = currentUser.email,
+                email = email ?: currentUser.email,
                 phoneNumber = currentUser.phoneNumber,
                 profilePicUri = profilePicUri ?: currentUser.profilePicUri,
                 karmaScore = currentUser.karmaScore,
@@ -93,6 +103,14 @@ class AccountViewModel @Inject constructor(
                 //This accounts for the added @ symbol if user does not include characters after.
                 user.username.length < 2-> {
                     _updateProfileState.value = Response(status = Status.ERROR, error = LendsumError.EMPTY_USERNAME)
+                    return
+                }
+                user.email.isEmpty() ->{
+                    _updateProfileState.value = Response(status = Status.ERROR, error = LendsumError.INVALID_EMAIL)
+                    return
+                }
+                !AndroidUtils.isValidEmail(user.email) ->{
+                    _updateProfileState.value = Response(status = Status.ERROR, error = LendsumError.INVALID_EMAIL)
                     return
                 }
                 !NetworkUtils.isNetworkAvailable(context) -> {
@@ -111,42 +129,48 @@ class AccountViewModel @Inject constructor(
 
         workManager.getWorkInfoByIdLiveData(workerId).observe(lifecycleOwner, Observer { workInfo ->
             workInfo?.let {
-                Log.d(TAG, "Profile worker state ${workInfo.state}")
-
                 when(workInfo.state){
-                    WorkInfo.State.ENQUEUED -> {}
-                    WorkInfo.State.RUNNING -> {}
                     WorkInfo.State.SUCCEEDED -> {
                         _updateProfileState.value = Response(status = Status.SUCCESS)
                     }
                     WorkInfo.State.FAILED -> { _updateProfileState.value = Response(status = Status.ERROR, error = LendsumError.FAILED_TO_UPDATE_PROFILE) }
-                    WorkInfo.State.BLOCKED -> { Log.i(TAG, "Work is blocked.") }
-                    WorkInfo.State.CANCELLED -> { Log.i(TAG, "Work was cancelled.")}
+                    WorkInfo.State.BLOCKED -> { Log.i(TAG, "Profile Work is blocked.") }
+                    WorkInfo.State.CANCELLED -> { Log.i(TAG, "Profile Work was cancelled.")}
+                    else -> { /*Don't care*/ }
                 }
             }
         })
     }
 
     //Firebase auth functions
-    fun updateAuthEmail(email: String){
+    fun updateAuthEmail(context: Context, email: String){
+
+        _updateEmailState.value = Response(status = Status.LOADING)
+
+        when{
+            email.isEmpty() ||  !AndroidUtils.isValidEmail(email)-> {
+                _updateEmailState.value = Response(status = Status.ERROR, error = LendsumError.INVALID_EMAIL)
+                return
+            }
+            !NetworkUtils.isNetworkAvailable(context) -> {
+                _updateEmailState.value = Response(status = Status.ERROR, error = LendsumError.NO_INTERNET)
+                return
+            }
+        }
+
         viewModelScope.launch(Dispatchers.IO) {
-            accountRepository.updateAuthEmail(email)
+            accountRepository.updateAuthEmail(email).collect {
+                _updateEmailState.value = it
+            }
         }
     }
 
-    fun getUpdateAuthEmailStatus(): MutableLiveData<Boolean> {
-        return accountRepository.getUpdateAuthEmailStatus()
-    }
-
-    fun updateAuthPass(password: String){
+    fun updateAuthPass(password: String, matchPass: String){
         viewModelScope.launch {
             accountRepository.updateAuthPass(password)
         }
     }
 
-    fun getUpdateAuthPassStatus():MutableLiveData<Boolean>{
-        return accountRepository.getUpdateAuthPassStatus()
-    }
 
     fun uploadProfilePhoto(context: Context, lifecycleOwner: LifecycleOwner, uri: Uri) {
 
@@ -157,15 +181,13 @@ class AccountViewModel @Inject constructor(
 
         workManager.getWorkInfoByIdLiveData(workerId).observe(lifecycleOwner, Observer { workInfo ->
             workInfo?.let {
-                Log.d(TAG, "Uri worker state ${workInfo.state}")
 
                 when(workInfo.state){
-                    WorkInfo.State.ENQUEUED -> {}
-                    WorkInfo.State.RUNNING -> {}
                     WorkInfo.State.SUCCEEDED -> { _updateProfileState.value = Response(status = Status.SUCCESS) }
                     WorkInfo.State.FAILED -> { _updateProfileState.value = Response(status = Status.ERROR, error = LendsumError.FAILED_TO_UPDATE_PROFILE) }
                     WorkInfo.State.BLOCKED -> { Log.i(TAG, "Uri Work is blocked.") }
-                    WorkInfo.State.CANCELLED -> { Log.i(TAG, "Work was cancelled.")}
+                    WorkInfo.State.CANCELLED -> { Log.i(TAG, "Uri Work was cancelled.")}
+                    else -> { /*Don't care*/ }
                 }
             }
         })
@@ -173,6 +195,10 @@ class AccountViewModel @Inject constructor(
 
     fun resetUpdateProfileState(){
         _updateProfileState.value = Response()
+    }
+
+    fun resetUpdateEmailState(){
+        _updateEmailState.value = Response()
     }
 
     companion object {

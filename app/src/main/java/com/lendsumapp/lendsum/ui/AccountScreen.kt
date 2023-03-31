@@ -1,14 +1,16 @@
 package com.lendsumapp.lendsum.ui
 
+import android.util.Log
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.StringRes
-import androidx.compose.foundation.background
-import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
+import androidx.compose.foundation.*
+import androidx.compose.foundation.gestures.Orientation
+import androidx.compose.foundation.gestures.ScrollableState
 import androidx.compose.foundation.gestures.detectTapGestures
+import androidx.compose.foundation.gestures.scrollable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Divider
@@ -66,6 +68,7 @@ fun AccountScreen(
     AccountScreenContent(
         user = accountViewModel.currentUser.value,
         updateProfileState = accountViewModel.updateProfileState.value,
+        updateEmailState = accountViewModel.updateEmailState.value,
         onBackClicked = {
             navController.navigateUp()
         },
@@ -75,8 +78,17 @@ fun AccountScreen(
         onSaveProfileInfo = { name, username ->
             accountViewModel.updateProfile(context, lifecycleOwner, name = name, username = username)
         },
+        onUpdateEmail = { email ->
+            accountViewModel.updateAuthEmail(context, email)
+        },
+        onUpdatePass = { password, matchPass ->
+            accountViewModel.updateAuthPass(password, matchPass)
+        },
         resetUpdateProfileState = {
             accountViewModel.resetUpdateProfileState()
+        },
+        resetUpdateEmailState = {
+            accountViewModel.resetUpdateEmailState()
         }
     )
 }
@@ -85,17 +97,25 @@ fun AccountScreen(
 fun AccountScreenContent(
     user: User?,
     updateProfileState: Response<Unit>,
+    updateEmailState: Response<Unit>,
     onBackClicked:() -> Unit,
     onChangeProfilePic: () -> Unit,
     onSaveProfileInfo: (String, String) -> Unit,
+    onUpdateEmail: (String) -> Unit,
+    onUpdatePass: (String, String) -> Unit,
     resetUpdateProfileState: () -> Unit,
+    resetUpdateEmailState:() -> Unit
 ) {
 
     val focusManager = LocalFocusManager.current
+    val scrollState = rememberScrollState()
     val context = LocalContext.current
 
     var name by remember { mutableStateOf("") }
     var username by remember { mutableStateOf("") }
+    var email by remember { mutableStateOf(user?.email ?: "") }
+    var password by remember { mutableStateOf("") }
+    var matchPass by remember { mutableStateOf("") }
 
     user?.let {
         name = it.name
@@ -111,6 +131,22 @@ fun AccountScreenContent(
                 when(updateProfileState.error){
                     LendsumError.OFFLINE_MODE -> Toast.makeText(context, context.getString(R.string.offline_edit_msg), Toast.LENGTH_SHORT).show()
                     LendsumError.FAILED_TO_UPDATE_PROFILE -> Toast.makeText(context, context.getString(R.string.profile_update_err), Toast.LENGTH_SHORT).show()
+                    else->{}
+                }
+            }
+            else -> {}
+        }
+    }
+
+    LaunchedEffect(updateEmailState.status){
+        when(updateEmailState.status){
+            Status.SUCCESS -> {
+                Toast.makeText(context, context.getString(R.string.user_profile_updated), Toast.LENGTH_SHORT).show()
+            }
+            Status.ERROR -> {
+                when(updateEmailState.error){
+                    LendsumError.LOGIN_REQUIRED -> Toast.makeText(context, context.getString(R.string.sign_in_again_msg), Toast.LENGTH_SHORT).show()
+                    LendsumError.FAILED_TO_UPDATE_EMAIL -> Toast.makeText(context, context.getString(R.string.profile_update_err), Toast.LENGTH_SHORT).show()
                     else->{}
                 }
             }
@@ -134,6 +170,7 @@ fun AccountScreenContent(
                 .pointerInput(Unit) {
                     detectTapGestures(onTap = { focusManager.clearFocus() })
                 }
+                .verticalScroll(scrollState)
                 .padding(8.dp),
             verticalArrangement = Arrangement.Top,
         ) {
@@ -144,14 +181,7 @@ fun AccountScreenContent(
                 uri = user?.profilePicUri ?: "",
                 onChangeProfilePic = onChangeProfilePic
             )
-            Divider(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(vertical = 8.dp),
-                thickness = 2.dp,
-                color = ColorPrimary
-            )
-            Text(text = stringResource(R.string.edit_profile).uppercase(), color = Color.White)
+            LabeledDivider(label = stringResource(R.string.edit_profile).uppercase())
             user?.let {
                 EditProfileOptions(
                     updateProfileState = updateProfileState,
@@ -163,14 +193,40 @@ fun AccountScreenContent(
                     onUsernameChanged = {
                         username = it
                         resetUpdateProfileState.invoke()
-                    },
+                    }
                 )
             }
             LendsumButton(
-                modifier = Modifier.fillMaxWidth(),
-                text = stringResource(id = R.string.save)
+                modifier = Modifier
+                    .fillMaxWidth(.33f)
+                    .align(Alignment.End),
+                text = stringResource(id = R.string.save).uppercase()
             ) {
                 onSaveProfileInfo(name, username)
+            }
+            LabeledDivider(label = stringResource(id = R.string.edit_login).uppercase())
+            user?.let {
+                EditCredentialOptions(
+                    modifier = Modifier.align(Alignment.End),
+                    updateEmailState = updateEmailState,
+                    user = user,
+                    onEmailChanged = {
+                        email = it
+                        resetUpdateEmailState.invoke()
+                    },
+                    onPasswordChanged = {
+                        password = it
+                    },
+                    onMatchPassChanged = {
+                        matchPass = it
+                    },
+                    onEmailUpdated = {
+                        onUpdateEmail(email)
+                    },
+                    onPasswordUpdated = {
+                        onUpdatePass(password, matchPass)
+                    }
+                )
             }
         }
     }
@@ -181,10 +237,10 @@ fun EditProfileOptions(
     updateProfileState: Response<Unit>,
     user: User,
     onNameChanged:(String) ->  Unit,
-    onUsernameChanged:(String) ->  Unit
+    onUsernameChanged:(String) ->  Unit,
 ) {
 
-    EditProfileOption.values().forEach { editOption ->
+    EditProfileOptions.values().forEach { editOption ->
 
         LendsumField(
             modifier = Modifier.fillMaxWidth(),
@@ -193,28 +249,104 @@ fun EditProfileOptions(
             supportingLabelColor = Color.White,
             textColor = Color.White,
             errorLabel = when(editOption){
-                EditProfileOption.ACCOUNT_NAME -> if(updateProfileState.error == LendsumError.EMPTY_NAME) stringResource(id = R.string.empty_profile_name) else null
-                EditProfileOption.ACCOUNT_USERNAME -> if(updateProfileState.error == LendsumError.EMPTY_USERNAME) stringResource(id = R.string.empty_username) else null
+                EditProfileOptions.ACCOUNT_NAME -> if(updateProfileState.error == LendsumError.EMPTY_NAME) stringResource(id = R.string.empty_profile_name) else null
+                EditProfileOptions.ACCOUNT_USERNAME -> if(updateProfileState.error == LendsumError.EMPTY_USERNAME) stringResource(id = R.string.empty_username) else null
             },
             defaultValue = when(editOption){
-                EditProfileOption.ACCOUNT_NAME -> user.name
-                EditProfileOption.ACCOUNT_USERNAME -> user.username
+                EditProfileOptions.ACCOUNT_NAME -> user.name
+                EditProfileOptions.ACCOUNT_USERNAME -> user.username
             },
             onTextChanged = {
-
                 when(editOption){
-                    EditProfileOption.ACCOUNT_NAME -> onNameChanged(it)
-                    EditProfileOption.ACCOUNT_USERNAME ->  onUsernameChanged(it)
+                    EditProfileOptions.ACCOUNT_NAME -> onNameChanged(it)
+                    EditProfileOptions.ACCOUNT_USERNAME ->  onUsernameChanged(it)
+                }
+            }
+        )
+    }
+}
+
+enum class EditProfileOptions(val keyboardType: KeyboardType, @StringRes val supportingLabel: Int){
+    ACCOUNT_NAME(KeyboardType.Text, R.string.name),
+    ACCOUNT_USERNAME(KeyboardType.Text, R.string.username)
+}
+
+@Composable
+fun EditCredentialOptions(
+    modifier: Modifier = Modifier,
+    updateEmailState: Response<Unit>,
+    user: User,
+    onEmailChanged:(String) -> Unit,
+    onPasswordChanged:(String) -> Unit,
+    onMatchPassChanged:(String) -> Unit,
+    onEmailUpdated:() -> Unit,
+    onPasswordUpdated:() -> Unit
+) {
+
+    EditCredentialOptions.values().forEach { credentialOption ->
+
+        LendsumField(
+            modifier = Modifier.fillMaxWidth(),
+            keyBoardType = credentialOption.keyboardType,
+            supportingLabel = stringResource(credentialOption.supportingLabel),
+            supportingLabelColor = Color.White,
+            textColor = Color.White,
+            errorLabel = when(credentialOption){
+                EditCredentialOptions.ACCOUNT_EMAIL -> when(updateEmailState.error){
+                    LendsumError.NO_INTERNET -> stringResource(id = R.string.not_connected_internet)
+                    LendsumError.INVALID_EMAIL -> stringResource(id = R.string.invalid_email_err_msg)
+                    else -> { null }
+                }
+                EditCredentialOptions.ACCOUNT_PASSWORD -> null
+                EditCredentialOptions.ACCOUNT_MATCH_PASSWORD -> null
+            },
+            defaultValue = when(credentialOption){
+                EditCredentialOptions.ACCOUNT_EMAIL -> user.email
+                else -> { null }
+            },
+            onTextChanged = {
+                when(credentialOption){
+                    EditCredentialOptions.ACCOUNT_EMAIL -> onEmailChanged(it)
+                    EditCredentialOptions.ACCOUNT_PASSWORD -> onPasswordChanged(it)
+                    EditCredentialOptions.ACCOUNT_MATCH_PASSWORD -> onMatchPassChanged(it)
                 }
             }
         )
 
+        if (credentialOption == EditCredentialOptions.ACCOUNT_EMAIL || credentialOption == EditCredentialOptions.ACCOUNT_MATCH_PASSWORD) {
+            LendsumButton(
+                modifier = modifier
+                    .fillMaxWidth(.33f),
+                text = stringResource(id = R.string.save).uppercase()
+            ) {
+                when(credentialOption){
+                    EditCredentialOptions.ACCOUNT_EMAIL -> onEmailUpdated.invoke()
+                    EditCredentialOptions.ACCOUNT_MATCH_PASSWORD -> onPasswordUpdated.invoke()
+                    else -> {}
+                }
+            }
+        }
     }
 }
 
-enum class EditProfileOption(val keyboardType: KeyboardType, @StringRes val supportingLabel: Int){
-    ACCOUNT_NAME(KeyboardType.Text, R.string.name),
-    ACCOUNT_USERNAME(KeyboardType.Text, R.string.username)
+enum class EditCredentialOptions(val keyboardType: KeyboardType, @StringRes val supportingLabel: Int){
+    ACCOUNT_EMAIL(KeyboardType.Text, R.string.email),
+    ACCOUNT_PASSWORD(KeyboardType.Password, R.string.password),
+    ACCOUNT_MATCH_PASSWORD(KeyboardType.Password, R.string.re_enter_password)
+}
+
+@Composable
+fun LabeledDivider(
+    label: String
+) {
+    Divider(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 8.dp),
+        thickness = 2.dp,
+        color = ColorPrimary
+    )
+    Text(text = label, color = ColorPrimary)
 }
 
 @OptIn(ExperimentalGlideComposeApi::class)
@@ -226,8 +358,7 @@ fun EditProfPic(
 ) {
     Box(
         modifier = modifier
-            .fillMaxWidth()
-            .fillMaxHeight(.25f),
+            .fillMaxWidth(),
         contentAlignment = Alignment.Center
     ) {
         GlideImage(
@@ -245,8 +376,8 @@ fun EditProfPic(
                     onChangeProfilePic.invoke()
                 }
                 .clip(RoundedCornerShape(100))
-                .fillMaxWidth(.50f)
-                .fillMaxHeight(),
+                .width(175.dp)
+                .height(175.dp),
             contentAlignment = Alignment.BottomCenter
         ){
             Icon(
@@ -271,9 +402,13 @@ fun AccountScreenPreview() {
     AccountScreenContent(
         user = User(),
         updateProfileState = Response(),
+        updateEmailState = Response(),
         onBackClicked = {},
         onChangeProfilePic = {},
-        onSaveProfileInfo = { name, username->},
-        resetUpdateProfileState = {}
+        onSaveProfileInfo = { name, username ->},
+        onUpdatePass = {pass, matchPass ->},
+        onUpdateEmail = {email ->},
+        resetUpdateProfileState = {},
+        resetUpdateEmailState = {}
     )
 }

@@ -105,6 +105,7 @@
     <string name="account_settings_desc">Change your name, username, password, email</string>
     <string name="name">Name</string>
     <string name="edit_profile">Edit profile</string>
+    <string name="edit_login">Edit login</string>
     <string name="profile_update_err">User Profile was not updated please try again later.</string>
     <string name="offline_edit_msg">You are in offline mode. Info will be updated when internet is available.</string>
 

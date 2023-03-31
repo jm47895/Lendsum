@@ -24,8 +24,6 @@ class PhoneAuthComponent @Inject constructor() {
 
     fun requestSMSCode(phoneNumber: String, activity: Activity) = callbackFlow{
 
-        Log.d(TAG, "Phone number: $phoneNumber")
-
         send(Response(status = Status.LOADING))
 
         val number: String
@@ -82,10 +80,10 @@ class PhoneAuthComponent @Inject constructor() {
 
         firebaseAuth.currentUser?.linkWithCredential(credential)?.addOnCompleteListener { task->
             if (task.isSuccessful){
-                Log.d(TAG, "Phone number is linked with current credentials")
+                Log.i(TAG, "Phone number is linked with current credentials")
                 trySend(Response(status = Status.SUCCESS))
             }else{
-                Log.d(TAG, "Phone link failed: ${task.exception}")
+                Log.e(TAG, "Phone link failed: ${task.exception}")
                 when(task.exception){
                     is FirebaseAuthInvalidCredentialsException -> trySend(Response(status = Status.ERROR, error = LendsumError.INVALID_PHONE_CREDENTIAL))
                 }

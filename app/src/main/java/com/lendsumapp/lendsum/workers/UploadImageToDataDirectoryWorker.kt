@@ -63,7 +63,7 @@ class UploadImageToDataDirectoryWorker @AssistedInject constructor (
                 } ?: throw NullPointerException()
 
             } catch (e: Exception) {
-                Log.d(TAG, e.toString())
+                Log.e(TAG, e.toString())
                 continuation.resumeWith(kotlin.Result.success(Result.retry()))
             }
         }

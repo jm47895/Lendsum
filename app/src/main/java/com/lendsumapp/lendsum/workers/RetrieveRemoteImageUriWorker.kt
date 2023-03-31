@@ -40,11 +40,11 @@ class RetrieveRemoteImageUriWorker @AssistedInject constructor(
 
                 profileImageRef?.downloadUrl?.addOnCompleteListener {
                     if (it.isSuccessful){
-                        Log.d(TAG, "Prof pic url success: ${it.result}")
+                        Log.i(TAG, "Prof pic url success: ${it.result}")
                         val data: Data = workDataOf(UPLOAD_PROF_PIC_URI_KEY to it.result.toString())
                         continuation.resumeWith(kotlin.Result.success(Result.success(data)))
                     }else{
-                        Log.d(TAG, "Prof pic url failed to download: ${it.exception}")
+                        Log.e(TAG, "Prof pic url failed to download: ${it.exception}")
                         continuation.resumeWith(kotlin.Result.success(Result.retry()))
                     }
                 } ?: continuation.resumeWith(kotlin.Result.success(Result.retry()))

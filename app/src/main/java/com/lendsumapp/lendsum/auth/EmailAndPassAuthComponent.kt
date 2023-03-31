@@ -15,8 +15,6 @@ import javax.inject.Inject
 class EmailAndPassAuthComponent @Inject constructor(){
 
     private val firebaseAuth : FirebaseAuth = FirebaseAuth.getInstance()
-    private val updateAuthEmailStatus: MutableLiveData<Boolean> = MutableLiveData()
-    private val updateAuthPassStatus: MutableLiveData<Boolean> = MutableLiveData()
 
     fun signInWithEmailAndPass(email: String, password: String) = callbackFlow<Response<Unit>>
     {
@@ -89,21 +87,27 @@ class EmailAndPassAuthComponent @Inject constructor(){
         }
     }
 
-    fun updateAuthEmail(email: String){
-        val user = firebaseAuth.currentUser
-        user?.updateEmail(email)?.addOnCompleteListener { task->
-            if (task.isSuccessful){
-                Log.d(TAG, "User email updated in firebase auth")
-                updateAuthEmailStatus.postValue(true)
-            }else{
-                Log.d(TAG, task.exception.toString())
-                updateAuthEmailStatus.postValue(false)
-            }
-        }
-    }
+    fun updateAuthEmail(email: String) = callbackFlow<Response<Unit>>{
 
-    fun getUpdateAuthEmailStatus(): MutableLiveData<Boolean>{
-        return updateAuthEmailStatus
+        val currentUser = firebaseAuth.currentUser
+        currentUser?.updateEmail(email)?.addOnCompleteListener { task->
+            if (task.isSuccessful){
+                Log.i(TAG, "User email updated in firebase auth")
+                trySend(Response(status = Status.SUCCESS))
+            }else{
+                Log.e(TAG, "User email not update in firebase auth: " + task.exception)
+                when(task.exception){
+                    is FirebaseAuthRecentLoginRequiredException -> trySend(Response(status = Status.ERROR, error = LendsumError.LOGIN_REQUIRED))
+                    else -> {
+                        trySend(Response(status = Status.ERROR, error = LendsumError.FAILED_TO_UPDATE_EMAIL))
+                    }
+                }
+            }
+        }?: trySend(Response(status = Status.ERROR, error = LendsumError.FAILED_TO_UPDATE_EMAIL))
+
+        awaitClose {
+
+        }
     }
 
     fun updateAuthPassword(password: String){
@@ -111,17 +115,11 @@ class EmailAndPassAuthComponent @Inject constructor(){
 
         user?.updatePassword(password)?.addOnCompleteListener { task ->
              if(task.isSuccessful){
-                 Log.d(TAG, "Password is updated")
-                 updateAuthPassStatus.postValue(true)
+                 Log.i(TAG, "Password is updated")
              }else{
-                 Log.d(TAG, "Password failed to update " + task.exception)
-                 updateAuthPassStatus.postValue(false)
+                 Log.e(TAG, "Password failed to update " + task.exception)
              }
         }
-    }
-
-    fun getUpdateAuthPassStatus(): MutableLiveData<Boolean>{
-        return updateAuthPassStatus
     }
 
     fun sendPasswordResetEmail(email: String) = callbackFlow<Response<Unit>>{

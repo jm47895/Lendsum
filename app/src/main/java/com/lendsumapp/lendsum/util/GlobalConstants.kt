@@ -10,6 +10,7 @@ object GlobalConstants {
     /*Firestore Constants*/
     const val FIREBASE_USER_COLLECTION_PATH = "users"
     const val FIREBASE_EMAIL_KEY = "email"
+    const val FIREBASE_PASS_KEY = "password"
     const val FIREBASE_USERNAME_KEY = "username"
     const val FIREBASE_PROFILE_NAME_KEY = "name"
     const val FIREBASE_PROFILE_PIC_URI_KEY = "profilePicUri"

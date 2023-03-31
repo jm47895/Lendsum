@@ -42,7 +42,7 @@ class DataSyncManager @Inject constructor(
             }
 
             override fun onCancelled(error: DatabaseError) {
-                Log.d(TAG, "Error retrieving chatIds ${error.message}")
+                Log.e(TAG, "Error retrieving chatIds ${error.message}")
             }
         })
     }
@@ -93,7 +93,7 @@ class DataSyncManager @Inject constructor(
                 }
 
                 override fun onCancelled(error: DatabaseError) {
-                    Log.d(TAG, "There was a databaseError: $error")
+                    Log.e(TAG, "There was a databaseError: $error")
                 }
 
 

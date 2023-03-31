@@ -36,7 +36,7 @@ fun LendsumField(
     TextField(
         modifier = modifier
             .fillMaxWidth()
-            .padding(8.dp),
+            .padding(horizontal = 8.dp),
         value = input,
         onValueChange = { text ->
 

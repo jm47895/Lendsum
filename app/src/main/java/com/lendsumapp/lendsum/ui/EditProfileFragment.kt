@@ -180,9 +180,9 @@ class EditProfileFragment : Fragment(), View.OnClickListener, CompoundButton.OnC
 
                 if(NetworkUtils.isNetworkAvailable(requireContext())) {
                     if (isPasswordValidated(password, passwordMatch)) {
-                        accountViewModel.getUpdateAuthPassStatus()
+                        /*accountViewModel.getUpdateAuthPassStatus()
                             .observe(viewLifecycleOwner, updateAuthPassStatusObserver)
-                        accountViewModel.updateAuthPass(password)
+                        accountViewModel.updateAuthPass(password)*/
                     }
                 }else{
                     AndroidUtils.showSnackBar(requireActivity(), getString(R.string.not_connected_internet))
@@ -300,8 +300,8 @@ class EditProfileFragment : Fragment(), View.OnClickListener, CompoundButton.OnC
                     when {
                         AndroidUtils.isValidEmail(textView.text.toString().trim()) && !TextUtils.isEmpty(textView.text) -> {
                             //user.email = textView.text.toString().trim()
-                            accountViewModel.getUpdateAuthEmailStatus().observe(viewLifecycleOwner, updateAuthEmailStatusObserver)
-                            accountViewModel.updateAuthEmail(user.email)
+                            //accountViewModel.getUpdateAuthEmailStatus().observe(viewLifecycleOwner, updateAuthEmailStatusObserver)
+                            //accountViewModel.updateAuthEmail(user.email)
                         }
                         else -> {
                             AndroidUtils.showSnackBar(requireActivity(), getString(R.string.invalid_email_data_not_saved))
