@@ -14,11 +14,9 @@ import com.lendsumapp.lendsum.data.model.Response
 import com.lendsumapp.lendsum.data.model.Status
 import com.lendsumapp.lendsum.data.model.User
 import com.lendsumapp.lendsum.repository.AccountRepository
-import com.lendsumapp.lendsum.util.AndroidUtils
 import com.lendsumapp.lendsum.util.DatabaseUtils
 import com.lendsumapp.lendsum.util.NetworkUtils
 import dagger.hilt.android.lifecycle.HiltViewModel
-import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import javax.inject.Inject

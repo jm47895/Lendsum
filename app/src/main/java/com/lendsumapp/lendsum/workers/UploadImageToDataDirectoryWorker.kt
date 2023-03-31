@@ -3,28 +3,28 @@ package com.lendsumapp.lendsum.workers
 import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
-import android.net.Uri
 import android.util.Log
-import androidx.compose.ui.graphics.asImageBitmap
 import androidx.core.net.toUri
 import androidx.hilt.work.HiltWorker
-import androidx.work.*
-import com.lendsumapp.lendsum.util.GlobalConstants
+import androidx.work.CoroutineWorker
+import androidx.work.Data
+import androidx.work.WorkerParameters
 import com.lendsumapp.lendsum.util.GlobalConstants.LENDSUM_PROFILE_PIC_DIR_PATH
 import com.lendsumapp.lendsum.util.GlobalConstants.UPLOAD_PROF_PIC_NAME_KEY
 import com.lendsumapp.lendsum.util.GlobalConstants.UPLOAD_PROF_PIC_URI_KEY
+import com.lendsumapp.lendsum.util.ImageUtil.getRotateAngle
+import com.lendsumapp.lendsum.util.ImageUtil.rotateBitmap
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
 import java.io.File
 import java.io.FileOutputStream
-import java.lang.Exception
 import kotlin.coroutines.suspendCoroutine
+
 @HiltWorker
 class UploadImageToDataDirectoryWorker @AssistedInject constructor (
     @Assisted context: Context,
     @Assisted params: WorkerParameters
 ) : CoroutineWorker(context, params){
-
     override suspend fun doWork(): Result {
 
         if (runAttemptCount == 3){
@@ -35,26 +35,32 @@ class UploadImageToDataDirectoryWorker @AssistedInject constructor (
 
             try {
                 val fileName = inputData.getString(UPLOAD_PROF_PIC_NAME_KEY)
-                val imageUri = inputData.getString(UPLOAD_PROF_PIC_URI_KEY)
+                val imageUri = inputData.getString(UPLOAD_PROF_PIC_URI_KEY)?.toUri()
                 val resolver = applicationContext.contentResolver
-                val bitmap =
-                    BitmapFactory.decodeStream(resolver.openInputStream(Uri.parse(imageUri)))
-                val outputDir = File(applicationContext.filesDir, LENDSUM_PROFILE_PIC_DIR_PATH)
 
-                if (!outputDir.exists()) {
-                    outputDir.mkdirs()
-                } // should succeed
+                imageUri?.let { uri ->
+                    var bitmap = BitmapFactory.decodeStream(resolver.openInputStream(uri))
 
-                val outputFile = File(outputDir, fileName!!)
-                val output = FileOutputStream(outputFile)
+                    val rotationAngle = uri.getRotateAngle(applicationContext)
 
-                bitmap.compress(Bitmap.CompressFormat.JPEG, 30, output)
+                    bitmap = bitmap.rotateBitmap(rotationAngle.toFloat())
 
-                val uri: Uri = outputFile.toUri()
+                    val outputDir = File(applicationContext.filesDir, LENDSUM_PROFILE_PIC_DIR_PATH)
 
-                val data: Data = workDataOf(UPLOAD_PROF_PIC_URI_KEY to uri.toString())
+                    if (!outputDir.exists()) {
+                        outputDir.mkdirs()
+                    } // should succeed
 
-                continuation.resumeWith(kotlin.Result.success(Result.success(data)))
+                    val outputFile = File(outputDir, fileName!!)
+                    val output = FileOutputStream(outputFile)
+
+                    bitmap.compress(Bitmap.CompressFormat.JPEG, 30, output)
+
+                    val data: Data = Data.Builder().putString(UPLOAD_PROF_PIC_URI_KEY, outputFile.toUri().toString()).build()
+
+                    continuation.resumeWith(kotlin.Result.success(Result.success(data)))
+
+                } ?: throw NullPointerException()
 
             } catch (e: Exception) {
                 Log.d(TAG, e.toString())
