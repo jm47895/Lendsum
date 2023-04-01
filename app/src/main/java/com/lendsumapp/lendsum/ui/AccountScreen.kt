@@ -221,10 +221,10 @@ fun AccountScreenContent(
                         matchPass = it
                     },
                     onEmailUpdated = {
-                        onUpdateEmail(email)
+                        onUpdateEmail(email.trim())
                     },
                     onPasswordUpdated = {
-                        onUpdatePass(password, matchPass)
+                        onUpdatePass(password.trim(), matchPass.trim())
                     }
                 )
             }

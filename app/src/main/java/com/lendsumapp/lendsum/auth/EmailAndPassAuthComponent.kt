@@ -11,6 +11,8 @@ import com.lendsumapp.lendsum.util.AndroidUtils
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.callbackFlow
 import javax.inject.Inject
+import kotlin.coroutines.resume
+import kotlin.coroutines.suspendCoroutine
 
 class EmailAndPassAuthComponent @Inject constructor(){
 
@@ -87,26 +89,24 @@ class EmailAndPassAuthComponent @Inject constructor(){
         }
     }
 
-    fun updateAuthEmail(email: String) = callbackFlow<Response<Unit>>{
+    suspend fun updateAuthEmail(email: String): Response<Unit>{
 
-        val currentUser = firebaseAuth.currentUser
-        currentUser?.updateEmail(email)?.addOnCompleteListener { task->
-            if (task.isSuccessful){
-                Log.i(TAG, "User email updated in firebase auth")
-                trySend(Response(status = Status.SUCCESS))
-            }else{
-                Log.e(TAG, "User email not update in firebase auth: " + task.exception)
-                when(task.exception){
-                    is FirebaseAuthRecentLoginRequiredException -> trySend(Response(status = Status.ERROR, error = LendsumError.LOGIN_REQUIRED))
-                    else -> {
-                        trySend(Response(status = Status.ERROR, error = LendsumError.FAILED_TO_UPDATE_EMAIL))
+        return suspendCoroutine { continuation ->
+
+            val currentUser = firebaseAuth.currentUser
+
+            currentUser?.updateEmail(email)?.addOnCompleteListener { task->
+                if (task.isSuccessful){
+                    Log.i(TAG, "User email updated in firebase auth")
+                    continuation.resume(Response(status = Status.SUCCESS))
+                }else{
+                    Log.e(TAG, "User email not update in firebase auth: " + task.exception)
+                    when(task.exception){
+                        is FirebaseAuthRecentLoginRequiredException -> continuation.resume(Response(status = Status.ERROR, error = LendsumError.LOGIN_REQUIRED))
+                        else -> continuation.resume(Response(status = Status.ERROR, error = LendsumError.FAILED_TO_UPDATE_EMAIL))
                     }
                 }
-            }
-        }?: trySend(Response(status = Status.ERROR, error = LendsumError.FAILED_TO_UPDATE_EMAIL))
-
-        awaitClose {
-
+            }?: continuation.resume(Response(status = Status.ERROR, error = LendsumError.FAILED_TO_UPDATE_EMAIL))
         }
     }
 

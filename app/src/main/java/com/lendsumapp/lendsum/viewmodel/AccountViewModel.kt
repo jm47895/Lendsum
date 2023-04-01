@@ -158,10 +158,8 @@ class AccountViewModel @Inject constructor(
             }
         }
 
-        viewModelScope.launch(Dispatchers.IO) {
-            accountRepository.updateAuthEmail(email).collect {
-                _updateEmailState.value = it
-            }
+        viewModelScope.launch{
+            _updateEmailState.value = accountRepository.updateAuthEmail(email)
         }
     }
 

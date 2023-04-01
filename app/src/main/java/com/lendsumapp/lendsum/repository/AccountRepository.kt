@@ -39,7 +39,7 @@ class AccountRepository @Inject constructor(
         return lendsumDatabase.getUserDao().updateUser(user)
     }
 
-    fun updateAuthEmail(email: String): Flow<Response<Unit>>{
+    suspend fun updateAuthEmail(email: String): Response<Unit>{
         return emailAndPassAuthComponent.updateAuthEmail(email)
     }
 
