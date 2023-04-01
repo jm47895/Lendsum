@@ -68,21 +68,28 @@ class LoginViewModel @Inject constructor(
     //Start of Email and Pass functions
     fun signInWithEmailAndPass(email: String, password: String){
 
-        if(!NetworkUtils.isNetworkAvailable(context)){
-            _loginState.value =
-                Response(status = Status.ERROR, error = LendsumError.NO_INTERNET)
-            return
+        _loginState.value = Response(status = Status.LOADING)
+
+        when{
+            !AndroidUtils.isValidEmail(email) || password.isEmpty() || email.isEmpty()-> {
+                _loginState.value = Response(status = Status.ERROR, error = LendsumError.INVALID_LOGIN)
+                return
+            }
+
+            !NetworkUtils.isNetworkAvailable(context) -> {
+                _loginState.value = Response(status = Status.ERROR, error = LendsumError.NO_INTERNET)
+                return
+            }
         }
 
         viewModelScope.launch {
-            loginRepository.signInWithEmailAndPass(email, password).collect{
-                _loginState.value = it
-                syncUserData()
-            }
+            _loginState.value = loginRepository.signInWithEmailAndPass(email, password)
         }
     }
 
     fun sendPasswordResetEmail(email: String){
+
+        _resetPassState.value = Response(status = Status.LOADING)
 
         if(!NetworkUtils.isNetworkAvailable(context)){
             _resetPassState.value = Response(status = Status.ERROR, error = LendsumError.NO_INTERNET)
@@ -95,9 +102,7 @@ class LoginViewModel @Inject constructor(
         }
 
         viewModelScope.launch {
-            loginRepository.sendPasswordResetEmail(email).collect{
-                _resetPassState.value = it
-            }
+            _resetPassState.value = loginRepository.sendPasswordResetEmail(email)
         }
     }
     //End of Email and Pass functions
@@ -109,12 +114,7 @@ class LoginViewModel @Inject constructor(
 
         firebaseUser.value?.let {
             viewModelScope.launch(Dispatchers.IO) {
-                loginRepository.syncAllUserData().collect{
-                    it.data?.let { user ->
-                        loginRepository.cacheExistingUser(user)
-                    }
-                    _syncDataState.value = it
-                }
+                _syncDataState.value  = loginRepository.syncAllUserData()
             }
         }
     }

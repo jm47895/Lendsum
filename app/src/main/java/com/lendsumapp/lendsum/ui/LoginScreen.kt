@@ -57,11 +57,12 @@ fun LoginScreen(
             }
     }
 
-    if(loginViewModel.syncState.value.status == Status.SUCCESS){
-        loginViewModel.resetSyncState()
-        navController.navigate(NavDestination.HOME.key){
-            popUpTo(NavDestination.LOGIN.key){
-                inclusive = true
+    LaunchedEffect(loginViewModel.loginState.value.status){
+        if(loginViewModel.loginState.value.status == Status.SUCCESS){
+            navController.navigate(NavDestination.HOME.key){
+                popUpTo(NavDestination.LOGIN.key){
+                    inclusive = true
+                }
             }
         }
     }
@@ -89,6 +90,9 @@ fun LoginScreen(
             val intent = GoogleSignIn.getClient(context, options)
             googleSignInLauncher.launch(intent.signInIntent)
         },
+        resetLoginResponse = {
+            loginViewModel.resetLoginState()
+        }
     )
 
 }
@@ -100,7 +104,8 @@ fun LoginScreenContent(
     onSignInClicked: (String, String) -> Unit,
     onForgotPasswordClicked: () -> Unit,
     onSignUpWithEmailClicked: () -> Unit,
-    onContinueWithGoogleClicked: () -> Unit
+    onContinueWithGoogleClicked: () -> Unit,
+    resetLoginResponse:() -> Unit
 ){
     val focusManager = LocalFocusManager.current
     var showSignUpOptions by remember { mutableStateOf(false) }
@@ -130,6 +135,7 @@ fun LoginScreenContent(
             errorLabel = if (loginState.error == LendsumError.INVALID_LOGIN) stringResource(id = R.string.email_or_pass_wrong) else null,
             onTextChanged = {
                 logInEmail = it
+                resetLoginResponse.invoke()
             }
         )
         LendsumField(
@@ -140,6 +146,7 @@ fun LoginScreenContent(
             errorLabel = if (loginState.error == LendsumError.INVALID_LOGIN) stringResource(id = R.string.email_or_pass_wrong) else null,
             onTextChanged = {
                 logInPass = it
+                resetLoginResponse.invoke()
             }
         )
 
@@ -237,6 +244,7 @@ fun LoginScreenPreview(){
         onSignInClicked = { _, _ ->},
         onForgotPasswordClicked = {},
         onSignUpWithEmailClicked = {},
-        onContinueWithGoogleClicked = {}
+        onContinueWithGoogleClicked = {},
+        resetLoginResponse = {}
     )
 }

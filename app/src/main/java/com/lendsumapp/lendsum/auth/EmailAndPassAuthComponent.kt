@@ -18,31 +18,17 @@ class EmailAndPassAuthComponent @Inject constructor(){
 
     private val firebaseAuth : FirebaseAuth = FirebaseAuth.getInstance()
 
-    fun signInWithEmailAndPass(email: String, password: String) = callbackFlow<Response<Unit>>
-    {
-        send(Response(status = Status.LOADING))
-
-        when {
-            AndroidUtils.isValidEmail(email) && password.isNotEmpty() -> {
-                firebaseAuth.signInWithEmailAndPassword(email, password).addOnCompleteListener { task->
-                    if(task.isSuccessful){
-                        trySend(Response(status = Status.SUCCESS))
-                        Log.i(TAG, "Sign in with email was successful.")
-                    }else{
-                        trySend(Response(status = Status.ERROR, error = LendsumError.INVALID_LOGIN))
-                        Log.e(TAG, "Sign in with email failed" + task.exception)
-                    }
-                    channel.close()
+    suspend fun signInWithEmailAndPass(email: String, password: String): Response<Unit>{
+        return suspendCoroutine { continuation ->
+            firebaseAuth.signInWithEmailAndPassword(email, password).addOnCompleteListener { task->
+                if(task.isSuccessful){
+                    continuation.resume(Response(status = Status.SUCCESS))
+                    Log.i(TAG, "Sign in with email was successful.")
+                }else{
+                    continuation.resume(Response(status = Status.ERROR, error = LendsumError.INVALID_LOGIN))
+                    Log.e(TAG, "Sign in with email failed" + task.exception)
                 }
             }
-            else -> {
-                send(Response(status = Status.ERROR, error = LendsumError.INVALID_LOGIN))
-                channel.close()
-            }
-        }
-
-        awaitClose {
-
         }
     }
 
@@ -122,27 +108,22 @@ class EmailAndPassAuthComponent @Inject constructor(){
         }
     }
 
-    fun sendPasswordResetEmail(email: String) = callbackFlow<Response<Unit>>{
+    suspend fun sendPasswordResetEmail(email: String): Response<Unit>{
 
-        send(Response(status = Status.LOADING))
-
-        firebaseAuth.sendPasswordResetEmail(email).addOnCompleteListener{ task ->
-            if(task.isSuccessful){
-                trySend(Response(Status.SUCCESS))
-                Log.i(TAG, "Reset Password email sent.")
-            }else{
-                val exception = task.exception as FirebaseAuthException
-                when(exception.errorCode){
-                   "ERROR_USER_NOT_FOUND" -> trySend(Response(status = Status.ERROR, error = LendsumError.USER_NOT_FOUND))
-                    else -> trySend(Response(status = Status.ERROR, error = LendsumError.FAILED_TO_SEND))
+        return suspendCoroutine { continuation ->
+            firebaseAuth.sendPasswordResetEmail(email).addOnCompleteListener{ task ->
+                if(task.isSuccessful){
+                    continuation.resume(Response(Status.SUCCESS))
+                    Log.i(TAG, "Reset Password email sent.")
+                }else{
+                    val exception = task.exception as FirebaseAuthException
+                    when(exception.errorCode){
+                        "ERROR_USER_NOT_FOUND" -> continuation.resume(Response(status = Status.ERROR, error = LendsumError.USER_NOT_FOUND))
+                        else -> continuation.resume(Response(status = Status.ERROR, error = LendsumError.FAILED_TO_SEND))
+                    }
+                    Log.e(TAG, "Reset Password email failed to send." + task.exception)
                 }
-                Log.e(TAG, "Reset Password email failed to send." + task.exception)
             }
-            channel.close()
-        }
-
-        awaitClose {
-
         }
     }
 

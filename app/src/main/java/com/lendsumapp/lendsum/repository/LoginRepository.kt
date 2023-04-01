@@ -13,6 +13,7 @@ import com.lendsumapp.lendsum.auth.GoogleAuthComponent
 import com.lendsumapp.lendsum.auth.PhoneAuthComponent
 import com.lendsumapp.lendsum.data.DataSyncManager
 import com.lendsumapp.lendsum.data.model.Response
+import com.lendsumapp.lendsum.data.model.Status
 import com.lendsumapp.lendsum.data.model.User
 import com.lendsumapp.lendsum.data.persistence.LendsumDatabase
 import com.lendsumapp.lendsum.util.GlobalConstants.FIREBASE_AUTH_UPDATE_MAP_KEY
@@ -71,11 +72,16 @@ class LoginRepository @Inject constructor(
             .build()
     }
 
-    fun signInWithEmailAndPass(email: String, password: String): Flow<Response<Unit>> {
-        return emailAndPassAuthComponent.signInWithEmailAndPass(email, password)
+    suspend fun signInWithEmailAndPass(email: String, password: String): Response<Unit> {
+
+        val response = emailAndPassAuthComponent.signInWithEmailAndPass(email, password)
+
+        if (response.status == Status.SUCCESS) syncAllUserData()
+
+        return response
     }
 
-    fun sendPasswordResetEmail(email: String): Flow<Response<Unit>>{
+    suspend fun sendPasswordResetEmail(email: String): Response<Unit>{
         return emailAndPassAuthComponent.sendPasswordResetEmail(email)
     }
 
@@ -89,11 +95,15 @@ class LoginRepository @Inject constructor(
     }
 
     //Sync functions
-    fun syncAllUserData(): Flow<Response<User>>{
+    suspend fun syncAllUserData(): Response<User>{
 
         val uid = firebaseAuth.currentUser?.uid
 
-        return dataSyncManager.syncAllUserDataFromFirestore(uid.toString())
+        val response = dataSyncManager.syncAllUserDataFromFirestore(uid.toString())
+
+        if(response.status == Status.SUCCESS) response.data?.let { cacheExistingUser(it) }
+
+        return response
     }
 
     suspend fun cacheExistingUser(user: User){

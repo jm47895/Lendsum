@@ -18,6 +18,8 @@ import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
+import kotlin.coroutines.resume
+import kotlin.coroutines.suspendCoroutine
 
 
 class DataSyncManager @Inject constructor(
@@ -52,30 +54,27 @@ class DataSyncManager @Inject constructor(
     }
 
     //Sync user data
-    fun syncAllUserDataFromFirestore(uid: String) = callbackFlow<Response<User>> {
+    suspend fun syncAllUserDataFromFirestore(uid: String): Response<User> {
 
-        send(Response(status = Status.LOADING))
+        return suspendCoroutine{ continuation ->
 
-        firestoreDb.collection(FIREBASE_USER_COLLECTION_PATH)
-            .document(uid)
-            .get().addOnSuccessListener { document ->
-                if(document != null){
-                    Log.i(TAG, "Retrieved Existing User Firestore Document ${document.toObject(User::class.java)}")
-                    trySend(Response(status = Status.SUCCESS, data = document.toObject(User::class.java)))
-                }else{
-                    /*This will only be hit if we lose all of our remote user data, which in this case
-                    * we should have back up data to look at*/
-                    Log.e(TAG, "Existing User Document Does not exist")
-                    trySend(Response(status = Status.ERROR))
+            firestoreDb.collection(FIREBASE_USER_COLLECTION_PATH)
+                .document(uid)
+                .get().addOnSuccessListener { document ->
+                    if(document != null){
+                        Log.i(TAG, "Retrieved Existing User Firestore Document ${document.toObject(User::class.java)}")
+                        continuation.resume(Response(status = Status.SUCCESS, data = document.toObject(User::class.java)))
+                    }else{
+                        /*This will only be hit if we lose all of our remote user data, which in this case
+                        * we should have back up data to look at*/
+                        Log.e(TAG, "Existing User Document Does not exist")
+                        continuation.resume(Response(status = Status.ERROR))
+                    }
                 }
-            }
-            .addOnFailureListener { exception ->
-                trySend(Response(status = Status.ERROR))
-                Log.e(TAG, exception.toString())
-            }
-
-        awaitClose {
-
+                .addOnFailureListener { exception ->
+                    continuation.resume(Response(status = Status.ERROR))
+                    Log.e(TAG, exception.toString())
+                }
         }
     }
 
