@@ -7,12 +7,12 @@ import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
-import com.google.firebase.firestore.ktx.firestore
-import com.google.firebase.ktx.Firebase
 import com.lendsumapp.lendsum.util.GlobalConstants
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
+import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
+
 @HiltWorker
 class UpdateUserFirestoreWorker @AssistedInject constructor(
     @Assisted context: Context,
@@ -40,16 +40,16 @@ class UpdateUserFirestoreWorker @AssistedInject constructor(
                     userDoc.update(inputData.keyValueMap).addOnCompleteListener { task->
                         if(task.isSuccessful){
                             Log.i(TAG, "User document updated in firestore")
-                            continuation.resumeWith(kotlin.Result.success(Result.success()))
+                            continuation.resume(Result.success())
                         }else{
                             Log.e(TAG, "User document failed to update in firestore")
-                            continuation.resumeWith(kotlin.Result.success(Result.retry()))
+                            continuation.resume(Result.retry())
                         }
                     }
-                } ?: continuation.resumeWith(kotlin.Result.success(Result.retry()))
+                } ?: continuation.resume(Result.retry())
 
             }catch (e: Exception){
-                continuation.resumeWith(kotlin.Result.success(Result.retry()))
+                continuation.resume(Result.retry())
             }
         }
     }

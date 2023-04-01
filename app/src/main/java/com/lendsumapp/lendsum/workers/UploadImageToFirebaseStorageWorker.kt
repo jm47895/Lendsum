@@ -5,20 +5,16 @@ import android.net.Uri
 import android.util.Log
 import androidx.hilt.work.HiltWorker
 import androidx.work.CoroutineWorker
-import androidx.work.Worker
 import androidx.work.WorkerParameters
-import com.google.firebase.ktx.Firebase
-import com.google.firebase.storage.FirebaseStorage
 import com.google.firebase.storage.StorageReference
-import com.google.firebase.storage.ktx.storage
 import com.lendsumapp.lendsum.util.GlobalConstants.FIREBASE_STORAGE_PROFILE_PIC_PATH
 import com.lendsumapp.lendsum.util.GlobalConstants.UPLOAD_PROF_PIC_NAME_KEY
 import com.lendsumapp.lendsum.util.GlobalConstants.UPLOAD_PROF_PIC_URI_KEY
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
-import kotlinx.coroutines.delay
-import java.util.concurrent.CountDownLatch
+import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
+
 @HiltWorker
 class UploadImageToFirebaseStorageWorker @AssistedInject constructor(
     @Assisted context: Context,
@@ -46,15 +42,15 @@ class UploadImageToFirebaseStorageWorker @AssistedInject constructor(
                 uploadTask?.addOnCompleteListener { task ->
                     if (task.isSuccessful) {
                         Log.i(TAG, "Profile pic uploaded to storage")
-                        continuation.resumeWith(kotlin.Result.success(Result.success()))
+                        continuation.resume(Result.success())
                     } else {
                         Log.e(TAG, "Profile pic failed to upload to storage ${task.exception}")
-                        continuation.resumeWith(kotlin.Result.success(Result.retry()))
+                        continuation.resume(Result.retry())
                     }
-                } ?: continuation.resumeWith(kotlin.Result.success(Result.retry()))
+                } ?: continuation.resume(Result.retry())
 
             }catch (e: Exception){
-                continuation.resumeWith(kotlin.Result.success(Result.retry()))
+                continuation.resume(Result.retry())
             }
 
         }

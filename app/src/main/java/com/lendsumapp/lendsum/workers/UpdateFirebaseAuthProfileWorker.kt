@@ -5,19 +5,16 @@ import android.util.Log
 import androidx.core.net.toUri
 import androidx.hilt.work.HiltWorker
 import androidx.work.CoroutineWorker
-import androidx.work.Worker
 import androidx.work.WorkerParameters
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.UserProfileChangeRequest
-import com.lendsumapp.lendsum.util.GlobalConstants.FIREBASE_AUTH_UPDATE_MAP_KEY
-import com.lendsumapp.lendsum.util.GlobalConstants.FIREBASE_AUTH_UPDATE_MAP_VALUE
 import com.lendsumapp.lendsum.util.GlobalConstants.FIREBASE_PROFILE_NAME_KEY
 import com.lendsumapp.lendsum.util.GlobalConstants.FIREBASE_PROFILE_PIC_URI_KEY
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
-import kotlinx.coroutines.delay
-import java.util.concurrent.CountDownLatch
+import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
+
 @HiltWorker
 class UpdateFirebaseAuthProfileWorker @AssistedInject constructor(
     @Assisted context: Context,
@@ -46,15 +43,15 @@ class UpdateFirebaseAuthProfileWorker @AssistedInject constructor(
                 currentUser?.updateProfile(changeRequest)?.addOnCompleteListener { task ->
                     if (task.isSuccessful) {
                         Log.i(TAG, "Firebase auth profile updated DisplayName:${currentUser.displayName} $profilePicUri")
-                        continuation.resumeWith(kotlin.Result.success(Result.success()))
+                        continuation.resume(Result.success())
                     } else {
                         Log.e(TAG, "Firebase auth failed to update. ${task.exception}")
-                        continuation.resumeWith(kotlin.Result.success(Result.retry()))
+                        continuation.resume(Result.retry())
                     }
-                } ?: continuation.resumeWith(kotlin.Result.success(Result.retry()))
+                } ?: continuation.resume(Result.retry())
 
             }catch (e: Exception){
-                continuation.resumeWith(kotlin.Result.success(Result.retry()))
+                continuation.resume(Result.retry())
             }
         }
     }

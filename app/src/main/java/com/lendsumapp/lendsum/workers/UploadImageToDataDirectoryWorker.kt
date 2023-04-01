@@ -18,6 +18,7 @@ import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
 import java.io.File
 import java.io.FileOutputStream
+import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
 
 @HiltWorker
@@ -58,13 +59,13 @@ class UploadImageToDataDirectoryWorker @AssistedInject constructor (
 
                     val data: Data = Data.Builder().putString(UPLOAD_PROF_PIC_URI_KEY, outputFile.toUri().toString()).build()
 
-                    continuation.resumeWith(kotlin.Result.success(Result.success(data)))
+                    continuation.resume(Result.success(data))
 
                 } ?: throw NullPointerException()
 
             } catch (e: Exception) {
                 Log.e(TAG, e.toString())
-                continuation.resumeWith(kotlin.Result.success(Result.retry()))
+                continuation.resume(Result.retry())
             }
         }
     }

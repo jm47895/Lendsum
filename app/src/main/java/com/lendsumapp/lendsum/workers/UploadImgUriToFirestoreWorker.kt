@@ -7,14 +7,14 @@ import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
-import com.google.firebase.firestore.ktx.firestore
-import com.google.firebase.ktx.Firebase
 import com.lendsumapp.lendsum.util.GlobalConstants.FIREBASE_PROFILE_PIC_URI_KEY
 import com.lendsumapp.lendsum.util.GlobalConstants.FIREBASE_USER_COLLECTION_PATH
 import com.lendsumapp.lendsum.util.GlobalConstants.UPLOAD_PROF_PIC_URI_KEY
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
+import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
+
 @HiltWorker
 class UploadImgUriToFirestoreWorker @AssistedInject constructor(
     @Assisted context: Context,
@@ -42,16 +42,16 @@ class UploadImgUriToFirestoreWorker @AssistedInject constructor(
                     userDoc.update(FIREBASE_PROFILE_PIC_URI_KEY, uri).addOnCompleteListener { task ->
                         if (task.isSuccessful) {
                             Log.i(TAG, "Profile pic uri update success")
-                            continuation.resumeWith(kotlin.Result.success(Result.success()))
+                            continuation.resume(Result.success())
                         } else {
                             Log.e(TAG, "Profile pic uri update failed: " + task.exception)
-                            continuation.resumeWith(kotlin.Result.success(Result.retry()))
+                            continuation.resume(Result.retry())
                         }
                     }
-                } ?: continuation.resumeWith(kotlin.Result.success(Result.retry()))
+                } ?: continuation.resume(Result.retry())
 
             }catch (e: Exception){
-                continuation.resumeWith(kotlin.Result.success(Result.retry()))
+                continuation.resume(Result.retry())
             }
 
         }
