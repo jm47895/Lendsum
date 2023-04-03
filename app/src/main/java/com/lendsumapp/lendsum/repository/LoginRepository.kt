@@ -48,7 +48,7 @@ class LoginRepository @Inject constructor(
     }
 
     //Start of Google Auth functions
-    fun handleGoogleSignInIntent(data: Intent): Flow<Response<Unit>>{
+    suspend fun handleGoogleSignInIntent(data: Intent): Response<Unit>{
         return googleAuthComponent.handleGoogleSignInIntent(data)
     }
 

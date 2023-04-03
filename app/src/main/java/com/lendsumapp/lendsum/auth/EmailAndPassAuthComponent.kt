@@ -1,19 +1,18 @@
 package com.lendsumapp.lendsum.auth
 
 import android.util.Log
-import androidx.lifecycle.MutableLiveData
-import com.google.firebase.FirebaseError.ERROR_EMAIL_ALREADY_IN_USE
-import com.google.firebase.auth.*
+import com.google.firebase.auth.EmailAuthProvider
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.FirebaseAuthException
+import com.google.firebase.auth.FirebaseAuthRecentLoginRequiredException
 import com.lendsumapp.lendsum.data.model.LendsumError
 import com.lendsumapp.lendsum.data.model.Response
 import com.lendsumapp.lendsum.data.model.Status
-import com.lendsumapp.lendsum.util.AndroidUtils
-import kotlinx.coroutines.channels.awaitClose
-import kotlinx.coroutines.flow.callbackFlow
 import javax.inject.Inject
 import javax.inject.Singleton
 import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
+
 @Singleton
 class EmailAndPassAuthComponent @Inject constructor(
     private val firebaseAuth: FirebaseAuth

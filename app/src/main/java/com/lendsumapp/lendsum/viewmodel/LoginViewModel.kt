@@ -57,10 +57,11 @@ class LoginViewModel @Inject constructor(
 
     //Start of Google Auth functions
     fun handleGoogleSignInIntent(data: Intent){
+
+        _googleSignInState.value = Response(status = Status.LOADING)
+
         viewModelScope.launch{
-            loginRepository.handleGoogleSignInIntent(data).collect{
-                _googleSignInState.value = it
-            }
+            _googleSignInState.value = loginRepository.handleGoogleSignInIntent(data)
         }
     }
     //End of Google Auth functions
