@@ -41,19 +41,21 @@ class NumberVerificationViewModel @Inject constructor(
 
     fun sendSMSCode(phoneNumber: String, activity: Activity){
 
+        _phoneCodeState.value = Response(status = Status.LOADING)
+
         if(!NetworkUtils.isNetworkAvailable(activity)){
             _phoneCodeState.value = Response(status = Status.ERROR, error = LendsumError.NO_INTERNET)
             return
         }
 
         viewModelScope.launch(Dispatchers.IO) {
-            loginRepository.requestSMSCode(phoneNumber, activity).collect{
-                _phoneCodeState.value = it
-            }
+            _phoneCodeState.value = loginRepository.requestSMSCode(phoneNumber, activity)
         }
     }
 
     fun verifyPhoneNumber(inputCode: String){
+
+        _phoneLinkState.value = Response(status = Status.LOADING)
 
         if(!NetworkUtils.isNetworkAvailable(context)){
             _phoneLinkState.value = Response(status = Status.ERROR, error = LendsumError.NO_INTERNET)
@@ -68,11 +70,9 @@ class NumberVerificationViewModel @Inject constructor(
         }
     }
 
-    fun linkPhoneNumWithLoginCredential(credential: PhoneAuthCredential){
-        viewModelScope.launch(Dispatchers.IO) {
-            loginRepository.linkPhoneNumWithLoginCredential(credential).collect{
-                _phoneLinkState.value = it
-            }
+    private fun linkPhoneNumWithLoginCredential(credential: PhoneAuthCredential){
+        viewModelScope.launch{
+            _phoneLinkState.value = loginRepository.linkPhoneNumWithLoginCredential(credential)
         }
     }
 

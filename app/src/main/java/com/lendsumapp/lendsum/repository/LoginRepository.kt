@@ -16,8 +16,10 @@ import com.lendsumapp.lendsum.data.model.Response
 import com.lendsumapp.lendsum.data.model.Status
 import com.lendsumapp.lendsum.data.model.User
 import com.lendsumapp.lendsum.data.persistence.LendsumDatabase
+import com.lendsumapp.lendsum.util.GlobalConstants
 import com.lendsumapp.lendsum.util.GlobalConstants.FIREBASE_AUTH_UPDATE_MAP_KEY
 import com.lendsumapp.lendsum.util.GlobalConstants.FIREBASE_AUTH_UPDATE_MAP_VALUE
+import com.lendsumapp.lendsum.util.GlobalConstants.FIREBASE_PROFILE_NAME_KEY
 import com.lendsumapp.lendsum.workers.UpdateFirebaseAuthProfileWorker
 import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
@@ -28,7 +30,8 @@ class LoginRepository @Inject constructor(
     private val phoneAuthComponent: PhoneAuthComponent,
     private val dataSyncManager: DataSyncManager,
     private var firebaseAuth: FirebaseAuth,
-    private val cacheDb: LendsumDatabase
+    private val cacheDb: LendsumDatabase,
+    private val workManager: WorkManager
 ){
 
     //Firebase
@@ -50,7 +53,7 @@ class LoginRepository @Inject constructor(
     }
 
     //Start of Email and Pass functions
-    fun registerWithEmailAndPassword(email: String, password: String): Flow<Response<Unit>>{
+    suspend fun registerWithEmailAndPassword(email: String, password: String): Response<Unit>{
         return emailAndPassAuthComponent.registerWithEmailAndPassword(email, password)
     }
 
@@ -59,17 +62,14 @@ class LoginRepository @Inject constructor(
         val constraints = Constraints.Builder().setRequiredNetworkType(NetworkType.CONNECTED).build()
         val updateFirebaseAuthProfile = OneTimeWorkRequestBuilder<UpdateFirebaseAuthProfileWorker>()
             .setConstraints(constraints)
-            .setInputData(createFirebaseAuthData(key, value))
+            .setInputData(
+                Data.Builder()
+                    .putString(key, value)
+                    .build()
+            )
             .build()
 
-        WorkManager.getInstance().enqueue(updateFirebaseAuthProfile)
-    }
-
-    private fun createFirebaseAuthData(key: String, value: String): Data {
-        return Data.Builder()
-            .putString(FIREBASE_AUTH_UPDATE_MAP_KEY,key)
-            .putString(FIREBASE_AUTH_UPDATE_MAP_VALUE, value)
-            .build()
+        workManager.enqueue(updateFirebaseAuthProfile)
     }
 
     suspend fun signInWithEmailAndPass(email: String, password: String): Response<Unit> {
@@ -86,11 +86,11 @@ class LoginRepository @Inject constructor(
     }
 
     //Phone Auth functions
-    fun requestSMSCode(phoneNumber: String, activity: Activity): Flow<Response<String>>{
+    suspend fun requestSMSCode(phoneNumber: String, activity: Activity): Response<String>{
         return phoneAuthComponent.requestSMSCode(phoneNumber, activity)
     }
 
-    fun linkPhoneNumWithLoginCredential(credential: PhoneAuthCredential): Flow<Response<Unit>>{
+    suspend fun linkPhoneNumWithLoginCredential(credential: PhoneAuthCredential): Response<Unit>{
        return phoneAuthComponent.linkPhoneNumWithLoginCredential(credential)
     }
 
@@ -106,7 +106,7 @@ class LoginRepository @Inject constructor(
         return response
     }
 
-    suspend fun cacheExistingUser(user: User){
+    private suspend fun cacheExistingUser(user: User){
         cacheDb.getUserDao().insertUser(user)
     }
 

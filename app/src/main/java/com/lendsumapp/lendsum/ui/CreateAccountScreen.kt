@@ -27,6 +27,7 @@ import com.lendsumapp.lendsum.ui.components.LendsumButton
 import com.lendsumapp.lendsum.ui.components.LendsumField
 import com.lendsumapp.lendsum.ui.components.LoadingAnimation
 import com.lendsumapp.lendsum.util.GlobalConstants
+import com.lendsumapp.lendsum.util.GlobalConstants.FIREBASE_PROFILE_NAME_KEY
 import com.lendsumapp.lendsum.viewmodel.CreateAccountViewModel
 
 @Composable
@@ -43,7 +44,7 @@ fun CreateAccountScreen(
     }
 
     if(createAccountViewModel.createAccountState.value.status == Status.SUCCESS){
-        accountForm?.let{ createAccountViewModel.updateFirebaseAuthProfile(GlobalConstants.FIREBASE_PROFILE_NAME_KEY, "${it.firstName} ${it.lastName}") }
+        accountForm?.let{ createAccountViewModel.updateProfileName("${it.firstName} ${it.lastName}") }
         createAccountViewModel.resetCreateAccountState()
         navController.navigate(NavDestination.NUMBER_VERIFICATION.key)
     }

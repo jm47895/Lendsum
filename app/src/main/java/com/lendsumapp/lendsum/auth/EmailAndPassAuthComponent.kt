@@ -11,12 +11,13 @@ import com.lendsumapp.lendsum.util.AndroidUtils
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.callbackFlow
 import javax.inject.Inject
+import javax.inject.Singleton
 import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
-
-class EmailAndPassAuthComponent @Inject constructor(){
-
-    private val firebaseAuth : FirebaseAuth = FirebaseAuth.getInstance()
+@Singleton
+class EmailAndPassAuthComponent @Inject constructor(
+    private val firebaseAuth: FirebaseAuth
+){
 
     suspend fun signInWithEmailAndPass(email: String, password: String): Response<Unit>{
         return suspendCoroutine { continuation ->
@@ -33,45 +34,39 @@ class EmailAndPassAuthComponent @Inject constructor(){
     }
 
 
-    fun registerWithEmailAndPassword(email: String, password: String) = callbackFlow<Response<Unit>>{
-
-        send(Response(status = Status.LOADING))
-
-        if(firebaseAuth.currentUser == null) {
-            firebaseAuth.createUserWithEmailAndPassword(email, password).addOnCompleteListener { task ->
-                if (task.isSuccessful){
-                    Log.i(TAG, "Create new user with email and pass was a success")
-                    trySend(Response(status = Status.SUCCESS))
-                }else{
-                    Log.e(TAG, "Create new user with email and pass failed " + task.exception)
-                    val firebaseAuthException = task.exception as FirebaseAuthException
-                    trySend(Response(
-                        status = Status.ERROR,
-                        error = if (firebaseAuthException.errorCode == "ERROR_EMAIL_ALREADY_IN_USE") LendsumError.USER_EMAIL_ALREADY_EXISTS else LendsumError.FAILED_TO_CREATE_USER)
-                    )
-                }
-                channel.close()
-            }
-        }else{
-            val emailAndPassCredential = EmailAuthProvider.getCredential(email, password)
-            firebaseAuth.currentUser?.linkWithCredential(emailAndPassCredential)?.addOnCompleteListener { task ->
-                if (task.isSuccessful){
-                    trySend(Response(status = Status.SUCCESS))
-                    Log.i(TAG, "Email and Google credential link was successful")
-                }else{
-                    Log.e(TAG, "Account link was unsuccessful: " + task.exception.toString())
-                    if(task.exception.toString().contains("linked")){
-                        trySend(Response(status = Status.ERROR, error = LendsumError.LINK_ALREADY_EXISTS))
+    suspend fun registerWithEmailAndPassword(email: String, password: String): Response<Unit>{
+        return suspendCoroutine { continuation ->
+            if(firebaseAuth.currentUser == null) {
+                firebaseAuth.createUserWithEmailAndPassword(email, password).addOnCompleteListener { task ->
+                    if (task.isSuccessful){
+                        Log.i(TAG, "Create new user with email and pass was a success")
+                        continuation.resume(Response(status = Status.SUCCESS))
                     }else{
-                        trySend(Response(status = Status.ERROR, error = LendsumError.FAILED_TO_LINK_FIREBASE))
+                        Log.e(TAG, "Create new user with email and pass failed " + task.exception)
+                        val firebaseAuthException = task.exception as FirebaseAuthException
+                        continuation.resume(Response(
+                            status = Status.ERROR,
+                            error = if (firebaseAuthException.errorCode == "ERROR_EMAIL_ALREADY_IN_USE") LendsumError.USER_EMAIL_ALREADY_EXISTS else LendsumError.FAILED_TO_CREATE_USER)
+                        )
                     }
                 }
-                channel.close()
+            }else{
+                val emailAndPassCredential = EmailAuthProvider.getCredential(email, password)
+                firebaseAuth.currentUser?.linkWithCredential(emailAndPassCredential)?.addOnCompleteListener { task ->
+                    if (task.isSuccessful){
+                        continuation.resume(Response(status = Status.SUCCESS))
+                        Log.i(TAG, "Email and Google credential link was successful")
+                    }else{
+                        Log.e(TAG, "Account link was unsuccessful: " + task.exception.toString())
+                        if(task.exception.toString().contains("linked")){
+                            continuation.resume(Response(status = Status.ERROR, error = LendsumError.LINK_ALREADY_EXISTS))
+                        }else{
+                            continuation.resume(Response(status = Status.ERROR, error = LendsumError.FAILED_TO_LINK_FIREBASE))
+                        }
+                    }
+
+                }
             }
-        }
-
-        awaitClose {
-
         }
     }
 

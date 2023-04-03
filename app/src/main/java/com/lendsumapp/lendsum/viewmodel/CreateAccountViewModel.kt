@@ -11,6 +11,8 @@ import com.lendsumapp.lendsum.data.model.Response
 import com.lendsumapp.lendsum.data.model.Status
 import com.lendsumapp.lendsum.repository.LoginRepository
 import com.lendsumapp.lendsum.util.AndroidUtils
+import com.lendsumapp.lendsum.util.GlobalConstants
+import com.lendsumapp.lendsum.util.GlobalConstants.FIREBASE_PROFILE_NAME_KEY
 import com.lendsumapp.lendsum.util.NetworkUtils
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
@@ -54,13 +56,15 @@ class CreateAccountViewModel @Inject constructor(
         }
 
         viewModelScope.launch(Dispatchers.IO) {
-            loginRepository.registerWithEmailAndPassword(email, password).collect{
-                _createAccountState.value = it
-            }
+            _createAccountState.value = loginRepository.registerWithEmailAndPassword(email, password)
         }
     }
 
-    fun updateFirebaseAuthProfile(key: String, value: String){
+    fun updateProfileName(name: String){
+        updateFirebaseAuthProfile(FIREBASE_PROFILE_NAME_KEY, name)
+    }
+
+    private fun updateFirebaseAuthProfile(key: String, value: String){
         loginRepository.launchUpdateFirebaseAuthProfileWorker(key, value)
     }
 
