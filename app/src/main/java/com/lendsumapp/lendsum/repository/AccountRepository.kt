@@ -43,8 +43,8 @@ class AccountRepository @Inject constructor(
         return emailAndPassAuthComponent.updateAuthEmail(email)
     }
 
-    fun updateAuthPass(password: String){
-        emailAndPassAuthComponent.updateAuthPassword(password)
+    suspend fun updateAuthPass(password: String): Response<Unit>{
+        return emailAndPassAuthComponent.updateAuthPassword(password)
     }
 
     fun launchUpdateProfileWorker(user: User): UUID{

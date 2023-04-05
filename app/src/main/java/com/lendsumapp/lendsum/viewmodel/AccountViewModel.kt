@@ -148,12 +148,12 @@ class AccountViewModel @Inject constructor(
         _updateEmailState.value = Response(status = Status.LOADING)
 
         when{
-            email.isEmpty() ||  !AndroidUtils.isValidEmail(email)-> {
-                _updateEmailState.value = Response(status = Status.ERROR, error = LendsumError.INVALID_EMAIL)
-                return
-            }
             !NetworkUtils.isNetworkAvailable(context) -> {
                 _updateEmailState.value = Response(status = Status.ERROR, error = LendsumError.NO_INTERNET)
+                return
+            }
+            email.isEmpty() ||  !AndroidUtils.isValidEmail(email)-> {
+                _updateEmailState.value = Response(status = Status.ERROR, error = LendsumError.INVALID_EMAIL)
                 return
             }
         }
@@ -163,9 +163,27 @@ class AccountViewModel @Inject constructor(
         }
     }
 
-    fun updateAuthPass(password: String, matchPass: String){
+    fun updateAuthPass(context: Context, password: String, matchPass: String){
+
+        _updatePassState.value = Response(status = Status.LOADING)
+
+        when{
+            !NetworkUtils.isNetworkAvailable(context) -> {
+                _updatePassState.value = Response(status = Status.ERROR, error = LendsumError.NO_INTERNET)
+                return
+            }
+            password != matchPass -> {
+                _updatePassState.value = Response(status = Status.ERROR, error = LendsumError.PASS_NO_MATCH)
+                return
+            }
+            password.isEmpty() || !AndroidUtils.isValidPassword(password)-> {
+                _updatePassState.value = Response(status = Status.ERROR, error = LendsumError.INVALID_PASS)
+                return
+            }
+        }
+
         viewModelScope.launch {
-            accountRepository.updateAuthPass(password)
+           _updatePassState.value =  accountRepository.updateAuthPass(password)
         }
     }
 

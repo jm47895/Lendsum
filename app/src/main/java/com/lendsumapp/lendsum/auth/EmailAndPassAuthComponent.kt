@@ -90,15 +90,24 @@ class EmailAndPassAuthComponent @Inject constructor(
         }
     }
 
-    fun updateAuthPassword(password: String){
-        val user = firebaseAuth.currentUser
+    suspend fun updateAuthPassword(password: String): Response<Unit>{
 
-        user?.updatePassword(password)?.addOnCompleteListener { task ->
-             if(task.isSuccessful){
-                 Log.i(TAG, "Password is updated")
-             }else{
-                 Log.e(TAG, "Password failed to update " + task.exception)
-             }
+        return suspendCoroutine { continuation ->
+
+            val user = firebaseAuth.currentUser
+
+            user?.updatePassword(password)?.addOnCompleteListener { task ->
+                if(task.isSuccessful){
+                    Log.i(TAG, "Password is updated")
+                    continuation.resume(Response(status = Status.SUCCESS))
+                }else{
+                    Log.e(TAG, "Password failed to update " + task.exception)
+                    when(task.exception){
+                        is FirebaseAuthRecentLoginRequiredException -> continuation.resume(Response(status = Status.ERROR, error = LendsumError.LOGIN_REQUIRED))
+                        else -> continuation.resume(Response(status = Status.ERROR, error = LendsumError.FAILED_TO_UPDATE_PASSWORD))
+                    }
+                }
+            }?: continuation.resume(Response(status = Status.ERROR, error = LendsumError.FAILED_TO_UPDATE_PASSWORD))
         }
     }
 

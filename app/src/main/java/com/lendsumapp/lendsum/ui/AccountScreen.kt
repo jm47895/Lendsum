@@ -69,6 +69,7 @@ fun AccountScreen(
         user = accountViewModel.currentUser.value,
         updateProfileState = accountViewModel.updateProfileState.value,
         updateEmailState = accountViewModel.updateEmailState.value,
+        updatePassState = accountViewModel.updatePassState.value,
         onBackClicked = {
             navController.navigateUp()
         },
@@ -82,7 +83,7 @@ fun AccountScreen(
             accountViewModel.updateAuthEmail(context, email)
         },
         onUpdatePass = { password, matchPass ->
-            accountViewModel.updateAuthPass(password, matchPass)
+            accountViewModel.updateAuthPass(context, password, matchPass)
         },
         resetUpdateProfileState = {
             accountViewModel.resetUpdateProfileState()
@@ -98,6 +99,7 @@ fun AccountScreenContent(
     user: User?,
     updateProfileState: Response<Unit>,
     updateEmailState: Response<Unit>,
+    updatePassState: Response<Unit>,
     onBackClicked:() -> Unit,
     onChangeProfilePic: () -> Unit,
     onSaveProfileInfo: (String, String) -> Unit,
@@ -147,6 +149,23 @@ fun AccountScreenContent(
                 when(updateEmailState.error){
                     LendsumError.LOGIN_REQUIRED -> Toast.makeText(context, context.getString(R.string.sign_in_again_msg), Toast.LENGTH_SHORT).show()
                     LendsumError.FAILED_TO_UPDATE_EMAIL -> Toast.makeText(context, context.getString(R.string.profile_update_err), Toast.LENGTH_SHORT).show()
+                    else->{}
+                }
+            }
+            else -> {}
+        }
+    }
+
+    LaunchedEffect(updatePassState.status){
+        when(updatePassState.status){
+            Status.SUCCESS -> {
+                Toast.makeText(context, context.getString(R.string.password_has_updated), Toast.LENGTH_SHORT).show()
+            }
+            Status.ERROR -> {
+                when(updatePassState.error){
+                    LendsumError.LOGIN_REQUIRED -> Toast.makeText(context, context.getString(R.string.sign_in_again_msg), Toast.LENGTH_SHORT).show()
+                    LendsumError.INVALID_PASS -> Toast.makeText(context, context.getString(R.string.password_param_err_msg), Toast.LENGTH_SHORT).show()
+                    LendsumError.PASS_NO_MATCH -> Toast.makeText(context, context.getString(R.string.pass_dont_match_err_msg), Toast.LENGTH_SHORT).show()
                     else->{}
                 }
             }
@@ -403,6 +422,7 @@ fun AccountScreenPreview() {
         user = User(),
         updateProfileState = Response(),
         updateEmailState = Response(),
+        updatePassState = Response(),
         onBackClicked = {},
         onChangeProfilePic = {},
         onSaveProfileInfo = { name, username ->},
