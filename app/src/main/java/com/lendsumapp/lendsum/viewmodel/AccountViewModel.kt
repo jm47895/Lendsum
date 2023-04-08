@@ -172,11 +172,15 @@ class AccountViewModel @Inject constructor(
                 _updatePassState.value = Response(status = Status.ERROR, error = LendsumError.NO_INTERNET)
                 return
             }
+            password.isEmpty() || matchPass.isEmpty() -> {
+                _updatePassState.value = Response(status = Status.ERROR, error = LendsumError.EMPTY_PASS)
+                return
+            }
             password != matchPass -> {
                 _updatePassState.value = Response(status = Status.ERROR, error = LendsumError.PASS_NO_MATCH)
                 return
             }
-            password.isEmpty() || !AndroidUtils.isValidPassword(password)-> {
+            !AndroidUtils.isValidPassword(password)-> {
                 _updatePassState.value = Response(status = Status.ERROR, error = LendsumError.INVALID_PASS)
                 return
             }
@@ -215,6 +219,10 @@ class AccountViewModel @Inject constructor(
 
     fun resetUpdateEmailState(){
         _updateEmailState.value = Response()
+    }
+
+    fun resetUpdatePassState(){
+        _updatePassState.value = Response()
     }
 
     companion object {

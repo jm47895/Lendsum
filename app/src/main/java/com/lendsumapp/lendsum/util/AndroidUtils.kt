@@ -1,7 +1,6 @@
 package com.lendsumapp.lendsum.util
 
 import android.app.Activity
-import android.content.Context
 import android.content.SharedPreferences
 import android.os.Build
 import android.text.TextUtils
@@ -47,11 +46,9 @@ class AndroidUtils{
 
         fun isValidPassword(password: String): Boolean {
             val matchCase: Matcher
-            val isValid: Boolean
             val pattern: Pattern = Pattern.compile(PASSWORD_PATTERN)
             matchCase = pattern.matcher(password)
-            isValid = matchCase.matches()
-            return isValid
+            return matchCase.matches()
         }
 
         fun hideView(view: View) {

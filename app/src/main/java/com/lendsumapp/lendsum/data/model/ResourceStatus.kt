@@ -19,6 +19,7 @@ enum class LendsumError{
     FAILED_TO_SEND,
     EMPTY_FIRST_NAME,
     EMPTY_NAME,
+    EMPTY_PASS,
     EMPTY_USERNAME,
     EMPTY_LAST_NAME,
     INVALID_PASS,

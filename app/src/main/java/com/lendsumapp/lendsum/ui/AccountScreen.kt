@@ -1,16 +1,12 @@
 package com.lendsumapp.lendsum.ui
 
-import android.util.Log
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.StringRes
 import androidx.compose.foundation.*
-import androidx.compose.foundation.gestures.Orientation
-import androidx.compose.foundation.gestures.ScrollableState
 import androidx.compose.foundation.gestures.detectTapGestures
-import androidx.compose.foundation.gestures.scrollable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Divider
@@ -90,6 +86,9 @@ fun AccountScreen(
         },
         resetUpdateEmailState = {
             accountViewModel.resetUpdateEmailState()
+        },
+        resetUpdatePassState = {
+            accountViewModel.resetUpdatePassState()
         }
     )
 }
@@ -106,7 +105,8 @@ fun AccountScreenContent(
     onUpdateEmail: (String) -> Unit,
     onUpdatePass: (String, String) -> Unit,
     resetUpdateProfileState: () -> Unit,
-    resetUpdateEmailState:() -> Unit
+    resetUpdateEmailState:() -> Unit,
+    resetUpdatePassState:() -> Unit
 ) {
 
     val focusManager = LocalFocusManager.current
@@ -164,8 +164,7 @@ fun AccountScreenContent(
             Status.ERROR -> {
                 when(updatePassState.error){
                     LendsumError.LOGIN_REQUIRED -> Toast.makeText(context, context.getString(R.string.sign_in_again_msg), Toast.LENGTH_SHORT).show()
-                    LendsumError.INVALID_PASS -> Toast.makeText(context, context.getString(R.string.password_param_err_msg), Toast.LENGTH_SHORT).show()
-                    LendsumError.PASS_NO_MATCH -> Toast.makeText(context, context.getString(R.string.pass_dont_match_err_msg), Toast.LENGTH_SHORT).show()
+                    LendsumError.NO_INTERNET -> Toast.makeText(context, context.getString(R.string.internet_required), Toast.LENGTH_SHORT).show()
                     else->{}
                 }
             }
@@ -228,6 +227,7 @@ fun AccountScreenContent(
                 EditCredentialOptions(
                     modifier = Modifier.align(Alignment.End),
                     updateEmailState = updateEmailState,
+                    updatePassState = updatePassState,
                     user = user,
                     onEmailChanged = {
                         email = it
@@ -235,9 +235,11 @@ fun AccountScreenContent(
                     },
                     onPasswordChanged = {
                         password = it
+                        resetUpdatePassState.invoke()
                     },
                     onMatchPassChanged = {
                         matchPass = it
+                        resetUpdatePassState.invoke()
                     },
                     onEmailUpdated = {
                         onUpdateEmail(email.trim())
@@ -294,6 +296,7 @@ enum class EditProfileOptions(val keyboardType: KeyboardType, @StringRes val sup
 fun EditCredentialOptions(
     modifier: Modifier = Modifier,
     updateEmailState: Response<Unit>,
+    updatePassState: Response<Unit>,
     user: User,
     onEmailChanged:(String) -> Unit,
     onPasswordChanged:(String) -> Unit,
@@ -316,7 +319,11 @@ fun EditCredentialOptions(
                     LendsumError.INVALID_EMAIL -> stringResource(id = R.string.invalid_email_err_msg)
                     else -> { null }
                 }
-                EditCredentialOptions.ACCOUNT_PASSWORD -> null
+                EditCredentialOptions.ACCOUNT_PASSWORD -> when(updatePassState.error){
+                    LendsumError.INVALID_PASS -> stringResource(id = R.string.password_param_err_msg)
+                    LendsumError.EMPTY_PASS -> stringResource(id = R.string.blank_pass_no_update)
+                    else -> {null}
+                }
                 EditCredentialOptions.ACCOUNT_MATCH_PASSWORD -> null
             },
             defaultValue = when(credentialOption){
@@ -429,6 +436,7 @@ fun AccountScreenPreview() {
         onUpdatePass = {pass, matchPass ->},
         onUpdateEmail = {email ->},
         resetUpdateProfileState = {},
-        resetUpdateEmailState = {}
+        resetUpdateEmailState = {},
+        resetUpdatePassState = {}
     )
 }
