@@ -61,12 +61,6 @@ class AccountViewModel @Inject constructor(
         }
     }
 
-    private fun updateLocalCachedUser(userObject: User){
-        viewModelScope.launch(Dispatchers.IO) {
-            accountRepository.updateLocalCachedUser(userObject)
-        }
-    }
-
     fun updateProfile(
         context: Context,
         lifecycleOwner: LifecycleOwner,

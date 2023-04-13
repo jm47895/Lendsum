@@ -35,10 +35,6 @@ class AccountRepository @Inject constructor(
         return lendsumDatabase.getUserDao().getUser(userId)
     }
 
-    suspend fun updateLocalCachedUser(user: User): Int{
-        return lendsumDatabase.getUserDao().updateUser(user)
-    }
-
     suspend fun updateAuthEmail(email: String): Response<Unit>{
         return emailAndPassAuthComponent.updateAuthEmail(email)
     }
