@@ -148,6 +148,8 @@ fun AccountScreenContent(
             Status.ERROR -> {
                 when(updateEmailState.error){
                     LendsumError.LOGIN_REQUIRED -> Toast.makeText(context, context.getString(R.string.sign_in_again_msg), Toast.LENGTH_SHORT).show()
+                    LendsumError.NO_INTERNET -> Toast.makeText(context, context.getString(R.string.internet_required), Toast.LENGTH_SHORT)
+                        .show()
                     LendsumError.FAILED_TO_UPDATE_EMAIL -> Toast.makeText(context, context.getString(R.string.profile_update_err), Toast.LENGTH_SHORT).show()
                     else->{}
                 }
@@ -315,7 +317,6 @@ fun EditCredentialOptions(
             textColor = Color.White,
             errorLabel = when(credentialOption){
                 EditCredentialOptions.ACCOUNT_EMAIL -> when(updateEmailState.error){
-                    LendsumError.NO_INTERNET -> stringResource(id = R.string.not_connected_internet)
                     LendsumError.INVALID_EMAIL -> stringResource(id = R.string.invalid_email_err_msg)
                     else -> { null }
                 }
